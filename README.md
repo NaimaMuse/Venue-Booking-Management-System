@@ -230,6 +230,96 @@ Change this password before any production use.
 
 
 
+\---
+
+
+
+\### 5. Environment Variable Configuration
+
+
+
+\#### Backend — `backend/.env`
+
+
+
+Copy from `backend/.env.example`:
+
+
+
+```env
+
+PORT=5000
+
+MONGO\_URI=mongodb://127.0.0.1:27017/hall-management
+
+JWT\_SECRET=change\_this\_to\_a\_long\_random\_secret
+
+NODE\_ENV=development
+
+CLIENT\_URL=http://localhost:5173
+
+CLIENT\_URLS=http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174
+
+FRONTEND\_URL=http://localhost:5173
+
+```
+
+
+
+| Variable | Required | Purpose |
+
+|----------|----------|---------|
+
+| `PORT` | Yes | API listen port (hosting platforms often inject this) |
+
+| `MONGO\_URI` | Yes | MongoDB connection string |
+
+| `JWT\_SECRET` | Yes | Secret for signing JWT access tokens |
+
+| `NODE\_ENV` | No | `development` or `production` |
+
+| `CLIENT\_URL` | Recommended | Primary frontend origin for CORS |
+
+| `CLIENT\_URLS` | Recommended | Comma-separated allowed CORS origins |
+
+| `FRONTEND\_URL` | Optional | Extra allowed frontend origin |
+
+
+
+\#### Frontend — `frontend/.env`
+
+
+
+Copy from `frontend/.env.example`:
+
+
+
+```env
+
+\# Leave empty in local dev (Vite proxies /api and /uploads to the backend).
+
+\# On production, set your public API URL:
+
+VITE\_API\_URL=
+
+```
+
+
+
+| Variable | Purpose |
+
+|----------|---------|
+
+| `VITE\_API\_URL` | Backend base URL. Empty locally (proxy). Set on Railway/production, e.g. `https://your-api.up.railway.app` |
+
+
+
+> Never commit real `.env` files. They are gitignored.
+
+
+
+\---
+
 
 
 
