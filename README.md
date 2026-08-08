@@ -380,7 +380,25 @@ Authorization: Bearer <jwt-token>
 
 | PATCH | `/api/hotels/my-hotel/approval-alert-seen` | Owner | Dismiss approval alert |
 
+\#### Halls — `/api/halls`
 
+
+
+| Method | Endpoint | Auth | Description |
+
+|--------|----------|------|-------------|
+
+| GET | `/api/halls` | Public | Public halls (approved hotels) |
+
+| GET | `/api/halls/:id` | Public | Hall details |
+
+| GET | `/api/halls/my-halls` | Owner | Owner hall inventory |
+
+| POST | `/api/halls` | Owner | Create hall (+ images) |
+
+| PUT | `/api/halls/:id` | Owner | Update hall |
+
+| DELETE | `/api/halls/:id` | Owner | Delete hall |
 
 
 
