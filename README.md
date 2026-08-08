@@ -380,6 +380,40 @@ Authorization: Bearer <jwt-token>
 | GET | `/api/health` | API + Mongo connectivity check |
 
 ---
+### 7. Implemented Features
+
+#### Public
+- Landing page (hero, services, about, contact)
+- Browse approved hotels and halls
+- Hotel details + hall booking page
+- Customer / owner signup and login
+
+#### Customer portal
+- Dashboard overview
+- My Bookings (track status, deposit invoice print)
+- My Appointments (inspection visits + alert badge)
+- Profile update with avatar crop
+
+#### Hotel owner portal
+- Hotel profile registration & updates
+- Pending / approved / rejected status banners
+- Halls CRUD with images, amenities, availability
+- Booking request workflow: accept → schedule visit → confirm deposit / cancel
+- **Hotel Report** (own hotel only): KPIs, charts, hall performance, date filters, print
+
+#### Admin portal
+- Dashboard with pending approvals & shortcuts
+- Hotel Approvals (approve / reject with reason / set pending)
+- All Venues directory (hall-focused, read-only)
+- Reports: Operations, Revenue, Performance (filters + CSV export)
+
+#### Cross-cutting
+- JWT role-based protection (frontend + backend)
+- Same-day hall booking conflict prevention
+- Image uploads (halls & avatars)
+- Responsive UI with shared design language
+
+---
 
 
 
