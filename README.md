@@ -358,5 +358,29 @@ Authorization: Bearer <jwt-token>
 
 
 
+\#### Hotels — `/api/hotels`
+
+
+
+| Method | Endpoint | Auth | Description |
+
+|--------|----------|------|-------------|
+
+| GET | `/api/hotels` | Public | List approved hotels |
+
+| GET | `/api/hotels/approved` | Public | List approved hotels |
+
+| GET | `/api/hotels/:id` | Public | Public hotel details + halls |
+
+| POST | `/api/hotels` | Owner | Create hotel application |
+
+| GET | `/api/hotels/my-hotel` | Owner | Owner’s hotel profile |
+
+| PUT | `/api/hotels/my-hotel` | Owner | Update hotel profile |
+
+| PATCH | `/api/hotels/my-hotel/approval-alert-seen` | Owner | Dismiss approval alert |
+
+
+
 
 
