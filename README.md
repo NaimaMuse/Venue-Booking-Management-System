@@ -1,17 +1,13 @@
 \# Hargeisa Hall Finder
 
 
-
 \## Venue Booking Management System
-
 
 
 \### 1. Project Title and Purpose
 
 
-
 \*\*Title:\*\* Hargeisa Hall Finder — Venue Booking Management System
-
 
 
 \*\*Purpose:\*\*
@@ -19,11 +15,7 @@
 A full-stack \*\*MERN\*\* web application that helps people in Hargeisa discover and book hotel event halls online. Hotel owners register their venues, manage halls and booking requests, while platform admins verify hotels and monitor operations, revenue, and performance.
 
 
-
 The system connects three user types:
-
-
-
 
 
 | Role | Goal |
@@ -37,9 +29,7 @@ The system connects three user types:
 | \*\*Admin\*\* | Approve/reject hotels, oversee venues, analyze platform reports |
 
 
-
 \*\*Repository:\*\* \[https://github.com/Rahmomoktar/Hall-Managment-System](https://github.com/Rahmomoktar/Hall-Managment-System)
-
 
 
 \---
@@ -380,7 +370,9 @@ Authorization: Bearer <jwt-token>
 
 | PATCH | `/api/hotels/my-hotel/approval-alert-seen` | Owner | Dismiss approval alert |
 
-\#### Halls — `/api/halls`
+\
+
+#### Halls — `/api/halls`
 
 
 
@@ -401,8 +393,44 @@ Authorization: Bearer <jwt-token>
 | DELETE | `/api/halls/:id` | Owner | Delete hall |
 
 
+#### Bookings — `/api/bookings`
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/bookings/unavailable-dates/:hallId` | Public | Blocked event dates |
+| POST | `/api/bookings` | Customer | Create booking request |
+| GET | `/api/bookings/my-bookings` | Customer | Customer bookings |
+| DELETE | `/api/bookings/:id` | Customer | Cancel pending booking |
+| GET | `/api/bookings/owner-requests` | Owner | Hotel booking requests |
+| PATCH | `/api/bookings/:id/status` | Owner | Accept / reject / cancel |
+| PATCH | `/api/bookings/:id/confirm` | Owner | Confirm + deposit |
+| PATCH | `/api/bookings/:id/appointment` | Owner | Schedule inspection visit |
 
 
+#### Owner reports — `/api/owner`
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/owner/reports` | Owner | Hotel-scoped report (`range`, `from`, `to`) |
+
+#### Admin — `/api/admin`
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/admin/stats` | Admin | Dashboard counters |
+| GET | `/api/admin/hotels` | Admin | All hotels (filter by status) |
+| GET | `/api/admin/hotels/pending` | Admin | Pending applications |
+| PATCH | `/api/admin/hotels/:id/status` | Admin | Approve / reject / set pending |
+| GET | `/api/admin/venues` | Admin | Hotels + halls directory |
+| GET | `/api/admin/reports` | Admin | Operations / revenue / performance data |
+
+#### Health
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/health` | API + Mongo connectivity check |
+
+---
 
 
 
