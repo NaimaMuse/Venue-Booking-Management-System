@@ -320,6 +320,42 @@ VITE\_API\_URL=
 
 \---
 
+\### 6. API Endpoints Documentation
+
+
+
+Base URL (local): `http://localhost:5000`  
+
+
+
+Protected routes require:
+
+
+
+```http
+
+Authorization: Bearer <jwt-token>
+
+```
+
+
+
+\#### Auth — `/api/auth`
+
+
+
+| Method | Endpoint | Auth | Description |
+
+|--------|----------|------|-------------|
+
+| POST | `/api/auth/register` | Public | Register customer or hotel owner |
+
+| POST | `/api/auth/login` | Public | Login and receive JWT |
+
+| GET | `/api/auth/me` | User | Current user profile |
+
+| PUT | `/api/auth/profile` | User | Update profile / avatar |
+
 
 
 
