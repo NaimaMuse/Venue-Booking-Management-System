@@ -1,14 +1,11 @@
 \# Hargeisa Hall Finder
 
-
 \## Venue Booking Management System
 
 
-\### 1. Project Title and Purpose
-
+### 1. Project Title and Purpose
 
 \*\*Title:\*\* Hargeisa Hall Finder — Venue Booking Management System
-
 
 \*\*Purpose:\*\*
 
@@ -16,7 +13,6 @@ A full-stack \*\*MERN\*\* web application that helps people in Hargeisa discover
 
 
 The system connects three user types:
-
 
 | Role | Goal |
 
@@ -31,12 +27,10 @@ The system connects three user types:
 
 \*\*Repository:\*\* \[https://github.com/Rahmomoktar/Hall-Managment-System](https://github.com/Rahmomoktar/Hall-Managment-System)
 
-
 \---
 
-\### 2. Team Members with Assigned Roles
-
-
+\
+### 2. Team Members with Assigned Roles
 
 | Name | Role | Responsibilities |
 
@@ -54,13 +48,10 @@ The system connects three user types:
 
 | \*\*Sahal\*\* | QA \& Documentation | Testing flows, README/environment docs, demo preparation |
 
+---
 
-
-\---
 
 \### 3. Technologies Used
-
-
 
 | Layer | Technology |
 
@@ -82,19 +73,11 @@ The system connects three user types:
 
 | Version control | Git + GitHub |
 
+---
 
+### 4. Installation Instructions
 
-\---
-
-
-
-\### 4. Installation Instructions
-
-
-
-\#### Prerequisites
-
-
+#### Prerequisites
 
 \- Node.js \*\*18+\*\* and npm  
 
@@ -103,10 +86,7 @@ The system connects three user types:
 \- Modern browser (Chrome / Edge / Firefox)
 
 
-
-\#### Setup
-
-
+#### Setup
 
 ```bash
 
@@ -117,13 +97,11 @@ git clone https://github.com/Rahmomoktar/Hall-Managment-System.git
 cd Hall-Managment-System
 
 
-
 \# 2) Backend dependencies
 
 cd backend
 
 npm install
-
 
 
 \# 3) Create backend environment file
@@ -135,13 +113,11 @@ copy .env.example .env
 \# Then edit backend/.env with your values
 
 
-
 \# 4) Frontend dependencies
 
 cd ../frontend
 
 npm install
-
 
 
 \# Optional local frontend env (usually not needed — Vite proxies /api)
@@ -150,10 +126,7 @@ copy .env.example .env
 
 ```
 
-
-
 \#### Run (two terminals)
-
 
 
 ```bash
@@ -166,8 +139,6 @@ npm run dev
 
 ```
 
-
-
 ```bash
 
 \# Terminal 2 — Frontend
@@ -178,8 +149,6 @@ npm run dev
 
 ```
 
-
-
 | Service | URL |
 
 |---------|-----|
@@ -189,7 +158,6 @@ npm run dev
 | Backend API | http://localhost:5000 |
 
 | Health check | http://localhost:5000/api/health |
-
 
 
 \#### Seed default admin
@@ -203,7 +171,6 @@ cd backend
 npm run seed:admin
 
 ```
-
 
 
 | Field | Value |
@@ -254,8 +221,6 @@ FRONTEND\_URL=http://localhost:5173
 
 ```
 
-
-
 | Variable | Required | Purpose |
 
 |----------|----------|---------|
@@ -294,8 +259,6 @@ VITE\_API\_URL=
 
 ```
 
-
-
 | Variable | Purpose |
 
 |----------|---------|
@@ -303,23 +266,17 @@ VITE\_API\_URL=
 | `VITE\_API\_URL` | Backend base URL. Empty locally (proxy). Set on Railway/production, e.g. `https://your-api.up.railway.app` |
 
 
-
 > Never commit real `.env` files. They are gitignored.
-
 
 
 \---
 
 \### 6. API Endpoints Documentation
 
-
-
 Base URL (local): `http://localhost:5000`  
 
 
-
 Protected routes require:
-
 
 
 ```http
@@ -328,11 +285,7 @@ Authorization: Bearer <jwt-token>
 
 ```
 
-
-
 \#### Auth — `/api/auth`
-
-
 
 | Method | Endpoint | Auth | Description |
 
@@ -347,9 +300,7 @@ Authorization: Bearer <jwt-token>
 | PUT | `/api/auth/profile` | User | Update profile / avatar |
 
 
-
 \#### Hotels — `/api/hotels`
-
 
 
 | Method | Endpoint | Auth | Description |
@@ -373,7 +324,6 @@ Authorization: Bearer <jwt-token>
 \
 
 #### Halls — `/api/halls`
-
 
 
 | Method | Endpoint | Auth | Description |
@@ -405,7 +355,6 @@ Authorization: Bearer <jwt-token>
 | PATCH | `/api/bookings/:id/status` | Owner | Accept / reject / cancel |
 | PATCH | `/api/bookings/:id/confirm` | Owner | Confirm + deposit |
 | PATCH | `/api/bookings/:id/appointment` | Owner | Schedule inspection visit |
-
 
 #### Owner reports — `/api/owner`
 
