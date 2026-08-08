@@ -68,5 +68,169 @@ The system connects three user types:
 
 \---
 
+\### 3. Technologies Used
+
+
+
+| Layer | Technology |
+
+|-------|------------|
+
+| Frontend | React 18, Vite, React Router v6, Axios, Recharts, react-easy-crop |
+
+| Styling | Global CSS (`frontend/src/index.css`) |
+
+| Backend | Node.js, Express.js 5 |
+
+| Database | MongoDB + Mongoose |
+
+| Auth | JWT (`jsonwebtoken`) + `bcryptjs` |
+
+| Uploads | Multer (hall images \& profile avatars) |
+
+| Tooling | Nodemon, Playwright (UI screenshot capture) |
+
+| Version control | Git + GitHub |
+
+
+
+\---
+
+
+
+\### 4. Installation Instructions
+
+
+
+\#### Prerequisites
+
+
+
+\- Node.js \*\*18+\*\* and npm  
+
+\- MongoDB running locally (or a MongoDB Atlas URI)  
+
+\- Modern browser (Chrome / Edge / Firefox)
+
+
+
+\#### Setup
+
+
+
+```bash
+
+\# 1) Clone the repository
+
+git clone https://github.com/Rahmomoktar/Hall-Managment-System.git
+
+cd Hall-Managment-System
+
+
+
+\# 2) Backend dependencies
+
+cd backend
+
+npm install
+
+
+
+\# 3) Create backend environment file
+
+copy .env.example .env
+
+\# On macOS/Linux: cp .env.example .env
+
+\# Then edit backend/.env with your values
+
+
+
+\# 4) Frontend dependencies
+
+cd ../frontend
+
+npm install
+
+
+
+\# Optional local frontend env (usually not needed — Vite proxies /api)
+
+copy .env.example .env
+
+```
+
+
+
+\#### Run (two terminals)
+
+
+
+```bash
+
+\# Terminal 1 — API
+
+cd backend
+
+npm run dev
+
+```
+
+
+
+```bash
+
+\# Terminal 2 — Frontend
+
+cd frontend
+
+npm run dev
+
+```
+
+
+
+| Service | URL |
+
+|---------|-----|
+
+| Frontend | http://127.0.0.1:5173 |
+
+| Backend API | http://localhost:5000 |
+
+| Health check | http://localhost:5000/api/health |
+
+
+
+\#### Seed default admin
+
+
+
+```bash
+
+cd backend
+
+npm run seed:admin
+
+```
+
+
+
+| Field | Value |
+
+|-------|-------|
+
+| Email | `admin@hargeisahallfinder.com` |
+
+| Password | `AdminPass123!` |
+
+
+
+Change this password before any production use.
+
+
+
+
+
 
 
