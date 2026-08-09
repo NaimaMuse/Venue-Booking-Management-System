@@ -124,4 +124,39 @@ function HotelDetails() {
         </div>
       </div>
     </div>
+    {(hasAbout || hasContact) && (
+  <div className="hh-details-strip">
+    {hasAbout && (
+      <div className="hh-details-strip-about">
+        <span>About</span>
+        <p>{hotel.description.trim()}</p>
+      </div>
+    )}
+
+    {hasContact && (
+      <ul className="hh-details-strip-meta">
+        {hotel.contactPhone ? (
+          <li>
+            <span>Phone</span>
+            <strong>{hotel.contactPhone}</strong>
+          </li>
+        ) : null}
+
+        {hotel.address ? (
+          <li>
+            <span>Location</span>
+            <strong>{hotel.address}</strong>
+          </li>
+        ) : null}
+
+        {hotel.city ? (
+          <li>
+            <span>City</span>
+            <strong>{hotel.city}</strong>
+          </li>
+        ) : null}
+      </ul>
+    )}
+  </div>
+)}
       </section>
