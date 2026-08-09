@@ -42,6 +42,58 @@ const handleSubmit = (event) => {
     <p>Hargeisa, Somaliland</p>
   </article>
 </div>
+<form className="contact-form" onSubmit={handleSubmit}>
+  <h2>Send a Message</h2>
+
+  {submitted ? (
+    <p className="contact-success">
+      Thank you. Your message has been received. We will contact you soon.
+    </p>
+  ) : (
+    <>
+      <div className="contact-form-row">
+        <input
+          type="text"
+          name="fullName"
+          placeholder="Full name"
+          value={formData.fullName}
+          onChange={handleChange}
+          required
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email address"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <input
+        type="tel"
+        name="phone"
+        placeholder="Phone number"
+        value={formData.phone}
+        onChange={handleChange}
+      />
+
+      <textarea
+        name="message"
+        rows="5"
+        placeholder="How can we help?"
+        value={formData.message}
+        onChange={handleChange}
+        required
+      />
+
+      <button type="submit" className="contact-submit-btn">
+        Send Message
+      </button>
+    </>
+  )}
+</form>
     </section>
   );
 }
