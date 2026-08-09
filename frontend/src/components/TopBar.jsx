@@ -22,6 +22,14 @@ function TopBar() {
         <span>+252 63 456 7890</span>
         <span>info@sabrabanquet.com</span>
       </div>
+
+      <div className="top-bar-right">
+  <select className="location-select" defaultValue="Hargeisa">
+    <option value="Hargeisa">Hargeisa</option>
+    <option value="Berbera">Berbera</option>
+    <option value="Borama">Borama</option>
+  </select>
+</div>
     </div>
   );
 }
