@@ -31,5 +31,19 @@ function Home() {
 
     return () => window.clearTimeout(timer);
   }, [location.hash, location.pathname]);
+
+  return (
+    <main className="home-page">
+      <div id="home">
+        <Hero />
+      </div>
+      <FeaturedVenues />
+      <Services />
+      <AboutUs />
+      <ContactSection />
+    </main>
+  );
 }
+
+export default Home;
 
