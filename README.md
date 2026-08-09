@@ -498,4 +498,41 @@ Authorization: Bearer <jwt-token>
 - Production hardening: stronger secrets management, rate limiting, cloud object storage for images  
 
 ---
+## Project Structure
+
+```
+Hall-Managment-System/
+├── backend/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── uploads/              # gitignored media
+│   ├── seedAdmin.js
+│   ├── server.js
+│   ├── .env.example
+│   └── package.json
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── layouts/
+│   │   ├── pages/
+│   │   ├── utils/
+│   │   ├── App.jsx
+│   │   └── index.css
+│   ├── UIux Design/
+│   │   └── screenshots/      # PNG screenshots for documentation
+│   ├── .env.example
+│   └── package.json
+├── .gitignore
+└── README.md
+```
+
+---
+
+## License
+
+Academic / educational use — Telesom Academy MERN project.
 
