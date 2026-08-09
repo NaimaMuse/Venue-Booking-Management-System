@@ -71,7 +71,66 @@ function HotelDetails() {
 
   return (
     <>
-      <section className="hh-body hh-details-body">
+    <section id="hotel-halls" className="hh-details-halls">
+  <header className="hh-hotel-head">
+    <div>
+      <p className="hh-hotel-place">Halls</p>
+      <h2>
+        {halls.length === 0
+          ? 'No halls yet'
+          : `${halls.length} space${halls.length === 1 ? '' : 's'}`}
+      </h2>
+    </div>
+  </header>
+
+  {halls.length === 0 ? (
+    <p className="hh-empty-inline">No available halls listed yet.</p>
+  ) : (
+    <div className="hh-hall-grid">
+      {halls.map((hall, hallIndex) => (
+        <article
+          key={hall._id}
+          className="hh-hall-card"
+          style={{ animationDelay: `${hallIndex * 45}ms` }}
+        >
+          <Link
+            to={`/venues/${hall._id}`}
+            className="hh-hall-photo"
+            aria-label={`View ${hall.hallName} details`}
+          >
+            <img
+              src={resolveImage(hall.images?.[0])}
+              alt=""
+              loading="lazy"
+              onError={(event) => {
+                event.currentTarget.src = '/hotel-hero-moole.png';
+              }}
+            />
+            <span className="hh-hall-photo-shade" />
+          </Link>
+
+          <div className="hh-hall-info">
+            <h3>{hall.hallName}</h3>
+
+            <p>
+              {hall.capacity} guests
+              <span aria-hidden="true">·</span>
+              ${hall.pricePerDay}/day
+            </p>
+
+            <Link
+              to={`/venues/${hall._id}`}
+              className="hh-hall-open"
+            >
+              Preview hall
+            </Link>
+          </div>
+        </article>
+      ))}
+    </div>
+  )}
+</section>
+    <section className="hh-body hh-details-body">
         {loading && (
   <div className="hh-skeleton-list" aria-hidden="true">
     <div className="hh-skeleton-block hh-skeleton-hero" />
@@ -159,4 +218,12 @@ function HotelDetails() {
     )}
   </div>
 )}
-      </section>
+    </section>
+        </>
+  )}
+  </section>
+</main>
+);
+}
+
+export default HotelDetails;
