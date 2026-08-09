@@ -6,15 +6,12 @@ import api, { getApiError } from '../utils/api';
 
 const getHallImage = (hall) => {
   const firstImage = hall?.images?.[0];
-
   if (!firstImage) {
     return '/banner01.png';
   }
-
   if (firstImage.startsWith('http')) {
     return firstImage;
   }
-
   return `${API_BASE}${firstImage}`;
 };
 
@@ -42,21 +39,14 @@ function FeaturedVenues() {
   }, []);
 
   return (
-    <section className="featured-venues-section">
-      <span className="section-label">Featured Halls</span>
-      <h2>Popular Halls in Hargeisa</h2>
+    <section className="featured-venues-section" id="venues">
+      <div className="section-header">
+        <span className="section-label">Featured Halls</span>
+        <h2>Popular Halls in Hargeisa</h2>
+      </div>
 
-      {loading && (
-        <p className="venues-status">
-          Loading halls...
-        </p>
-      )}
-
-      {error && (
-        <p className="venues-status venues-error">
-          {error}
-        </p>
-      )}
+      {loading && <p className="venues-status">Loading halls...</p>}
+      {error && <p className="venues-status venues-error">{error}</p>}
 
       {!loading && !error && halls.length === 0 && (
         <p className="venues-status">
@@ -77,30 +67,19 @@ function FeaturedVenues() {
                     event.currentTarget.src = '/banner01.png';
                   }}
                 />
-
-                <span className="capacity-badge">
-                  {hall.capacity} guests
-                </span>
+                <span className="capacity-badge">{hall.capacity} guests</span>
               </div>
 
               <div className="venue-card-body">
                 <h3>{hall.hallName}</h3>
-
                 <p className="venue-hotel">
                   {hall.hotelId?.hotelName || 'Approved Hotel'}
-                  {hall.hotelId?.city
-                    ? ` · ${hall.hotelId.city}`
-                    : ''}
+                  {hall.hotelId?.city ? ` · ${hall.hotelId.city}` : ''}
                 </p>
-
                 <p className="price-tag">
                   ${Number(hall.pricePerDay).toLocaleString()}/day
                 </p>
-
-                <Link
-                  to={`/venues/${hall._id}`}
-                  className="venue-card-btn"
-                >
+                <Link to={`/venues/${hall._id}`} className="venue-card-btn">
                   View Details &amp; Reserve
                 </Link>
               </div>
@@ -110,10 +89,7 @@ function FeaturedVenues() {
       )}
 
       <div className="featured-venues-cta">
-        <Link
-          to="/hotels"
-          className="customer-gold-btn"
-        >
+        <Link to="/hotels" className="customer-gold-btn">
           Browse Hotels &amp; Halls
         </Link>
       </div>
