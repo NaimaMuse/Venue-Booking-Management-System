@@ -71,4 +71,57 @@ function HotelDetails() {
 
   return (
     <>
-      <section className="hh-body hh-details-body"></section>
+      <section className="hh-body hh-details-body">
+        {loading && (
+  <div className="hh-skeleton-list" aria-hidden="true">
+    <div className="hh-skeleton-block hh-skeleton-hero" />
+    <div className="hh-skeleton-block" />
+  </div>
+)}
+
+{error && <p className="hh-empty hh-error">{error}</p>}
+
+{!loading && !error && hotel && (
+  <>
+    <div className="hh-details-hero">
+      <img
+        src={heroImage}
+        alt={hotel.hotelName}
+        onError={(event) => {
+          event.currentTarget.src = '/hotel-hero-moole.png';
+        }}
+      />
+
+      <div className="hh-details-hero-shade" aria-hidden="true" />
+      <div className="hh-details-hero-ornament" aria-hidden="true" />
+
+      <div className="hh-details-hero-copy">
+        <p className="hh-eyebrow hh-details-eyebrow">
+          Hargeisa Hall Finder
+        </p>
+
+        <p className="hh-details-hero-place">
+          {hotel.city}
+          {hotel.address ? ` · ${hotel.address}` : ''}
+        </p>
+
+        <h1>{hotel.hotelName}</h1>
+
+        <div className="hh-details-hero-meta-row">
+          <button
+            type="button"
+            className="hh-details-hero-pill"
+            onClick={scrollToHalls}
+          >
+            {halls.length} hall{halls.length === 1 ? '' : 's'} available
+          </button>
+
+          {hotel.contactPhone ? (
+            <span className="hh-details-hero-pill is-soft">
+              {hotel.contactPhone}
+            </span>
+          ) : null}
+        </div>
+      </div>
+    </div>
+      </section>
