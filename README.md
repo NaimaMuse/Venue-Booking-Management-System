@@ -414,6 +414,16 @@ Authorization: Bearer <jwt-token>
 - Responsive UI with shared design language
 
 ---
+### 8. Screenshots or Demo Links
+
+**GitHub:** [Rahmomoktar/Hall-Managment-System](https://github.com/Rahmomoktar/Hall-Managment-System)  
+
+**Local demo:** http://127.0.0.1:5173 (after running frontend + backend)
+
+**Full screenshot pack (27 PNGs):** [`frontend/UIux Design/screenshots/`](frontend/UIux%20Design/screenshots/)
+
+#### Sample screenshots
+
 
 
 
