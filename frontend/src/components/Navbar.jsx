@@ -48,18 +48,27 @@ const handleSectionClick = (event, link) => {
       </Link>
 
       <div className="nav-links">
-        {navLinks.map((link) => (
-            <Link
-  key={link.label}
-  to={link.href}
-  className="nav-link"
-  onClick={(event) => handleSectionClick(event, link)}
->
-            
-          
-            {link.label}
-          </Link>
-        ))}
+        {navLinks.map((link) => {
+  const isActive = link.hash
+    ? location.pathname === '/' &&
+      (location.hash === `#${link.hash}` ||
+        (link.hash === 'home' &&
+          (!location.hash || location.hash === '#home')))
+    : location.pathname === link.href ||
+      location.pathname.startsWith(`${link.href}/`);
+
+  return (
+    <Link
+      key={link.label}
+      to={link.href}
+      className={`nav-link${isActive ? ' active' : ''}`}
+      onClick={(event) => handleSectionClick(event, link)}
+    >
+      {link.label}
+    </Link>
+  );
+})}
+   
       </div>
     </nav>
   );
