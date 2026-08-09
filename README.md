@@ -441,6 +441,24 @@ Authorization: Bearer <jwt-token>
 ![Admin approvals](frontend/UIux%20Design/screenshots/21-admin-hotel-approvals.png)
 
 **Revenue report**
+![Revenue report](frontend/UIux%20Design/screenshots/26-report-revenue.png)
+
+#### Complete screenshot list
+
+| # | Screen | Path |
+|---|--------|------|
+| 01 | Public home | `frontend/UIux Design/screenshots/01-public-home.png` |
+| 02 | Hotels list | `.../02-public-hotels.png` |
+| 03 | Hotel details | `.../03-public-hotel-details.png` |
+| 04 | Venue booking | `.../04-public-venue-details-booking.png` |
+| 05 | Contact | `.../05-public-contact.png` |
+| 06 | Login | `.../06-public-login.png` |
+| 07 | Signup | `.../07-public-signup.png` |
+| 08–11 | Customer portal | dashboard, bookings, appointments, profile |
+| 12–17 | Owner portal | dashboard, hotel, halls, forms, bookings |
+| 18–19 | Owner popups | schedule visit, confirm booking |
+| 20–24 | Admin portal | dashboard, approvals, reject popup, venues, reports hub |
+| 25–27 | Admin reports | operations, revenue, performance |
 
 
 
