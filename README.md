@@ -460,5 +460,15 @@ Authorization: Bearer <jwt-token>
 | 20–24 | Admin portal | dashboard, approvals, reject popup, venues, reports hub |
 | 25–27 | Admin reports | operations, revenue, performance |
 
+#### Suggested demo flow (for marking)
+
+1. Register as **hotel owner** → create hotel profile  
+2. Login as **admin** → approve hotel  
+3. Owner adds halls (images, capacity, price)  
+4. Register as **customer** → book a hall  
+5. Owner: accept → schedule visit → confirm deposit  
+6. Customer: My Bookings → print invoice  
+7. Owner: open **Hotel Report**  
+8. Admin: open Operations / Revenue / Performance reports  
 
 
