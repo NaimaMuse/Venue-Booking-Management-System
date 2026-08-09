@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
+import {
+  clearAuth,
+  getDashboardPath,
+  getUser,
+} from '../utils/auth';
+
 const navLinks = [
   { label: 'Home', href: '/#home', hash: 'home' },
   { label: 'Hotels & Halls', href: '/hotels', hash: null },
@@ -12,6 +18,25 @@ const navLinks = [
 function Navbar() {
     const location = useLocation();
 const navigate = useNavigate();
+const [user, setUser] = useState(() => getUser());
+
+useEffect(() => {
+  const syncUser = () => setUser(getUser());
+
+  window.addEventListener('auth-changed', syncUser);
+  window.addEventListener('storage', syncUser);
+
+  return () => {
+    window.removeEventListener('auth-changed', syncUser);
+    window.removeEventListener('storage', syncUser);
+  };
+}, []);
+
+const handleLogout = () => {
+  clearAuth();
+  setUser(null);
+  navigate('/login');
+};
 
 const handleSectionClick = (event, link) => {
   if (!link.hash) {
@@ -49,8 +74,7 @@ const handleSectionClick = (event, link) => {
 
       <div className="nav-links">
         {navLinks.map((link) => {
-  const isActive = link.hash
-    ? location.pathname === '/' &&
+  const isActive = link.hash ? location.pathname === '/' &&
       (location.hash === `#${link.hash}` ||
         (link.hash === 'home' &&
           (!location.hash || location.hash === '#home')))
@@ -70,6 +94,31 @@ const handleSectionClick = (event, link) => {
 })}
    
       </div>
+      {user ? (
+  <div className="nav-auth-box">
+    <Link
+      to={getDashboardPath(user.role)}
+      className="nav-profile-btn"
+      aria-label="Open dashboard"
+      title="Open dashboard"
+    >
+      Profile
+    </Link>
+
+    <button
+      type="button"
+      className="nav-logout-btn"
+      onClick={handleLogout}
+    >
+      Logout
+    </button>
+  </div>
+) : location.pathname === '/login' ||
+  location.pathname === '/signup' ? null : (
+  <Link to="/login" className="nav-contact-btn">
+    Sign In / Register
+  </Link>
+)}
     </nav>
   );
 }
