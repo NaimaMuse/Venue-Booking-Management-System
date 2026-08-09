@@ -29,6 +29,12 @@ function TopBar() {
     <option value="Berbera">Berbera</option>
     <option value="Borama">Borama</option>
   </select>
+
+  <div className="auth-links">
+    <a href="/">Log In</a>
+    <span>|</span>
+    <a href="/">Sign Up</a>
+  </div>
 </div>
     </div>
   );
