@@ -28,6 +28,27 @@ function Login() {
       setError('Please enter a valid email address.');
       return;
     }
+      try {
+    setLoading(true);
+
+    const { data } = await api.post('/api/auth/login', {
+      email: email.trim().toLowerCase(),
+      password: password.trim(),
+    });
+
+    saveAuth(data.token, data.user);
+
+    const redirectTo =
+      location.state?.from && data.user.role === 'customer'
+        ? location.state.from
+        : getDashboardPath(data.user.role);
+
+    navigate(redirectTo);
+  } catch (err) {
+    setError(getApiError(err, 'Unable to login right now'));
+  } finally {
+    setLoading(false);
+  }
   };
 
   return (
