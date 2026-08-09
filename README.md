@@ -486,4 +486,16 @@ Authorization: Bearer <jwt-token>
 | Keeping UI consistent across portals | Shared plum/gold design system and reusable page patterns (hero, KPIs, tables) |
 
 ---
+### 10. Future Improvements
+
+- Online payment gateway (Zaad / eDahab / card) instead of manual deposit recording  
+- Email / SMS notifications for approvals, booking status, and visit reminders  
+- Customer reviews and ratings for halls  
+- Advanced calendar availability view for owners  
+- Multi-branch hotels (one owner, multiple properties)  
+- Automated tests (API + critical UI flows)  
+- Role-based audit logs for admin actions  
+- Production hardening: stronger secrets management, rate limiting, cloud object storage for images  
+
+---
 
