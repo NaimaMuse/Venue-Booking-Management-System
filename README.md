@@ -32,21 +32,20 @@ The system connects three user types:
 \
 ### 2. Team Members with Assigned Roles
 
-| Name | Role | Responsibilities |
+| Name |                       Role |                                 Responsibilities |
 
-|------|------|------------------|
 
-| \*\*Naima Muse\*\* | Frontend Lead | Public pages, customer portal, React routing, UI integration |
+1. Naima Muse                  Group Leader & Backend Developer       Project coordination, Express API, MongoDB models, JWT auth & core backend logic
 
-| \*\*Rahma Mukhtar\*\* | Backend Lead | Express API, MongoDB models, JWT auth, booking workflow, owner/admin reports |
+2. Rahma Mukhtar               Full-Stack Integration                 Frontend and backend integration, API endpoints connection & data flow
 
-| \*\*Naima\*\* | UI/UX Designer | Visual design system, page layouts, screenshots \& design documentation |
+3. Naima Abdulkarim            Frontend Developer                     Customer portal, public pages, React routing & page layouts
 
-| \*\*Abdiasis\*\* | Full-Stack Developer | Owner portal features, halls CRUD, booking request handling |
+4. Abdiasis                    Frontend Developer                     Owner portal features, halls management views & booking interfaces
 
-| \*\*Abdiqani\*\* | Full-Stack Developer | Admin portal, hotel approvals, venues directory, analytics reports |
+5. sahal                       UI/UX Designer                         Visual design system, page wireframes, testing flows & project documentation
 
-| \*\*Sahal\*\* | QA \& Documentation | Testing flows, README/environment docs, demo preparation |
+6. Abdiqani                   QA \& Documentation                     Testing flows, README/environment docs, demo preparation |
 
 ---
 
