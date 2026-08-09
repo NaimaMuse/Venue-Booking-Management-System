@@ -1,6 +1,27 @@
-import React from 'react';
-
+import React, { useState } from 'react';
 function ContactSection() {
+    const [formData, setFormData] = useState({
+  fullName: '',
+  email: '',
+  phone: '',
+  message: '',
+});
+
+const [submitted, setSubmitted] = useState(false);
+
+const handleChange = (event) => {
+  const { name, value } = event.target;
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
+
+const handleSubmit = (event) => {
+  event.preventDefault();
+  setSubmitted(true);
+};
   return (
     <section className="contact-section">
       <h2>Get In Touch</h2>
