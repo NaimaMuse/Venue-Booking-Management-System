@@ -471,4 +471,19 @@ Authorization: Bearer <jwt-token>
 7. Owner: open **Hotel Report**  
 8. Admin: open Operations / Revenue / Performance reports  
 
+---
+
+### 9. Challenges Faced and Solutions
+
+| Challenge | Solution |
+|-----------|----------|
+| Preventing double-booking the same hall on one event date | Server-side conflict check on create/accept using `hallId + eventDate + active statuses` |
+| Unverified hotels appearing publicly | Admin verification workflow (`pending` / `approved` / `rejected`); public listings only show approved hotels |
+| CORS failures between Vite and Express (local + Railway) | Explicit CORS allow-list + Railway origin pattern support + Vite `/api` proxy for local dev |
+| Large hall image uploads | Multer multipart uploads stored under `backend/uploads`, served as static files |
+| Admin needing analytics without mixing hotel data incorrectly | Dedicated admin reports API with date filters; owner report scoped strictly to `ownerId` hotel |
+| Separating Approvals vs Venues in admin UI | Approvals = status decisions with reject reasons; Venues = read-only hall directory |
+| Keeping UI consistent across portals | Shared plum/gold design system and reusable page patterns (hero, KPIs, tables) |
+
+---
 
