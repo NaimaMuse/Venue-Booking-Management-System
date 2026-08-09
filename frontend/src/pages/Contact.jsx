@@ -34,3 +34,20 @@ function Contact() {
       </section>
 
       <section className="contact-content"></section>
+
+      <div className="contact-info">
+  <article className="contact-info-card">
+    <h3>Email</h3>
+    <p>info@hargeisahallfinder.com</p>
+  </article>
+
+  <article className="contact-info-card">
+    <h3>Phone</h3>
+    <p>+252 63 456 7890</p>
+  </article>
+
+  <article className="contact-info-card">
+    <h3>Location</h3>
+    <p>Hargeisa, Somaliland</p>
+  </article>
+</div>
