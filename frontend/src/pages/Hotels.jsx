@@ -149,3 +149,72 @@ function Hotels() {
     : 'No hotels found. Try another name or city.';
 
   return (
+    <section className="hh-hero">
+  <div className="hh-hero-inner">
+    {focusedHotel ? (
+      <>
+        <p className="hh-eyebrow">Hargeisa Hall Finder</p>
+        <h1>{focusedHotel.hotelName}</h1>
+        <p className="hh-hero-sub">
+          {[focusedHotel.city, focusedHotel.address]
+            .filter(Boolean)
+            .join(' · ') || 'Halls at this hotel'}
+        </p>
+      </>
+    ) : (
+      <>
+        <h1 className="hh-brand">Hargeisa Hall Finder</h1>
+        <p className="hh-section-title">Hotels &amp; Halls</p>
+        <p className="hh-hero-sub">
+          Search by hotel, capacity, or price.
+        </p>
+      </>
+    )}
+
+    <form className="hh-search" onSubmit={handleSearch}>
+      <input
+        type="search"
+        value={searchTerm}
+        onChange={(event) => setSearchTerm(event.target.value)}
+        placeholder="Hotel name or city"
+        aria-label="Search hotels"
+        className="hh-search-main"
+      />
+
+      <input
+        type="number"
+        min="1"
+        inputMode="numeric"
+        value={capacityTerm}
+        onChange={(event) => setCapacityTerm(event.target.value)}
+        placeholder="Min capacity"
+        aria-label="Minimum capacity"
+        className="hh-search-num"
+      />
+
+      <input
+        type="number"
+        min="0"
+        step="1"
+        inputMode="decimal"
+        value={maxPriceTerm}
+        onChange={(event) => setMaxPriceTerm(event.target.value)}
+        placeholder="Max $/day"
+        aria-label="Maximum price per day"
+        className="hh-search-num"
+      />
+
+      <button type="submit">Search</button>
+
+      {hasActiveFilters ? (
+        <button
+          type="button"
+          className="hh-search-clear"
+          onClick={handleClear}
+        >
+          Clear
+        </button>
+      ) : null}
+    </form>
+  </div>
+</section>
