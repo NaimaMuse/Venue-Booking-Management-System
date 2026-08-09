@@ -23,6 +23,52 @@ function AboutUs() {
             className="about-gallery-img about-gallery-bottom"
           />
         </div>
+        <div className="about-content">
+  <span className="about-label">About Us</span>
+
+  <h2>We Want To Give You The Best Services</h2>
+
+  <p className="about-copy">
+    Hargeisa Hall Finder helps customers discover approved banquet halls,
+    compare capacity and pricing, and schedule venue visits before
+    confirming an event date — while hotel owners list and manage their
+    venues with confidence.
+  </p>
+
+  <div className="about-features">
+    <article className="about-feature">
+      <img
+        src="/about-icon01.png"
+        alt=""
+        className="about-feature-icon"
+      />
+
+      <div>
+        <h3>Guaranteed Results</h3>
+        <p>
+          Every venue is admin-verified so you only browse approved
+          halls with clear details.
+        </p>
+      </div>
+    </article>
+
+    <article className="about-feature">
+      <img
+        src="/about-icon02.png"
+        alt=""
+        className="about-feature-icon"
+      />
+
+      <div>
+        <h3>Quality Services</h3>
+        <p>
+          Inspect halls in person, request bookings online, and plan
+          events with transparent pricing.
+        </p>
+      </div>
+    </article>
+  </div>
+</div>
       </div>
     </section>
   );
