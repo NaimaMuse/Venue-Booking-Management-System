@@ -94,3 +94,58 @@ function Hotels() {
     setMaxPriceTerm('');
     setFilters(emptyFilters);
   };
+    const totalHalls = useMemo(
+    () =>
+      hotels.reduce(
+        (sum, hotel) => sum + (hotel.halls?.length ?? hotel.hallCount ?? 0),
+        0
+      ),
+    [hotels]
+  );
+
+  const resultsLabel = useMemo(() => {
+    if (loading) {
+      return 'Loading…';
+    }
+
+    const counts = `${hotels.length} hotel${
+      hotels.length === 1 ? '' : 's'
+    } · ${totalHalls} hall${totalHalls === 1 ? '' : 's'}`;
+
+    if (!hasActiveFilters) {
+      return `${hotels.length} hotels · ${totalHalls} halls`;
+    }
+
+    const bits = [];
+
+    if (filters.q) {
+      bits.push(`“${filters.q}”`);
+    }
+
+    if (filters.minCapacity) {
+      bits.push(`${filters.minCapacity}+ guests`);
+    }
+
+    if (filters.maxPrice) {
+      bits.push(`up to $${filters.maxPrice}/day`);
+    }
+
+    return `${counts} for ${bits.join(' · ')}`;
+  }, [
+    loading,
+    hotels.length,
+    totalHalls,
+    hasActiveFilters,
+    filters,
+  ]);
+
+  const focusedHotel =
+    !loading && !error && filters.q && hotels.length === 1
+      ? hotels[0]
+      : null;
+
+  const emptyMessage = hasActiveFilters
+    ? 'No halls match your filters. Try another name, capacity, or price.'
+    : 'No hotels found. Try another name or city.';
+
+  return (
