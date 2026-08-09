@@ -424,6 +424,23 @@ Authorization: Bearer <jwt-token>
 
 #### Sample screenshots
 
+**Home**
+
+![Home](frontend/UIux%20Design/screenshots/01-public-home.png)
+
+**Customer dashboard**
+
+![Customer dashboard](frontend/UIux%20Design/screenshots/08-customer-dashboard.png)
+
+**Owner bookings**
+
+![Owner bookings](frontend/UIux%20Design/screenshots/17-owner-bookings.png)
+
+**Admin approvals**
+
+![Admin approvals](frontend/UIux%20Design/screenshots/21-admin-hotel-approvals.png)
+
+**Revenue report**
 
 
 
