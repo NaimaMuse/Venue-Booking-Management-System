@@ -375,7 +375,7 @@ function MyBookings() {
                         </div>
                       ) : dayRate > 0 ? (
                         <div>
-                          <dt>Day rate</dt>
+                          <dt>DAY RATE</dt>
                           <dd>{formatMoney(dayRate)}</dd>
                         </div>
                       ) : null}
