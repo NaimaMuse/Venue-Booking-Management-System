@@ -11,6 +11,10 @@ const IconPending = () => (
   </svg>
 );
 
+
+
+
+
 const IconHotels = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path
@@ -30,7 +34,7 @@ const IconHalls = () => (
   </svg>
 );
 
-const IconBookings = () => (
+const IconBookings =  () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <rect x="4.5" y="5" width="15" height="15" rx="2" stroke="currentColor" strokeWidth="1.7" />
     <path d="M8 3.5V6.5M16 3.5V6.5M4.5 10H19.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
