@@ -267,7 +267,7 @@ function CustomerProfile() {
 
           <aside className="customer-panel customer-profile-summary">
             <div className="customer-panel-head">
-              <h2>Profile summary</h2>
+              <h2>Profile Summaryy</h2>
             </div>
 
             <div className="customer-profile-summary-card">
