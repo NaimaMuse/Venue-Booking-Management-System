@@ -304,7 +304,7 @@ function CustomerOverview() {
 
               <section className="customer-panel customer-dash-actions">
                 <div className="customer-panel-head">
-                  <h2>Quick Actions</h2>
+                <h2>QUICK ACTIONS</h2>
                 </div>
                 <div className="customer-dash-action-grid">
                   <Link to="/hotels" className="customer-dash-action">
