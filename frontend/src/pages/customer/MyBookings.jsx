@@ -303,8 +303,7 @@ function MyBookings() {
         <div className="customer-empty-panel mb-empty">
           <p className="customer-empty-title">No bookings in this view</p>
           <p className="customer-empty">
-            Explore hotels and halls to submit a booking request for your next
-            event.
+            EXPLORE HALLS AND HOTELS TO FIND THE PERFECT VENUE FOR YOUR EVENT.
           </p>
           <Link to="/hotels" className="customer-gold-btn">
             Explore Hotels &amp; Halls
