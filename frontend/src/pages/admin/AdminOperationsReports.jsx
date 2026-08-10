@@ -9,6 +9,15 @@ import {
   useAdminReports,
 } from '../../hooks/useAdminReports';
 
+   
+
+
+
+
+
+
+
+
 const IconHotels = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path
@@ -90,6 +99,7 @@ function StatusBars({ items, total }) {
     </ul>
   );
 }
+
 
 function AdminOperationsReports() {
   const [range, setRange] = useState('all');
@@ -254,5 +264,7 @@ function AdminOperationsReports() {
     </div>
   );
 }
+
+
 
 export default AdminOperationsReports;
