@@ -189,7 +189,7 @@ function MyAppointments() {
                       </strong>
                     </div>
                     <div>
-                      <span>Guests</span>
+                     <span>GUESTS</span>
                       <strong>{booking.guestCount || '—'}</strong>
                     </div>
                   </div>
