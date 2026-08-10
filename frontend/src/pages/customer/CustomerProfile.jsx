@@ -196,7 +196,7 @@ function CustomerProfile() {
                     />
                   </div>
                   <p className="profile-upload-hint">
-                    Drag to reposition and crop before saving. JPG, PNG, or WEBP.
+                   DRAG & DROP OR CLICK TO UPLOAD A NEW PHOTO. JPG, PNG, WEBP UP TO 5MB.
                   </p>
                 </div>
               </div>
