@@ -127,7 +127,7 @@ function MyAppointments() {
           </p>
           <div className="appointments-empty-actions">
             <Link to="/customer/my-bookings" className="customer-gold-btn">
-              View Bookings
+              VIEW BOOKINGS
             </Link>
             <Link to="/hotels" className="owner-schedule-btn">
               Browse Halls
