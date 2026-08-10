@@ -260,7 +260,7 @@ function MyBookings() {
           </article>
           <article className="my-bookings-stat is-confirmed">
             <div>
-              <span>Confirmed</span>
+              <span>CONFIRMED</span>
               <strong>{stats.confirmed}</strong>
             </div>
             <span className="my-bookings-stat-icon" aria-hidden="true">
