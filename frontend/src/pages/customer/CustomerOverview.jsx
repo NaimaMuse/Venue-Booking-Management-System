@@ -276,7 +276,7 @@ function CustomerOverview() {
                         </strong>
                       </li>
                       <li>
-                        <span>Location</span>
+                       <span>LOCATION</span>
                         <strong>
                           {nextAppointment.appointment?.locationNotes ||
                             nextAppointment.hotelId?.hotelName ||
