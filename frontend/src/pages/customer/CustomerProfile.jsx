@@ -151,7 +151,7 @@ function CustomerProfile() {
         <div>
           <p className="customer-eyebrow">Hargeisa Hall Finder</p>
           <h1>My Profile</h1>
-          <p>Keep your account details and photo ready for booking visits.</p>
+          <p>keep your account details and photo ready for booking visits.</p>
         </div>
         <Link to="/customer/my-bookings" className="customer-gold-btn">
           My Bookings
