@@ -213,7 +213,8 @@ function CustomerOverview() {
                 <div className="customer-empty-panel customer-empty-panel-inset">
                   <p className="customer-empty-title">No booking requests yet</p>
                   <p className="customer-empty">
-                    Browse hotels and halls to get started with your first request.
+                   bROWSE HALLS AND HOTELS TO SEND BOOKING REQUESTS
+                   
                   </p>
                   <Link to="/hotels" className="customer-gold-btn">
                     Browse Halls
