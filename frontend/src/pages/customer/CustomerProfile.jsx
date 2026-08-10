@@ -180,13 +180,13 @@ function CustomerProfile() {
                   <p className="customer-profile-photo-kicker">Profile photo</p>
                   <h3>{displayName}</h3>
                   <div className="customer-profile-photo-actions">
-                    <button
-                      type="button"
+                   <button type="button"
                       className="profile-upload-btn"
                       onClick={() => fileInputRef.current?.click()}
                     >
-                      Change Photo
-                    </button>
+                        CHANGE PHOTO
+
+                   </button>
                     <input
                       ref={fileInputRef}
                       type="file"
