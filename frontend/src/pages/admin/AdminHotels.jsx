@@ -346,6 +346,10 @@ function AdminHotels() {
         </div>
       )}
 
+
+
+
+
       {rejectHotel && (
         <div className="booking-modal-overlay" role="presentation">
           <div
