@@ -145,3 +145,93 @@ function HotelProfile() {
       setSaving(false);
     }
   };
+  const verification = hotel?.verificationStatus;
+
+  return (
+    <div className="customer-page hotel-profile-page">
+      {showApprovalAlert && (
+        <div className="owner-approval-flash" role="status">
+          <span>
+            Congratulations! Your hotel has been approved. You can keep your
+            profile details up to date anytime.
+          </span>
+          <button
+            type="button"
+            className="owner-alert-dismiss"
+            onClick={dismissApprovalAlert}
+            aria-label="Dismiss approval alert"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      <section className="customer-page-header hotel-profile-hero">
+        <div>
+          <p className="customer-eyebrow">Hotel Profile</p>
+          <h1>{form.hotelName.trim() || 'My Hotel Profile'}</h1>
+          <p>
+            Keep your venue details clear and current so customers can reach you
+            and book with confidence.
+          </p>
+        </div>
+        {verification && (
+          <span className={`hotel-profile-status is-${verification}`}>
+            {statusLabel[verification] || verification}
+          </span>
+        )}
+      </section>
+
+      {verification === 'pending' && (
+        <div className="owner-status-banner owner-status-pending">
+          Your hotel registration is under admin review. Halls stay hidden from
+          the public website until approval.
+        </div>
+      )}
+
+      {verification === 'rejected' && (
+        <div className="owner-status-banner owner-status-rejected">
+          Registration was rejected
+          {hotel.rejectionReason ? `: ${hotel.rejectionReason}` : '.'} Update
+          your details and contact support if needed.
+        </div>
+      )}
+
+      {loading && <p className="customer-status">Loading hotel profile...</p>}
+
+      {!loading && (
+        <div className="hotel-profile-layout">
+          <section className="customer-panel hotel-profile-form-panel">
+            <div className="customer-panel-head">
+              <h2>{hotel ? 'Edit hotel details' : 'Register your hotel'}</h2>
+            </div>
+
+            <form className="profile-form hotel-profile-form" onSubmit={handleSubmit}>
+              {error && <p className="auth-error">{error}</p>}
+              {success && <p className="profile-success">{success}</p>}
+
+              <label className="hotel-profile-full">
+                Hotel Name
+                <input
+                  type="text"
+                  name="hotelName"
+                  value={form.hotelName}
+                  onChange={handleChange}
+                  placeholder="e.g. Moole Hotel Hargeisa"
+                  required
+                />
+              </label>
+
+              <div className="hotel-profile-grid">
+                <label>
+                  City
+                  <input
+                    type="text"
+                    name="city"
+                    value={form.city}
+                    onChange={handleChange}
+                    placeholder="Hargeisa"
+                    required
+                  />
+                </label>
+                
