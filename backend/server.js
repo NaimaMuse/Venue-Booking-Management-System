@@ -58,8 +58,8 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/hotels', require('./routes/hotelRoutes'));
+app.use('/api/halls', require('./routes/hallRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
-// Future: app.use('/api/halls', require('./routes/hallRoutes'));
 // Future: app.use('/api/bookings', require('./routes/bookingRoutes'));
 
 // Unknown API routes
@@ -67,10 +67,21 @@ app.use('/api', (req, res) => {
   res.status(404).json({ message: 'API route not found' });
 });
 
-// Global error handler
+// Global error handler (includes multer upload errors)
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error(err);
+
+  if (err.code === 'LIMIT_FILE_COUNT') {
+    return res.status(400).json({ message: 'Too many files. Maximum is 5 images.' });
+  }
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ message: 'File too large. Maximum is 5 MB per image.' });
+  }
+  if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+    return res.status(400).json({ message: 'Unexpected file field. Use field name "images".' });
+  }
+
   const status = err.status || err.statusCode || 500;
   res.status(status).json({
     message: err.message || 'Internal server error',

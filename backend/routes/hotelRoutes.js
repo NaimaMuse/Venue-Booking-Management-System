@@ -10,6 +10,7 @@ const {
   approveHotel,
   rejectHotel,
 } = require('../controllers/hotelController');
+const { getHallsByHotelId } = require('../controllers/hallController');
 const {
   protect,
   optionalProtect,
@@ -42,6 +43,9 @@ router.post('/', protect, authorize('hotel_owner'), createHotel);
 // Admin approve/reject on hotel resource
 router.patch('/:id/approve', protect, authorize('admin'), approveHotel);
 router.patch('/:id/reject', protect, authorize('admin'), rejectHotel);
+
+// Nested halls for a hotel (public if approved; owner/admin otherwise)
+router.get('/:id/halls', optionalProtect, getHallsByHotelId);
 
 // Public get-by-id (optional auth so owner/admin can see non-approved)
 router.get('/:id', optionalProtect, getHotelById);
