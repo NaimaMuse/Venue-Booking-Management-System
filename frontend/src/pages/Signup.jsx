@@ -96,6 +96,82 @@ function Signup() {
             Already have an account? <Link to="/login">Log In</Link>
           </p>
         </div>
+
+        // 1. Dheeraadka State & Hooks
+const [adminAvailable, setAdminAvailable] = useState(false);
+
+useEffect(() => {
+  let cancelled = false;
+
+  const loadAdminAvailability = async () => {
+    try {
+      const { data } = await api.get('/api/auth/admin-available');
+      if (!cancelled) {
+        setAdminAvailable(Boolean(data.adminAvailable));
+      }
+    } catch {
+      if (!cancelled) {
+        setAdminAvailable(false);
+      }
+    }
+  };
+
+  loadAdminAvailability();
+
+  return () => {
+    cancelled = true;
+  };
+}, []);
+
+useEffect(() => {
+  if (!adminAvailable && role === 'admin') {
+    setRole('customer');
+  }
+}, [adminAvailable, role]);
+
+// 2. Qaybta UI-ga ee Role Toggle-ka
+<p className="signup-subtitle">
+  {adminAvailable
+    ? 'Join as a customer, hotel owner, or create the one-time system admin account.'
+    : 'Join as a customer to book halls, or as a hotel owner to list your venue.'}
+</p>
+
+<div
+  className={`signup-role-toggle${adminAvailable ? ' has-admin' : ''}`}
+  role="group"
+  aria-label="Account type"
+>
+  <button
+    type="button"
+    className={role === 'customer' ? 'is-active' : ''}
+    onClick={() => setRole('customer')}
+  >
+    Customer
+  </button>
+  <button
+    type="button"
+    className={role === 'hotel_owner' ? 'is-active' : ''}
+    onClick={() => setRole('hotel_owner')}
+  >
+    Hotel Owner
+  </button>
+  {adminAvailable && (
+    <button
+      type="button"
+      className={role === 'admin' ? 'is-active' : ''}
+      onClick={() => setRole('admin')}
+    >
+      Admin
+    </button>
+  )}
+</div>
+
+{role === 'admin' && (
+  <p className="signup-admin-note">
+    This creates the system admin. After this account is registered,
+    the Admin option will disappear permanently.
+  </p>
+)}
       </section>
     </main>
   );
