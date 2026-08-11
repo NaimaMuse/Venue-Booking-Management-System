@@ -242,3 +242,131 @@ function HallForm() {
                   required
                 />
               </label>
+
+              <div className="hall-form-grid">
+                <label>
+                  Capacity
+                  <div className="hall-form-input-wrap">
+                    <input
+                      type="number"
+                      min="1"
+                      name="capacity"
+                      value={form.capacity}
+                      onChange={handleChange}
+                      placeholder="150"
+                      required
+                    />
+                    <em>guests</em>
+                  </div>
+                </label>
+                <label>
+                  Price Per Day
+                  <div className="hall-form-input-wrap is-price">
+                    <em>$</em>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      name="pricePerDay"
+                      value={form.pricePerDay}
+                      onChange={handleChange}
+                      placeholder="1000"
+                      required
+                    />
+                  </div>
+                </label>
+              </div>
+
+              <label className="hall-form-full">
+                Description
+                <textarea
+                  name="description"
+                  rows="5"
+                  value={form.description}
+                  onChange={handleChange}
+                  placeholder="Describe the hall layout, decor, lighting, and the events it suits best..."
+                />
+              </label>
+
+              <div className="owner-amenities-block hall-form-full">
+                <div className="hall-form-section-head">
+                  <p className="owner-field-label">Amenities</p>
+                  <span>Select all that apply</span>
+                </div>
+                <div className="owner-amenity-options">
+                  {AMENITY_OPTIONS.map((amenity) => {
+                    const selected = amenities.includes(amenity);
+                    return (
+                      <button
+                        key={amenity}
+                        type="button"
+                        className={`owner-amenity-chip${selected ? ' is-selected' : ''}`}
+                        onClick={() => toggleAmenity(amenity)}
+                      >
+                        {amenity}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <label className="hall-form-availability">
+                <input
+                  type="checkbox"
+                  name="isAvailable"
+                  checked={form.isAvailable}
+                  onChange={handleChange}
+                />
+                <span>
+                  <strong>Available for booking</strong>
+                  <em>Customers can request this hall when it is active.</em>
+                </span>
+              </label>
+
+              <div className="hall-form-upload hall-form-full">
+                <div className="hall-form-section-head">
+                  <p className="owner-field-label">Gallery images</p>
+                  <span>Up to 5 photos · {remainingSlots} left</span>
+                </div>
+
+                <label className="hall-form-dropzone">
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    multiple
+                    hidden
+                    onChange={handleFiles}
+                    disabled={remainingSlots === 0}
+                  />
+                  <strong>Choose images</strong>
+                  <span>PNG, JPG, or WEBP. Best with wide venue photos.</span>
+                </label>
+
+                {isEdit && (
+                  <p className="profile-upload-hint">
+                    Uploading new images replaces the previous gallery.
+                  </p>
+                )}
+
+                {(existingImages.length > 0 || previews.length > 0) && (
+                  <div className="owner-image-previews hall-form-previews">
+                    {newFiles.length === 0 &&
+                      existingImages.map((image) => (
+                        <img key={image} src={resolveImage(image)} alt="" />
+                      ))}
+                    {previews.map((src, index) => (
+                      <div key={src} className="owner-preview-item">
+                        <img src={src} alt="" />
+                        <button
+                          type="button"
+                          onClick={() => removeNewFile(index)}
+                          aria-label="Remove image"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
