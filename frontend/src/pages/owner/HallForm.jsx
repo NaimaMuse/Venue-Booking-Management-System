@@ -369,4 +369,99 @@ function HallForm() {
                   </div>
                 )}
               </div>
-              
+              <div className="hall-form-actions">
+                <Link to="/owner/halls" className="owner-schedule-btn">
+                  Cancel
+                </Link>
+                <button
+                  type="submit"
+                  className="customer-gold-btn profile-save-btn"
+                  disabled={saving || !canSubmit}
+                >
+                  {saving
+                    ? 'Saving...'
+                    : isEdit
+                      ? 'Save Changes'
+                      : 'Create Hall'}
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <aside className="customer-panel hall-form-preview">
+            <div className="customer-panel-head">
+              <h2>Live preview</h2>
+            </div>
+
+            <div className="hall-preview-card">
+              <div
+                className="hall-preview-cover"
+                style={
+                  coverPreview
+                    ? { backgroundImage: `url(${coverPreview})` }
+                    : undefined
+                }
+              >
+                {!coverPreview && <span>Add a cover photo</span>}
+              </div>
+              <div className="hall-preview-body">
+                <p className="hall-preview-hotel">
+                  {hotel?.hotelName || 'Your hotel'}
+                </p>
+                <h3>{form.hallName.trim() || 'Hall name'}</h3>
+                <div className="hall-preview-meta">
+                  <span>
+                    {form.capacity ? `${form.capacity} guests` : 'Capacity'}
+                  </span>
+                  <span>
+                    {form.pricePerDay
+                      ? `$${form.pricePerDay}/day`
+                      : 'Price / day'}
+                  </span>
+                </div>
+                <p className="hall-preview-copy">
+                  {form.description.trim() ||
+                    'Your hall description will appear here for customers.'}
+                </p>
+                {amenities.length > 0 && (
+                  <div className="hall-preview-amenities">
+                    {amenities.slice(0, 4).map((item) => (
+                      <span key={item}>{item}</span>
+                    ))}
+                    {amenities.length > 4 && (
+                      <span>+{amenities.length - 4}</span>
+                    )}
+                  </div>
+                )}
+                <span
+                  className={`hall-preview-status${
+                    form.isAvailable ? '' : ' is-inactive'
+                  }`}
+                >
+                  {form.isAvailable ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+            </div>
+
+            <ul className="hall-preview-checklist">
+              <li className={form.hallName.trim() ? 'is-done' : ''}>
+                Hall name
+              </li>
+              <li className={form.capacity && form.pricePerDay ? 'is-done' : ''}>
+                Capacity and price
+              </li>
+              <li className={amenities.length > 0 ? 'is-done' : ''}>
+                Amenities selected
+              </li>
+              <li className={photoCount > 0 ? 'is-done' : ''}>Photos added</li>
+            </ul>
+          </aside>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default HallForm;
+
+
