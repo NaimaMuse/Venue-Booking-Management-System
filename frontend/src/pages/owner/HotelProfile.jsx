@@ -234,4 +234,102 @@ function HotelProfile() {
                     required
                   />
                 </label>
-                
+                <label>
+                  Contact Phone
+                  <input
+                    type="tel"
+                    name="contactPhone"
+                    value={form.contactPhone}
+                    onChange={handleChange}
+                    placeholder="+252 63 ..."
+                    required
+                  />
+                </label>
+              </div>
+
+              <label className="hotel-profile-full">
+                Address
+                <input
+                  type="text"
+                  name="address"
+                  value={form.address}
+                  onChange={handleChange}
+                  placeholder="Street, district, landmark"
+                  required
+                />
+              </label>
+
+              <label className="hotel-profile-full">
+                Description
+                <textarea
+                  name="description"
+                  rows="5"
+                  value={form.description}
+                  onChange={handleChange}
+                  placeholder="Tell customers about your venue, capacity style, and services..."
+                />
+              </label>
+
+              <button
+                type="submit"
+                className="customer-gold-btn profile-save-btn"
+                disabled={saving}
+              >
+                {saving
+                  ? 'Saving...'
+                  : hotel
+                    ? 'Update Hotel Profile'
+                    : 'Register Hotel'}
+              </button>
+            </form>
+          </section>
+
+          <aside className="customer-panel hotel-profile-summary">
+            <div className="customer-panel-head">
+              <h2>Profile summary</h2>
+            </div>
+
+            <div className="hotel-profile-summary-card">
+              <p className="hotel-profile-summary-kicker">Venue</p>
+              <h3>{form.hotelName.trim() || 'Your hotel name'}</h3>
+              <p>{form.city.trim() || 'City not set yet'}</p>
+            </div>
+
+            <ul className="hotel-profile-summary-list">
+              <li>
+                <span>Address</span>
+                <strong>{form.address.trim() || '—'}</strong>
+              </li>
+              <li>
+                <span>Phone</span>
+                <strong>{form.contactPhone.trim() || '—'}</strong>
+              </li>
+              <li>
+                <span>Status</span>
+                <strong>
+                  {verification
+                    ? statusLabel[verification] || verification
+                    : 'Not registered'}
+                </strong>
+              </li>
+            </ul>
+
+            {hotel?._id && verification === 'approved' && (
+              <Link
+                to={`/hotels/${hotel._id}`}
+                className="owner-schedule-btn hotel-profile-public-link"
+                target="_blank"
+                rel="noreferrer"
+              >
+                View public hotel page
+              </Link>
+            )}
+          </aside>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default HotelProfile;
+
