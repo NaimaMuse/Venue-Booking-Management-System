@@ -130,3 +130,115 @@ function HallForm() {
     setNewFiles((prev) => [...prev, ...capped].slice(0, 5));
     event.target.value = '';
   };
+
+  const removeNewFile = (index) => {
+    setNewFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError('');
+
+    if (!form.hallName.trim() || !form.capacity || !form.pricePerDay) {
+      setError('Hall name, capacity, and price per day are required.');
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      const body = new FormData();
+      body.append('hallName', form.hallName.trim());
+      body.append('capacity', String(form.capacity));
+      body.append('pricePerDay', String(form.pricePerDay));
+      body.append('description', form.description.trim());
+      body.append('amenities', JSON.stringify(amenities));
+      body.append('isAvailable', String(form.isAvailable));
+      newFiles.forEach((file) => body.append('images', file));
+
+      if (isEdit) {
+        await api.put(`/api/halls/${id}`, body);
+      } else {
+        await api.post('/api/halls', body);
+      }
+
+      navigate('/owner/halls');
+    } catch (err) {
+      setError(getApiError(err, 'Unable to save hall'));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const hotelApproved = hotel?.verificationStatus === 'approved';
+  const canSubmit = Boolean(hotel) && (isEdit || hotelApproved);
+  const coverPreview =
+    previews[0] ||
+    (newFiles.length === 0 && existingImages[0]
+      ? resolveImage(existingImages[0])
+      : '');
+  const photoCount = newFiles.length || existingImages.length;
+  const remainingSlots = Math.max(0, 5 - newFiles.length);
+
+  return (
+    <div className="customer-page hall-form-page">
+      <section className="customer-page-header hall-form-hero">
+        <div>
+          <p className="customer-eyebrow">
+            {isEdit ? 'Edit Hall' : 'New Hall'}
+          </p>
+          <h1>{isEdit ? 'Update Hall Listing' : 'Add New Hall'}</h1>
+          <p>
+            {isEdit
+              ? 'Refresh photos, pricing, and amenities so customers see the best version of your venue.'
+              : 'Create a polished hall listing with capacity, pricing, amenities, and gallery photos.'}
+          </p>
+        </div>
+        <Link to="/owner/halls" className="hall-form-back-btn">
+          Back to Halls
+        </Link>
+      </section>
+
+      {loading && <p className="customer-status">Loading form...</p>}
+
+      {!loading && hotel && hotel.verificationStatus === 'pending' && (
+        <div className="owner-status-banner owner-status-pending">
+          Your hotel <strong>{hotel.hotelName}</strong> is still pending admin
+          approval. You can prepare details, but halls go live only after
+          approval.
+        </div>
+      )}
+
+      {!loading && (
+        <div className="hall-form-layout">
+          <section className="customer-panel hall-form-main">
+            <div className="customer-panel-head">
+              <h2>Hall details</h2>
+              <span className="hall-form-step-hint">
+                {amenities.length} amenities · {photoCount} photos
+              </span>
+            </div>
+
+            <form className="profile-form hall-form" onSubmit={handleSubmit}>
+              {error && <p className="auth-error">{error}</p>}
+
+              <div className="hall-form-hotel-chip">
+                <span>Hotel</span>
+                <strong>
+                  {hotel
+                    ? `${hotel.hotelName}${hotel.city ? ` · ${hotel.city}` : ''}`
+                    : 'No hotel registered'}
+                </strong>
+              </div>
+
+              <label className="hall-form-full">
+                Hall Name
+                <input
+                  type="text"
+                  name="hallName"
+                  value={form.hallName}
+                  onChange={handleChange}
+                  placeholder="e.g. Grand Banquet Hall"
+                  required
+                />
+              </label>
