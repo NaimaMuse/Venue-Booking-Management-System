@@ -8,6 +8,7 @@ const {
   updateHall,
   deleteHall,
 } = require('../controllers/hallController');
+const { getUnavailableDates } = require('../controllers/bookingController');
 const {
   protect,
   optionalProtect,
@@ -23,6 +24,9 @@ router.get('/', getHalls);
 // Owner — define BEFORE /:id
 router.get('/mine', protect, authorize('hotel_owner'), getMyHalls);
 router.get('/my', protect, authorize('hotel_owner'), getMyHalls);
+
+// Public unavailable dates for a hall
+router.get('/:id/unavailable-dates', getUnavailableDates);
 
 router.post(
   '/',
