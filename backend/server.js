@@ -56,13 +56,11 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Auth routes
 app.use('/api/auth', require('./routes/authRoutes'));
-
-// Future route mounts (hotels, venues, bookings, users, …)
-// app.use('/api/hotels', require('./routes/hotelRoutes'));
-// app.use('/api/venues', require('./routes/venueRoutes'));
-// app.use('/api/bookings', require('./routes/bookingRoutes'));
+app.use('/api/hotels', require('./routes/hotelRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
+// Future: app.use('/api/halls', require('./routes/hallRoutes'));
+// Future: app.use('/api/bookings', require('./routes/bookingRoutes'));
 
 // Unknown API routes
 app.use('/api', (req, res) => {
