@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-import Navbar from '../components/Navbar';
-import { API_BASE } from '../utils/auth';
-import api, { getApiError } from '../utils/api';
+import Navbar from '../../components/Navbar';
+import { API_BASE } from '../../utils/auth';
+import api, { getApiError } from '../../utils/api';
 
 const resolveImage = (image) => {
   if (!image) {

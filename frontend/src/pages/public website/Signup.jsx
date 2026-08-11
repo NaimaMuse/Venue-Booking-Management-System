@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { getDashboardPath, saveAuth } from '../utils/auth';
-import api, { getApiError } from '../utils/api';
+import { getDashboardPath, saveAuth } from '../../utils/auth';
+import api, { getApiError } from '../../utils/api';
 
 function Signup() {
   const navigate = useNavigate();

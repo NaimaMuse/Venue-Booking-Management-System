@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-import { getDashboardPath, saveAuth } from '../utils/auth';
-import api, { getApiError } from '../utils/api';
+import { getDashboardPath, saveAuth } from '../../utils/auth';
+import api, { getApiError } from '../../utils/api';
 
 function Login() {
   const navigate = useNavigate();
