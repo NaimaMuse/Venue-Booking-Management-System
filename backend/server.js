@@ -60,6 +60,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/hotels', require('./routes/hotelRoutes'));
 app.use('/api/halls', require('./routes/hallRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/owner', require('./routes/ownerRoutes'));
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 
 // Unknown API routes
