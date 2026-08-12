@@ -466,4 +466,241 @@ function OwnerBookings() {
                           >
                             Cancel
                           </button>
+                          </>
+                      )}
+                      {(booking.status === 'confirmed' ||
+                        booking.status === 'rejected' ||
+                        booking.status === 'cancelled') && (
+                        <span className="owner-bookings-done">
+                          No actions needed
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {scheduleBooking && (
+        <div
+          className="booking-modal-overlay"
+          role="presentation"
+          onClick={() => !scheduling && setScheduleBooking(null)}
+        >
+          <div
+            className="booking-modal booking-modal--owner"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="schedule-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="booking-modal-head">
+              <div className="booking-modal-intro">
+                <p className="hh-eyebrow booking-modal-eyebrow">Inspection</p>
+                <h2 id="schedule-modal-title">Schedule Inspection Visit</h2>
+              </div>
+              <button
+                type="button"
+                className="booking-modal-close"
+                onClick={() => setScheduleBooking(null)}
+                aria-label="Close"
+                disabled={scheduling}
+              >
+                ×
+              </button>
+            </div>
+
+            <p className="booking-modal-sub">
+              Set a meetup time for{' '}
+              <strong>
+                {scheduleBooking.customerId?.fullName || 'the customer'}
+              </strong>{' '}
+              at{' '}
+              <strong>
+                {scheduleBooking.hallId?.hallName || 'the venue'}
+              </strong>
+              .
+            </p>
+
+            {scheduleError && <p className="auth-error">{scheduleError}</p>}
+
+            <form className="booking-form" onSubmit={handleScheduleSubmit}>
+              <label className="booking-field">
+                <span className="booking-field-label">
+                  Inspection Date &amp; Time
+                </span>
+                <input
+                  type="datetime-local"
+                  value={scheduleForm.scheduledDate}
+                  onChange={(event) =>
+                    setScheduleForm((prev) => ({
+                      ...prev,
+                      scheduledDate: event.target.value,
+                    }))
+                  }
+                  required
+                />
+              </label>
+
+              <label className="booking-field">
+                <span className="booking-field-label">Meetup Notes</span>
+                <textarea
+                  rows="3"
+                  placeholder="e.g. Meet at Main Gate with Manager Hassan"
+                  value={scheduleForm.locationNotes}
+                  onChange={(event) =>
+                    setScheduleForm((prev) => ({
+                      ...prev,
+                      locationNotes: event.target.value,
+                    }))
+                  }
+                />
+              </label>
+
+              <div className="booking-modal-actions">
+                <button
+                  type="button"
+                  className="owner-schedule-btn"
+                  onClick={() => setScheduleBooking(null)}
+                  disabled={scheduling}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="customer-gold-btn booking-modal-save-btn"
+                  disabled={scheduling}
+                >
+                  {scheduling ? 'Saving...' : 'Save Visit Schedule'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {confirmBooking && (
+        <div
+          className="booking-modal-overlay"
+          role="presentation"
+          onClick={() => !confirming && setConfirmBooking(null)}
+        >
+          <div
+            className="booking-modal booking-modal--owner"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="booking-modal-head">
+              <div className="booking-modal-intro">
+                <p className="hh-eyebrow booking-modal-eyebrow">Deposit</p>
+                <h2 id="confirm-modal-title">Finalize &amp; Confirm Booking</h2>
+              </div>
+              <button
+                type="button"
+                className="booking-modal-close"
+                onClick={() => setConfirmBooking(null)}
+                aria-label="Close"
+                disabled={confirming}
+              >
+                ×
+              </button>
+            </div>
+
+            <p className="booking-modal-sub">
+              Record the deposit collected after the inspection with{' '}
+              <strong>
+                {confirmBooking.customerId?.fullName || 'the customer'}
+              </strong>{' '}
+              for{' '}
+              <strong>
+                {confirmBooking.hallId?.hallName || 'the venue'}
+              </strong>
+              .
+            </p>
+
+            {confirmError && <p className="auth-error">{confirmError}</p>}
+
+            <form className="booking-form" onSubmit={handleConfirmSubmit}>
+              <label className="booking-field">
+                <span className="booking-field-label">
+                  Deposit Amount Collected
+                </span>
+                <input
+                  type="number"
+                  min="1"
+                  step="0.01"
+                  placeholder="e.g. 200"
+                  value={confirmForm.depositAmount}
+                  onChange={(event) =>
+                    setConfirmForm((prev) => ({
+                      ...prev,
+                      depositAmount: event.target.value,
+                    }))
+                  }
+                  required
+                />
+              </label>
+
+              <label className="owner-deposit-toggle">
+                <span>Deposit Paid</span>
+                <input
+                  type="checkbox"
+                  checked={confirmForm.depositPaid}
+                  onChange={(event) =>
+                    setConfirmForm((prev) => ({
+                      ...prev,
+                      depositPaid: event.target.checked,
+                    }))
+                  }
+                />
+                <em>{confirmForm.depositPaid ? 'Yes — verified' : 'No'}</em>
+              </label>
+
+              <label className="booking-field">
+                <span className="booking-field-label">Agreement Notes</span>
+                <textarea
+                  rows="4"
+                  placeholder="Hall design details, seating layout, card arrangements, extras agreed during the meeting..."
+                  value={confirmForm.agreementNotes}
+                  onChange={(event) =>
+                    setConfirmForm((prev) => ({
+                      ...prev,
+                      agreementNotes: event.target.value,
+                    }))
+                  }
+                />
+              </label>
+
+              <div className="booking-modal-actions">
+                <button
+                  type="button"
+                  className="owner-schedule-btn"
+                  onClick={() => setConfirmBooking(null)}
+                  disabled={confirming}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="customer-gold-btn booking-modal-save-btn"
+                  disabled={confirming || !confirmForm.depositPaid}
+                >
+                  {confirming ? 'Confirming...' : 'Confirm Booking & Deposit'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default OwnerBookings;
+
     
