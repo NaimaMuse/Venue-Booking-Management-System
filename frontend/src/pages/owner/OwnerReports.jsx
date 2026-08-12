@@ -200,3 +200,196 @@ function OwnerReports() {
               </strong>
             </article>
           </section>
+          
+          <section className="owner-reports-grid">
+            <article className="owner-reports-panel">
+              <div className="owner-reports-panel-head">
+                <div>
+                  <p>Demand</p>
+                  <h2>Bookings over time</h2>
+                </div>
+              </div>
+              {(report.timeline || []).length === 0 ? (
+                <p className="owner-reports-empty">No timeline data yet.</p>
+              ) : (
+                <div className="owner-reports-chart">
+                  <ResponsiveContainer width="100%" height={240}>
+                    <AreaChart data={report.timeline}>
+                      <defs>
+                        <linearGradient id="ownerRev" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#c5a070" stopOpacity={0.45} />
+                          <stop offset="100%" stopColor="#c5a070" stopOpacity={0.02} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid stroke="#f0e6ec" vertical={false} />
+                      <XAxis dataKey="label" tick={{ fill: '#8a8190', fontSize: 11 }} />
+                      <YAxis tick={{ fill: '#8a8190', fontSize: 11 }} allowDecimals={false} />
+                      <Tooltip />
+                      <Area
+                        type="monotone"
+                        dataKey="bookings"
+                        stroke="#4a2040"
+                        fill="url(#ownerRev)"
+                        strokeWidth={2}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </article>
+
+            <article className="owner-reports-panel">
+              <div className="owner-reports-panel-head">
+                <div>
+                  <p>Pipeline</p>
+                  <h2>Booking status</h2>
+                </div>
+              </div>
+              {pieData.length === 0 ? (
+                <p className="owner-reports-empty">No status data yet.</p>
+              ) : (
+                <div className="owner-reports-pie-wrap">
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        dataKey="value"
+                        nameKey="name"
+                        innerRadius={48}
+                        outerRadius={74}
+                        paddingAngle={3}
+                      >
+                        {pieData.map((entry) => (
+                          <Cell
+                            key={entry.key}
+                            fill={STATUS_COLORS[entry.key] || '#c5a070'}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <ul className="owner-reports-legend">
+                    {pieData.map((item) => (
+                      <li key={item.key}>
+                        <span
+                          style={{ background: STATUS_COLORS[item.key] }}
+                        />
+                        {item.name}
+                        <strong>{item.value}</strong>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </article>
+          </section>
+
+          <section className="owner-reports-panel">
+            <div className="owner-reports-panel-head">
+              <div>
+                <p>Halls</p>
+                <h2>Hall performance</h2>
+              </div>
+              <Link to="/owner/halls">Manage halls</Link>
+            </div>
+
+            {(report.byHall || []).length === 0 ? (
+              <p className="owner-reports-empty">No halls listed yet.</p>
+            ) : (
+              <div className="owner-reports-table-wrap">
+                <table className="owner-reports-table">
+                  <thead>
+                    <tr>
+                      <th>Hall</th>
+                      <th>Capacity</th>
+                      <th>Price / day</th>
+                      <th>Bookings</th>
+                      <th>Confirmed</th>
+                      <th>Deposit revenue</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {report.byHall.map((hall) => (
+                      <tr key={hall.hallId}>
+                        <td>
+                          <strong>{hall.hallName}</strong>
+                        </td>
+                        <td>{hall.capacity} guests</td>
+                        <td>{money(hall.pricePerDay)}</td>
+                        <td>{hall.bookings}</td>
+                        <td>{hall.confirmed}</td>
+                        <td>{money(hall.revenue)}</td>
+                        <td>
+                          <span
+                            className={`admin-venue-avail${
+                              hall.isAvailable ? ' is-on' : ' is-off'
+                            }`}
+                          >
+                            {hall.isAvailable ? 'Available' : 'Unavailable'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+
+          <section className="owner-reports-panel">
+            <div className="owner-reports-panel-head">
+              <div>
+                <p>Activity</p>
+                <h2>Recent bookings</h2>
+              </div>
+              <Link to="/owner/bookings">View all</Link>
+            </div>
+
+            {(report.recent || []).length === 0 ? (
+              <p className="owner-reports-empty">No bookings in this period.</p>
+            ) : (
+              <div className="owner-reports-table-wrap">
+                <table className="owner-reports-table">
+                  <thead>
+                    <tr>
+                      <th>Customer</th>
+                      <th>Hall</th>
+                      <th>Event date</th>
+                      <th>Guests</th>
+                      <th>Deposit</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {report.recent.map((booking) => (
+                      <tr key={booking.id}>
+                        <td>
+                          <strong>{booking.customerName}</strong>
+                        </td>
+                        <td>{booking.hallName}</td>
+                        <td>{formatDate(booking.eventDate)}</td>
+                        <td>{booking.guestCount || '—'}</td>
+                        <td>{money(booking.depositAmount)}</td>
+                        <td>
+                          <span
+                            className={`status-badge status-badge-${booking.status}`}
+                          >
+                            {booking.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default OwnerReports;
