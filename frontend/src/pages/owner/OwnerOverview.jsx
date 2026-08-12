@@ -255,3 +255,311 @@ function OwnerOverview() {
           </button>
         </div>
       )}
+      
+      <section className="customer-welcome owner-welcome-banner">
+        <div>
+          <p className="customer-eyebrow">Owner Portal</p>
+          <h1>Welcome back, {getFirstName(user?.fullName)}!</h1>
+          <p>
+            Manage your hotel profile, halls, and customer booking requests from
+            one place.
+            {hotel?.hotelName ? ` · ${hotel.hotelName}` : ''}
+          </p>
+        </div>
+        <div className="owner-welcome-actions">
+          {canAddHalls ? (
+            <Link to="/owner/reports" className="customer-gold-btn">
+              Hotel Report
+            </Link>
+          ) : null}
+          {canAddHalls ? (
+            <Link to="/owner/halls/new" className="owner-schedule-btn">
+              + Add New Hall
+            </Link>
+          ) : (
+            <Link to="/owner/hotel-profile" className="customer-gold-btn">
+              Hotel Profile
+            </Link>
+          )}
+        </div>
+      </section>
+
+      {!hotel && !loading && (
+        <div className="owner-status-banner owner-status-pending">
+          <strong>No hotel registered yet.</strong>
+          <span>
+            {' '}
+            Complete your{' '}
+            <Link to="/owner/hotel-profile">hotel profile</Link> to get started.
+          </span>
+        </div>
+      )}
+
+      {hotel && status === 'pending' && (
+        <div className="owner-status-banner owner-status-pending">
+          <span className="status-badge status-badge-pending">
+            Status: Pending Admin Approval
+          </span>
+          <span>
+            Your hotel registration is under review. Halls stay hidden until
+            approved.
+          </span>
+        </div>
+      )}
+
+      {hotel && status === 'rejected' && (
+        <div className="owner-status-banner owner-status-rejected">
+          <span className="status-badge status-badge-rejected">
+            Status: Rejected
+          </span>
+          <span>
+            {hotel.rejectionReason ||
+              'Please update your hotel profile and contact support.'}
+          </span>
+        </div>
+      )}
+
+      {loading && <p className="customer-status">Loading dashboard...</p>}
+      {error && <p className="customer-status customer-error">{error}</p>}
+
+      {!loading && !error && (
+        <>
+          <section className="owner-metric-row">
+            <article className="metric-card owner-metric-card">
+              <span className="owner-metric-icon">
+                <IconBuilding />
+              </span>
+              <div>
+                <p>Total Halls</p>
+                <strong>{metrics.totalHalls}</strong>
+              </div>
+            </article>
+            <article className="metric-card owner-metric-card">
+              <span className="owner-metric-icon">
+                <IconClock />
+              </span>
+              <div>
+                <p>Pending Requests</p>
+                <strong>{metrics.pending}</strong>
+              </div>
+            </article>
+            <article className="metric-card owner-metric-card">
+              <span className="owner-metric-icon">
+                <IconCalendar />
+              </span>
+              <div>
+                <p>Upcoming Visits</p>
+                <strong>{metrics.upcomingVisits}</strong>
+              </div>
+            </article>
+          </section>
+
+          <section className="owner-dash-grid">
+            {canAddHalls && (
+              <section className="customer-panel owner-halls-panel">
+                <div className="customer-panel-head">
+                  <h2>Your Halls</h2>
+                  <Link to="/owner/halls">Manage halls</Link>
+                </div>
+
+                {halls.length === 0 ? (
+                  <p className="customer-empty">
+                    No halls yet. Add your first hall with amenities and photos so
+                    customers can book it.
+                  </p>
+                ) : (
+                  <div className="owner-hall-dash-list">
+                    {halls.slice(0, 4).map((hall) => (
+                      <article key={hall._id} className="owner-hall-dash-card">
+                        <img
+                          src={resolveImage(hall.images?.[0])}
+                          alt={hall.hallName}
+                        />
+                        <div className="owner-hall-dash-body">
+                          <div className="owner-hall-dash-top">
+                            <strong>{hall.hallName}</strong>
+                            <span
+                              className={`owner-hall-status${
+                                hall.isAvailable === false ? ' is-inactive' : ''
+                              }`}
+                            >
+                              {hall.isAvailable === false ? 'Inactive' : 'Active'}
+                            </span>
+                          </div>
+                          <span>
+                            {hall.capacity} guests · ${hall.pricePerDay}/day
+                          </span>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                )}
+
+                <div className="owner-dashboard-actions">
+                  <Link to="/owner/halls/new" className="owner-accept-btn">
+                    + Add New Hall
+                  </Link>
+                  {hotel?._id && (
+                    <Link
+                      to={`/hotels/${hotel._id}`}
+                      className="owner-schedule-btn"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      View Public Hotel Page
+                    </Link>
+                  )}
+                </div>
+              </section>
+            )}
+
+            <section className="customer-panel owner-month-panel owner-report-teaser">
+              <div className="customer-panel-head">
+                <h2>Hotel report snapshot</h2>
+                {canAddHalls ? (
+                  <Link to="/owner/reports">Full report</Link>
+                ) : null}
+              </div>
+              <p className="owner-report-teaser-copy">
+                Stats for{' '}
+                <strong>{hotel?.hotelName || 'your hotel'}</strong> this month —
+                deposits, demand, and conversion.
+              </p>
+              <ul className="owner-month-list">
+                <li>
+                  <span>New bookings</span>
+                  <strong>{monthOverview.newBookings}</strong>
+                </li>
+                <li>
+                  <span>Accepted / confirmed</span>
+                  <strong>{monthOverview.acceptedBookings}</strong>
+                </li>
+                <li>
+                  <span>Deposit revenue</span>
+                  <strong>${monthOverview.revenue.toLocaleString()}</strong>
+                </li>
+                <li>
+                  <span>Occupancy signal</span>
+                  <strong>{monthOverview.occupancy}%</strong>
+                </li>
+              </ul>
+              {canAddHalls ? (
+                <Link to="/owner/reports" className="owner-report-open-btn">
+                  Open hotel report →
+                </Link>
+              ) : null}
+            </section>
+          </section>
+
+          <section className="owner-dash-grid owner-dash-grid-bottom">
+            <section className="customer-panel">
+              <div className="customer-panel-head">
+                <h2>Recent Bookings</h2>
+                <Link to="/owner/bookings">View all</Link>
+              </div>
+
+              {recent.length === 0 ? (
+                <div className="owner-empty-bookings">
+                  <IconCalendar />
+                  <p>No booking requests yet</p>
+                  <span>
+                    Once customers request your halls, they will show here.
+                  </span>
+                </div>
+              ) : (
+                <div className="customer-table-wrap">
+                  <table className="customer-table">
+                    <thead>
+                      <tr>
+                        <th>Customer</th>
+                        <th>Hall</th>
+                        <th>Event Date</th>
+                        <th>Guests</th>
+                        <th>Status</th>
+                        <th>Requested On</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {recent.map((booking) => (
+                        <tr key={booking._id}>
+                          <td>
+                            <strong>
+                              {booking.customerId?.fullName || 'Customer'}
+                            </strong>
+                            <span>{booking.customerId?.email || ''}</span>
+                          </td>
+                          <td>{booking.hallId?.hallName || 'Hall'}</td>
+                          <td>{formatDate(booking.eventDate)}</td>
+                          <td>{booking.guestCount || '—'}</td>
+                          <td>
+                            <span
+                              className={`status-badge ${statusClass[booking.status] || ''}`}
+                            >
+                              {booking.status}
+                            </span>
+                          </td>
+                          <td>{formatDate(booking.createdAt)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+
+            <section className="customer-panel owner-status-panel">
+              <div className="customer-panel-head">
+                <h2>Booking Status</h2>
+              </div>
+              {chartHasData ? (
+                <div className="owner-status-chart">
+                  <ResponsiveContainer width="100%" height={220}>
+                    <PieChart>
+                      <Pie
+                        data={statusChart}
+                        dataKey="value"
+                        nameKey="name"
+                        innerRadius={52}
+                        outerRadius={78}
+                        paddingAngle={3}
+                      >
+                        {statusChart.map((entry) => (
+                          <Cell
+                            key={entry.key}
+                            fill={CHART_COLORS[entry.key]}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <ul className="owner-status-legend">
+                    {statusChart.map((item) => (
+                      <li key={item.key}>
+                        <span
+                          className="owner-status-dot"
+                          style={{ background: CHART_COLORS[item.key] }}
+                        />
+                        <span>{item.name}</span>
+                        <strong>{item.percent}%</strong>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <div className="owner-empty-bookings">
+                  <p>No booking status data yet</p>
+                  <span>Stats will appear once requests start coming in.</span>
+                </div>
+              )}
+            </section>
+          </section>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default OwnerOverview;
+
