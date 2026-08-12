@@ -211,3 +211,259 @@ function OwnerBookings() {
       setConfirmError('Enter the deposit amount collected.');
       return;
     }
+ try {
+      setConfirming(true);
+      setConfirmError('');
+
+      const { data } = await api.patch(
+        `/api/bookings/${confirmBooking._id}/confirm`,
+        {
+          depositAmount: Number(confirmForm.depositAmount),
+          depositPaid: true,
+          agreementNotes: confirmForm.agreementNotes.trim(),
+        }
+      );
+
+      setBookings((prev) =>
+        prev.map((item) =>
+          item._id === confirmBooking._id ? data.booking : item
+        )
+      );
+      setConfirmBooking(null);
+    } catch (err) {
+      setConfirmError(getApiError(err, 'Unable to confirm booking'));
+    } finally {
+      setConfirming(false);
+    }
+  };
+
+  const handlePostVisitCancel = async (bookingId) => {
+    const confirmed = window.confirm(
+      'Cancel this booking after the inspection? The deal will be marked as cancelled.'
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    await updateStatus(bookingId, 'cancelled');
+  };
+
+  const stats = useMemo(() => {
+    const pending = bookings.filter((b) => b.status === 'pending').length;
+    const accepted = bookings.filter((b) => b.status === 'accepted').length;
+    const confirmed = bookings.filter((b) => b.status === 'confirmed').length;
+    return {
+      total: bookings.length,
+      pending,
+      accepted,
+      confirmed,
+    };
+  }, [bookings]);
+
+  return (
+    <div className="customer-page owner-bookings-page">
+      <section className="customer-page-header owner-bookings-hero">
+        <div>
+          <p className="customer-eyebrow">Requests</p>
+          <h1>Booking Requests</h1>
+          <p>
+            Accept requests, schedule inspections, then finalize deposits or
+            cancel after the visit.
+          </p>
+        </div>
+      </section>
+
+      {!loading && !error && (
+        <section className="my-bookings-stats owner-bookings-stats">
+          <article className="my-bookings-stat is-total">
+            <div>
+              <span>Total</span>
+              <strong>{stats.total}</strong>
+            </div>
+            <span className="my-bookings-stat-icon" aria-hidden="true">
+              <IconTotal />
+            </span>
+          </article>
+          <article className="my-bookings-stat is-pending">
+            <div>
+              <span>Pending</span>
+              <strong>{stats.pending}</strong>
+            </div>
+            <span className="my-bookings-stat-icon" aria-hidden="true">
+              <IconPending />
+            </span>
+          </article>
+          <article className="my-bookings-stat is-accepted">
+            <div>
+              <span>Accepted</span>
+              <strong>{stats.accepted}</strong>
+            </div>
+            <span className="my-bookings-stat-icon" aria-hidden="true">
+              <IconAccepted />
+            </span>
+          </article>
+          <article className="my-bookings-stat is-confirmed">
+            <div>
+              <span>Confirmed</span>
+              <strong>{stats.confirmed}</strong>
+            </div>
+            <span className="my-bookings-stat-icon" aria-hidden="true">
+              <IconConfirmed />
+            </span>
+          </article>
+        </section>
+      )}
+
+      {loading && <p className="customer-status">Loading requests...</p>}
+      {error && <p className="customer-status customer-error">{error}</p>}
+
+      {!loading && !error && bookings.length === 0 && (
+        <section className="customer-panel owner-bookings-empty">
+          <p className="customer-empty-title">No booking requests yet</p>
+          <p className="customer-empty">
+            When customers request your halls, they will appear here for review.
+          </p>
+        </section>
+      )}
+
+      {!loading && bookings.length > 0 && (
+        <section className="owner-requests-section">
+          <div className="owner-requests-head">
+            <div>
+              <h2>All requests</h2>
+              <p>Review and manage customer booking requests.</p>
+            </div>
+            <span className="owner-bookings-count">
+              {bookings.length} booking{bookings.length === 1 ? '' : 's'}
+            </span>
+          </div>
+
+          <div className="owner-requests-list">
+            {bookings.map((booking, index) => {
+              const customerName =
+                booking.customerId?.fullName || 'Customer';
+              const contact =
+                booking.customerId?.phone ||
+                booking.customerId?.email ||
+                '';
+              const avatarSrc = getAvatarUrl(booking.customerId?.avatarUrl);
+
+              return (
+                <article
+                  key={booking._id}
+                  className="owner-request-card"
+                  style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
+                >
+                  <div className="owner-request-body">
+                    <div className="owner-request-top">
+                      <div className="owner-request-customer">
+                        {avatarSrc ? (
+                          <img
+                            src={avatarSrc}
+                            alt={customerName}
+                            className="owner-request-avatar-img"
+                          />
+                        ) : (
+                          <span className="owner-request-avatar">
+                            {getNameLetter(customerName)}
+                          </span>
+                        )}
+                        <div>
+                          <strong>{customerName}</strong>
+                          <span>{contact}</span>
+                        </div>
+                      </div>
+                      <span
+                        className={`status-badge ${statusClass[booking.status] || ''}`}
+                      >
+                        {statusLabel[booking.status] || booking.status}
+                      </span>
+                    </div>
+
+                    <h3>{booking.hallId?.hallName || 'Hall'}</h3>
+
+                    <div className="owner-request-meta">
+                      <div>
+                        <span>Event date</span>
+                        <strong>{formatDate(booking.eventDate)}</strong>
+                      </div>
+                      <div>
+                        <span>Guests</span>
+                        <strong>{booking.guestCount || '—'}</strong>
+                      </div>
+                      <div>
+                        <span>Submitted</span>
+                        <strong>{formatDate(booking.createdAt)}</strong>
+                      </div>
+                      {booking.status === 'confirmed' && booking.depositPaid && (
+                        <div>
+                          <span>Deposit</span>
+                          <strong>
+                            ${Number(booking.depositAmount || 0).toLocaleString()}
+                          </strong>
+                        </div>
+                      )}
+                    </div>
+
+                    {booking.specialNotes && (
+                      <p className="owner-request-notes">
+                        <span>Notes</span>
+                        {booking.specialNotes}
+                      </p>
+                    )}
+
+                    <div className="owner-booking-actions owner-request-actions">
+                      {booking.status === 'pending' && (
+                        <>
+                          <button
+                            type="button"
+                            className="owner-accept-btn"
+                            disabled={busyId === booking._id}
+                            onClick={() =>
+                              updateStatus(booking._id, 'accepted')
+                            }
+                          >
+                            Accept
+                          </button>
+                          <button
+                            type="button"
+                            className="owner-reject-btn"
+                            disabled={busyId === booking._id}
+                            onClick={() =>
+                              updateStatus(booking._id, 'rejected')
+                            }
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
+                      {booking.status === 'accepted' && (
+                        <>
+                          <button
+                            type="button"
+                            className="owner-schedule-btn"
+                            onClick={() => openScheduleModal(booking)}
+                          >
+                            {booking.appointment?.scheduledDate
+                              ? 'Edit Visit'
+                              : 'Schedule Visit'}
+                          </button>
+                          <button
+                            type="button"
+                            className="owner-confirm-btn"
+                            disabled={busyId === booking._id}
+                            onClick={() => openConfirmModal(booking)}
+                          >
+                            Finalize &amp; Confirm
+                          </button>
+                          <button
+                            type="button"
+                            className="owner-reject-btn"
+                            disabled={busyId === booking._id}
+                            onClick={() =>
+                              handlePostVisitCancel(booking._id)
+                            }
+                          >
+                            Cancel
+                          </button>
+    
