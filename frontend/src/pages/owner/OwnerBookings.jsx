@@ -211,8 +211,7 @@ function OwnerBookings() {
       setConfirmError('Enter the deposit amount collected.');
       return;
     }
-
-    try {
+ try {
       setConfirming(true);
       setConfirmError('');
 
@@ -467,7 +466,7 @@ function OwnerBookings() {
                           >
                             Cancel
                           </button>
-                        </>
+                          </>
                       )}
                       {(booking.status === 'confirmed' ||
                         booking.status === 'rejected' ||
@@ -703,3 +702,5 @@ function OwnerBookings() {
 }
 
 export default OwnerBookings;
+
+    
