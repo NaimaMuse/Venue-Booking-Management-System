@@ -334,6 +334,37 @@ img {
   margin-top: 28px;
 }
 
+.featured-slider {
+  position: relative;
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.featured-slider-btn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #d4b37a;
+  border-radius: 999px;
+  background: #4a2040;
+  color: #ffffff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.featured-slider-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.featured-slider-btn:not(:disabled):hover {
+  background: #5b2850;
+}
+
 .home-contact-section {
   padding: 88px 5% 64px;
   background: #ffffff;
