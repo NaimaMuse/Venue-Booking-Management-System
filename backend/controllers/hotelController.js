@@ -39,12 +39,15 @@ const attachHallCounts = async (hotels) => {
 };
 
 /**
- * Public: list approved hotels. Optional ?q= search on hotelName / city.
+ * Public: list approved hotels (+ halls). Optional ?q= ?minCapacity= ?maxPrice=
  */
 const getHotels = async (req, res) => {
   try {
     const filter = { verificationStatus: 'approved' };
     const q = (req.query.q || req.query.search || '').trim();
+    const minCapacity = Number(req.query.minCapacity || req.query.capacity);
+    const maxPrice = Number(req.query.maxPrice);
+    const minPrice = Number(req.query.minPrice);
 
     if (q) {
       const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
@@ -55,11 +58,62 @@ const getHotels = async (req, res) => {
       .populate('ownerId', 'fullName email phone')
       .sort({ hotelName: 1 });
 
-    const hotelsWithCounts = await attachHallCounts(hotels);
+    const hotelIds = hotels.map((hotel) => hotel._id);
+    const hallFilter = {
+      hotelId: { $in: hotelIds },
+      isAvailable: { $ne: false },
+    };
+
+    if (Number.isFinite(minCapacity) && minCapacity > 0) {
+      hallFilter.capacity = { ...(hallFilter.capacity || {}), $gte: minCapacity };
+    }
+    if (Number.isFinite(maxPrice) && maxPrice >= 0) {
+      hallFilter.pricePerDay = {
+        ...(hallFilter.pricePerDay || {}),
+        $lte: maxPrice,
+      };
+    }
+    if (Number.isFinite(minPrice) && minPrice >= 0) {
+      hallFilter.pricePerDay = {
+        ...(hallFilter.pricePerDay || {}),
+        $gte: minPrice,
+      };
+    }
+
+    const halls = hotelIds.length
+      ? await Hall.find(hallFilter).sort({ hallName: 1 }).lean()
+      : [];
+
+    const hallsByHotel = new Map();
+    halls.forEach((hall) => {
+      const key = String(hall.hotelId);
+      if (!hallsByHotel.has(key)) {
+        hallsByHotel.set(key, []);
+      }
+      hallsByHotel.get(key).push(hall);
+    });
+
+    const hasHallFilters =
+      (Number.isFinite(minCapacity) && minCapacity > 0) ||
+      (Number.isFinite(maxPrice) && maxPrice >= 0) ||
+      (Number.isFinite(minPrice) && minPrice >= 0);
+
+    const hotelsWithHalls = hotels
+      .map((hotel) => {
+        const plain =
+          typeof hotel.toObject === 'function' ? hotel.toObject() : hotel;
+        const hotelHalls = hallsByHotel.get(String(plain._id)) || [];
+        return {
+          ...plain,
+          halls: hotelHalls,
+          hallCount: hotelHalls.length,
+        };
+      })
+      .filter((hotel) => !hasHallFilters || hotel.hallCount > 0);
 
     return res.status(200).json({
-      count: hotelsWithCounts.length,
-      hotels: hotelsWithCounts,
+      count: hotelsWithHalls.length,
+      hotels: hotelsWithHalls,
     });
   } catch (error) {
     return res.status(500).json({
@@ -174,19 +228,39 @@ const createHotel = async (req, res) => {
  */
 const getMyHotel = async (req, res) => {
   try {
-    const hotel = await Hotel.findOne({ ownerId: req.user._id }).populate(
+    const ownerId = req.user._id;
+
+    let hotel = await Hotel.findOne({ ownerId }).populate(
       'ownerId',
       'fullName email phone role avatarUrl hasSeenApprovalAlert'
     );
+
+    // Fallback if ownerId was stored as a plain string in older data
+    if (!hotel) {
+      hotel = await Hotel.findOne({ ownerId: String(ownerId) }).populate(
+        'ownerId',
+        'fullName email phone role avatarUrl hasSeenApprovalAlert'
+      );
+    }
 
     if (!hotel) {
       return res.status(404).json({ message: 'Hotel not found' });
     }
 
     const halls = await Hall.find({ hotelId: hotel._id }).sort({ hallName: 1 });
+    const plain = typeof hotel.toObject === 'function' ? hotel.toObject() : hotel;
+    const owner =
+      plain.ownerId && typeof plain.ownerId === 'object' ? plain.ownerId : null;
 
     return res.status(200).json({
-      hotel,
+      hotel: {
+        ...plain,
+        verificationStatus: String(plain.verificationStatus || 'pending')
+          .trim()
+          .toLowerCase(),
+        // Convenience for older frontend checks that read this on hotel
+        hasSeenApprovalAlert: owner?.hasSeenApprovalAlert === true,
+      },
       halls,
       hallCount: halls.length,
     });
@@ -422,7 +496,11 @@ const rejectHotel = async (req, res) => {
 const updateHotelStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { verificationStatus, rejectionReason } = req.body;
+    const { rejectionReason } = req.body;
+    // Accept both verificationStatus (API) and status (admin UI alias)
+    const rawStatus = req.body.verificationStatus ?? req.body.status;
+    const verificationStatus =
+      typeof rawStatus === 'string' ? rawStatus.trim().toLowerCase() : rawStatus;
 
     if (!isValidObjectId(id)) {
       return res.status(400).json({ message: 'Invalid hotel id' });

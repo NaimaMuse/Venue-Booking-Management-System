@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { getDashboardPath, saveAuth } from '../../utils/auth';
 import api, { getApiError } from '../../utils/api';
+import {
+  getPendingBooking,
+  submitPendingBookingIfAny,
+} from '../../utils/pendingBooking';
 
 function Signup() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const pendingBooking = Boolean(
+    location.state?.pendingBooking || getPendingBooking()
+  );
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -43,10 +51,14 @@ function Signup() {
   }, []);
 
   useEffect(() => {
+    if (pendingBooking) {
+      setRole('customer');
+      return;
+    }
     if (!adminAvailable && role === 'admin') {
       setRole('customer');
     }
-  }, [adminAvailable, role]);
+  }, [adminAvailable, pendingBooking, role]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -119,7 +131,33 @@ function Signup() {
         return;
       }
 
-      navigate(getDashboardPath(data.user.role));
+      if (data.user?.role === 'customer') {
+        try {
+          const submitted = await submitPendingBookingIfAny(api);
+          if (submitted) {
+            navigate('/customer/my-bookings', {
+              state: { toast: 'Booking request submitted successfully.' },
+            });
+            return;
+          }
+        } catch (bookingErr) {
+          navigate(location.state?.from || '/customer/my-bookings', {
+            state: {
+              toast: getApiError(
+                bookingErr,
+                'Account created. Please submit the booking again.'
+              ),
+            },
+          });
+          return;
+        }
+      }
+
+      navigate(
+        location.state?.from && data.user?.role === 'customer'
+          ? location.state.from
+          : getDashboardPath(data.user.role)
+      );
     } catch (err) {
       const message = getApiError(err, 'Unable to create account right now');
       setError(message);
@@ -140,7 +178,7 @@ function Signup() {
       <section className="signup-shell">
         <aside className="signup-aside" aria-hidden="true">
           <div className="signup-aside-inner">
-            <p className="signup-aside-kicker">Hargeisa Hall Finder</p>
+            <p className="signup-aside-kicker">HallHub</p>
             <h2>Find and list the best event halls in Hargeisa.</h2>
             <p>
               Create an account to book venues, schedule visits, or register
@@ -160,51 +198,55 @@ function Signup() {
           </Link>
 
           <header className="signup-header">
-            <img src="/images/logo.png" alt="Hargeisa Hall Finder" />
+            <img src="/images/logo.png" alt="HallHub" />
             <div>
-              <p className="signup-brand">Hargeisa Hall Finder</p>
+              <p className="signup-brand">HallHub</p>
               <h1>Create account</h1>
             </div>
           </header>
 
           <p className="signup-subtitle">
-            {adminAvailable
-              ? 'Join as a customer, hotel owner, or create the one-time system admin account.'
-              : 'Join as a customer to book halls, or as a hotel owner to list your venue.'}
+            {pendingBooking
+              ? 'Create a customer account to complete your booking request.'
+              : adminAvailable
+                ? 'Join as a customer, hotel owner, or create the one-time system admin account.'
+                : 'Join as a customer to book halls, or as a hotel owner to list your venue.'}
           </p>
 
           {error && <p className="auth-error">{error}</p>}
 
           <form className="signup-form" onSubmit={handleSubmit}>
-            <div
-              className={`signup-role-toggle${adminAvailable ? ' has-admin' : ''}`}
-              role="group"
-              aria-label="Account type"
-            >
-              <button
-                type="button"
-                className={role === 'customer' ? 'is-active' : ''}
-                onClick={() => setRole('customer')}
+            {!pendingBooking && (
+              <div
+                className={`signup-role-toggle${adminAvailable ? ' has-admin' : ''}`}
+                role="group"
+                aria-label="Account type"
               >
-                Customer
-              </button>
-              <button
-                type="button"
-                className={role === 'hotel_owner' ? 'is-active' : ''}
-                onClick={() => setRole('hotel_owner')}
-              >
-                Hotel Owner
-              </button>
-              {adminAvailable && (
                 <button
                   type="button"
-                  className={role === 'admin' ? 'is-active' : ''}
-                  onClick={() => setRole('admin')}
+                  className={role === 'customer' ? 'is-active' : ''}
+                  onClick={() => setRole('customer')}
                 >
-                  Admin
+                  Customer
                 </button>
-              )}
-            </div>
+                <button
+                  type="button"
+                  className={role === 'hotel_owner' ? 'is-active' : ''}
+                  onClick={() => setRole('hotel_owner')}
+                >
+                  Hotel Owner
+                </button>
+                {adminAvailable && (
+                  <button
+                    type="button"
+                    className={role === 'admin' ? 'is-active' : ''}
+                    onClick={() => setRole('admin')}
+                  >
+                    Admin
+                  </button>
+                )}
+              </div>
+            )}
 
             {role === 'admin' && (
               <p className="signup-admin-note">
@@ -315,7 +357,17 @@ function Signup() {
           </form>
 
           <p className="auth-toggle">
-            Already have an account? <Link to="/login">Log In</Link>
+            Already have an account?{' '}
+            <Link
+              to="/login"
+              state={
+                pendingBooking
+                  ? { from: location.state?.from, pendingBooking: true }
+                  : undefined
+              }
+            >
+              Log In
+            </Link>
           </p>
         </div>
       </section>

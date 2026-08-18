@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    hasSeenApprovalAlert: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

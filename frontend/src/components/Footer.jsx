@@ -6,7 +6,7 @@ function Footer() {
     <footer className="site-footer">
       <div className="footer-inner">
         <div className="footer-col">
-          <h3>Hargeisa Hall Finder</h3>
+          <h3>HallHub</h3>
           <p>
             Discover hotels and banquet halls in Hargeisa, compare capacity and
             pricing, and schedule hall visits before you book.

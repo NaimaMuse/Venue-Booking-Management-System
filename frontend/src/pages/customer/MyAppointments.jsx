@@ -87,7 +87,7 @@ function MyAppointments() {
     <div className="customer-page appointments-page">
       <section className="customer-page-header appointments-hero">
         <div>
-          <p className="customer-eyebrow">Hargeisa Hall Finder</p>
+          <p className="customer-eyebrow">HallHub</p>
           <h1>My Appointments</h1>
           <p>
             Track scheduled hall inspection visits confirmed by hotel owners.

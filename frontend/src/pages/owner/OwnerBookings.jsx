@@ -108,9 +108,22 @@ function OwnerBookings() {
       setBusyId(bookingId);
       setError('');
 
-      const { data } = await api.patch(`/api/bookings/${bookingId}/status`, {
-        status,
-      });
+      const action =
+        status === 'accepted'
+          ? 'accept'
+          : status === 'rejected'
+            ? 'reject'
+            : status === 'cancelled'
+              ? 'cancel'
+              : null;
+
+      if (!action) {
+        throw new Error(`Unsupported booking status: ${status}`);
+      }
+
+      const { data } = await api.patch(
+        `/api/bookings/${bookingId}/${action}`
+      );
 
       setBookings((prev) =>
         prev.map((item) => (item._id === bookingId ? data.booking : item))

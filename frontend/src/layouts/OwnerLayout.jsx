@@ -76,7 +76,7 @@ function OwnerLayout() {
 
   const handleLogout = () => {
     clearAuth();
-    navigate('/login');
+    navigate('/');
   };
 
   const firstName = getFirstName(user?.fullName);

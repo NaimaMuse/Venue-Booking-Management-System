@@ -138,7 +138,7 @@ function Hotels() {
         <div className="hh-hero-inner">
           {focusedHotel ? (
             <>
-              <p className="hh-eyebrow">Hargeisa Hall Finder</p>
+              <p className="hh-eyebrow">HallHub</p>
               <h1>{focusedHotel.hotelName}</h1>
               <p className="hh-hero-sub">
                 {[focusedHotel.city, focusedHotel.address]
@@ -148,7 +148,7 @@ function Hotels() {
             </>
           ) : (
             <>
-              <h1 className="hh-brand">Hargeisa Hall Finder</h1>
+              <h1 className="hh-brand">HallHub</h1>
               <p className="hh-section-title">Hotels &amp; Halls</p>
               <p className="hh-hero-sub">
                 Search by hotel, capacity, or price.
@@ -230,7 +230,7 @@ function Hotels() {
                   style={{ animationDelay: `${hotelIndex * 60}ms` }}
                 >
                   <header className="hh-hotel-head">
-                    <div>
+                    <div className="hh-hotel-head-main">
                       <p className="hh-hotel-place">
                         {hotel.city}
                         {hotel.address ? ` · ${hotel.address}` : ''}
@@ -243,14 +243,25 @@ function Hotels() {
                           {hotel.hotelName}
                         </Link>
                       </h2>
+                      {hotel.description ? (
+                        <p className="hh-hotel-description">{hotel.description}</p>
+                      ) : null}
                     </div>
-                    <span className="hh-hotel-count">
-                      {halls.length} hall{halls.length === 1 ? '' : 's'}
-                    </span>
+                    <div className="hh-hotel-actions">
+                      <span className="hh-hotel-count">
+                        {halls.length || hotel.hallCount || 0} hall
+                        {(halls.length || hotel.hallCount || 0) === 1 ? '' : 's'}
+                      </span>
+                      <Link to={`/hotels/${hotel._id}`} className="hh-hotel-link">
+                        View hotel
+                      </Link>
+                    </div>
                   </header>
 
                   {halls.length === 0 ? (
-                    <p className="hh-empty-inline">No halls listed yet.</p>
+                    <div className="hh-empty-panel">
+                      <p className="hh-empty-inline">No halls listed yet.</p>
+                    </div>
                   ) : (
                     <div className="hh-hall-grid">
                       {halls.map((hall, hallIndex) => (

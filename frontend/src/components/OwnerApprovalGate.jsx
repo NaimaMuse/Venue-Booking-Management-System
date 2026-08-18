@@ -1,14 +1,17 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import api, { getApiError } from '../utils/api';
-import { clearAuth } from '../utils/auth';
+import { clearAuth, getUser } from '../utils/auth';
 
 function OwnerApprovalGate({ children }) {
+  const location = useLocation();
+  const user = getUser();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [hotel, setHotel] = useState(null);
   const [checking, setChecking] = useState(false);
+  const [missingHotel, setMissingHotel] = useState(false);
 
   const loadStatus = useCallback(async ({ silent = false } = {}) => {
     try {
@@ -19,11 +22,31 @@ function OwnerApprovalGate({ children }) {
       }
       setError('');
 
-      const { data } = await api.get('/api/hotels/my-hotel');
-      setHotel(data.hotel || null);
+      let data;
+      try {
+        ({ data } = await api.get('/api/hotels/my-hotel'));
+      } catch (firstErr) {
+        if (firstErr.response?.status === 404) {
+          ({ data } = await api.get('/api/hotels/mine'));
+        } else {
+          throw firstErr;
+        }
+      }
+
+      const nextHotel = data?.hotel || null;
+      if (nextHotel?.verificationStatus) {
+        nextHotel.verificationStatus = String(nextHotel.verificationStatus)
+          .trim()
+          .toLowerCase();
+      }
+
+      setHotel(nextHotel);
+      setMissingHotel(false);
     } catch (err) {
       if (err.response?.status === 404) {
         setHotel(null);
+        setMissingHotel(true);
+        setError('');
       } else {
         setError(getApiError(err, 'Unable to check approval status'));
       }
@@ -37,18 +60,29 @@ function OwnerApprovalGate({ children }) {
     loadStatus();
   }, [loadStatus]);
 
-  // Auto-refresh while waiting so approval unlocks the portal without re-login
+  const status = String(hotel?.verificationStatus || '').toLowerCase();
+  const isApproved = status === 'approved';
+  const isRejected = status === 'rejected';
+  const isPending = Boolean(hotel) && status === 'pending';
+
+  // Auto-refresh while waiting so approval unlocks without re-login
   useEffect(() => {
-    if (hotel?.verificationStatus === 'approved') {
+    if (isApproved || missingHotel) {
       return undefined;
     }
 
     const timer = setInterval(() => {
       loadStatus({ silent: true });
-    }, 15000);
+    }, 10000);
 
     return () => clearInterval(timer);
-  }, [hotel?.verificationStatus, loadStatus]);
+  }, [isApproved, missingHotel, loadStatus]);
+
+  // Allow hotel profile when this account has not created a hotel yet
+  const onHotelProfile = location.pathname.startsWith('/owner/hotel-profile');
+  if (!loading && missingHotel && onHotelProfile) {
+    return children;
+  }
 
   if (loading) {
     return (
@@ -60,12 +94,9 @@ function OwnerApprovalGate({ children }) {
     );
   }
 
-  if (hotel?.verificationStatus === 'approved') {
+  if (isApproved) {
     return children;
   }
-
-  const isRejected = hotel?.verificationStatus === 'rejected';
-  const isPending = !hotel || hotel.verificationStatus === 'pending';
 
   return (
     <div className="owner-waiting-screen" role="dialog" aria-modal="true">
@@ -76,28 +107,39 @@ function OwnerApprovalGate({ children }) {
         </div>
 
         <p className="owner-waiting-kicker">
-          {isRejected ? 'Application rejected' : 'Waiting for approval'}
+          {missingHotel
+            ? 'Hotel profile required'
+            : isRejected
+              ? 'Application rejected'
+              : 'Waiting for approval'}
         </p>
 
         <h1>
-          {isRejected
-            ? 'Your hotel was not approved'
-            : 'Waiting until you are approved'}
+          {missingHotel
+            ? 'No hotel linked to this account'
+            : isRejected
+              ? 'Your hotel was not approved'
+              : 'Waiting until you are approved'}
         </h1>
 
         <p className="owner-waiting-copy">
-          {isRejected
-            ? hotel?.rejectionReason ||
-              'Please contact support or update your hotel details after talking to the admin.'
-            : hotel
-              ? `Your hotel “${hotel.hotelName}” is under admin review. You cannot open the owner dashboard until it is approved.`
-              : 'Your owner account is waiting for hotel approval. You cannot open the owner system until an admin approves you.'}
+          {missingHotel
+            ? `Signed in as ${user?.email || 'owner'}. Create your hotel profile first, or log in with the same owner account that submitted the hotel the admin approved.`
+            : isRejected
+              ? hotel?.rejectionReason ||
+                'Please contact support or update your hotel details after talking to the admin.'
+              : `Your hotel “${hotel?.hotelName || 'Hotel'}” is under admin review (status: ${status || 'pending'}). You cannot open the owner dashboard until it is approved.`}
         </p>
 
         {error && <p className="auth-error">{error}</p>}
 
         <div className="owner-waiting-actions">
-          {isPending && (
+          {missingHotel && (
+            <Link to="/owner/hotel-profile" className="customer-gold-btn">
+              Create hotel profile
+            </Link>
+          )}
+          {(isPending || (!missingHotel && !isRejected)) && (
             <button
               type="button"
               className="customer-gold-btn"
@@ -115,7 +157,7 @@ function OwnerApprovalGate({ children }) {
             className="owner-reject-btn"
             onClick={() => {
               clearAuth();
-              window.location.href = '/login';
+              window.location.href = '/';
             }}
           >
             Logout

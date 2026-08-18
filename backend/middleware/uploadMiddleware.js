@@ -13,6 +13,12 @@ const ALLOWED_MIME_TYPES = new Set([
   'image/webp',
 ]);
 
+const ALLOWED_VIDEO_MIME_TYPES = new Set([
+  'video/mp4',
+  'video/webm',
+  'video/quicktime',
+]);
+
 const hallImageStorage = multer.diskStorage({
   destination: (_req, _file, cb) => {
     cb(null, hallsUploadDir);
@@ -24,29 +30,39 @@ const hallImageStorage = multer.diskStorage({
   },
 });
 
-const imageFileFilter = (_req, file, cb) => {
-  if (ALLOWED_MIME_TYPES.has(file.mimetype)) {
+const hallMediaFileFilter = (_req, file, cb) => {
+  if (file.fieldname === 'images' && ALLOWED_MIME_TYPES.has(file.mimetype)) {
     return cb(null, true);
   }
 
-  const err = new Error('Only jpeg, png, and webp images are allowed');
+  if (file.fieldname === 'video' && ALLOWED_VIDEO_MIME_TYPES.has(file.mimetype)) {
+    return cb(null, true);
+  }
+
+  const err = new Error(
+    file.fieldname === 'video'
+      ? 'Only MP4, WEBM, or MOV videos are allowed'
+      : 'Only jpeg, png, and webp images are allowed'
+  );
   err.status = 400;
   return cb(err, false);
 };
 
 /**
- * Multipart field name: `images` (up to 5 files).
+ * Multipart fields:
+ * - `images` up to 5 files
+ * - `video` up to 1 file
  */
-const uploadHallImages = multer({
+const uploadHallMedia = multer({
   storage: hallImageStorage,
-  fileFilter: imageFileFilter,
+  fileFilter: hallMediaFileFilter,
   limits: {
-    files: 5,
-    fileSize: 5 * 1024 * 1024, // 5 MB per file
+    files: 6,
+    fileSize: 25 * 1024 * 1024, // allow one short hall video
   },
 });
 
 module.exports = {
-  uploadHallImages,
+  uploadHallMedia,
   hallsUploadDir,
 };

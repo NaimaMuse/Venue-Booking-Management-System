@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { getDashboardPath, saveAuth } from '../../utils/auth';
 import api, { getApiError } from '../../utils/api';
+import { submitPendingBookingIfAny } from '../../utils/pendingBooking';
 
 function Login() {
   const navigate = useNavigate();
@@ -37,6 +38,28 @@ function Login() {
 
       saveAuth(data.token, data.user);
 
+      if (data.user.role === 'customer') {
+        try {
+          const submitted = await submitPendingBookingIfAny(api);
+          if (submitted) {
+            navigate('/customer/my-bookings', {
+              state: { toast: 'Booking request submitted successfully.' },
+            });
+            return;
+          }
+        } catch (bookingErr) {
+          navigate(location.state?.from || '/customer/my-bookings', {
+            state: {
+              toast: getApiError(
+                bookingErr,
+                'Signed in. Please submit the booking again.'
+              ),
+            },
+          });
+          return;
+        }
+      }
+
       const redirectTo =
         location.state?.from && data.user.role === 'customer'
           ? location.state.from
@@ -55,9 +78,9 @@ function Login() {
       <section className="auth-wrap">
         <div className="auth-card">
           <div className="auth-brand">
-            <img src="/images/logo.png" alt="Hargeisa Hall Finder" />
+            <img src="/images/logo.png" alt="HallHub" />
             <div>
-              <p className="auth-brand-name">Hargeisa Hall Finder</p>
+              <p className="auth-brand-name">HallHub</p>
               <h1>Welcome Back</h1>
             </div>
           </div>
@@ -95,7 +118,10 @@ function Login() {
           </form>
 
           <p className="auth-toggle">
-            Don&apos;t have an account? <Link to="/signup">Sign Up</Link>
+            Don&apos;t have an account?{' '}
+            <Link to="/signup" state={location.state}>
+              Sign Up
+            </Link>
           </p>
         </div>
       </section>

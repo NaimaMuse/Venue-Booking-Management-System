@@ -18,5 +18,8 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.1",
     "multer": "^2.2.0"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

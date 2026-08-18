@@ -28,7 +28,7 @@ function AboutUs() {
           <span className="about-label">About Us</span>
           <h2>We Want To Give You The Best Services</h2>
           <p className="about-copy">
-            Hargeisa Hall Finder helps customers discover approved banquet halls,
+            HallHub helps customers discover approved banquet halls,
             compare capacity and pricing, and schedule venue visits before
             confirming an event date — while hotel owners list and manage their
             venues with confidence.

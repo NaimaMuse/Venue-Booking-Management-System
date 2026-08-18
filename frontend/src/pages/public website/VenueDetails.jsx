@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import { API_BASE, getToken, getUser } from '../../utils/auth';
 import api, { getApiError } from '../../utils/api';
+import { savePendingBooking } from '../../utils/pendingBooking';
 
 const resolveImage = (image) => {
   if (!image) {
@@ -13,6 +14,16 @@ const resolveImage = (image) => {
     return image;
   }
   return `${API_BASE}${image}`;
+};
+
+const resolveVideo = (video) => {
+  if (!video) {
+    return '';
+  }
+  if (video.startsWith('http')) {
+    return video;
+  }
+  return `${API_BASE}${video}`;
 };
 
 const formatUnavailableLabel = (isoDate) => {
@@ -80,35 +91,15 @@ function VenueDetails() {
     const list = hall?.images?.length ? hall.images : ['/banner01.png'];
     return list.map(resolveImage);
   }, [hall]);
+  const hallVideo = useMemo(() => resolveVideo(hall?.videoUrl || ''), [hall]);
 
   const currentUser = getUser();
   const canRequestBooking = !currentUser || currentUser.role === 'customer';
   const dateConflict = form.eventDate && unavailableSet.has(form.eventDate);
 
-  const ensureCustomer = () => {
-    const token = getToken();
-    const user = getUser();
-
-    if (!token || !user) {
-      navigate('/login', { state: { from: `/venues/${id}` } });
-      return false;
-    }
-
-    if (user.role !== 'customer') {
-      setFormError('Booking requests are available for customer accounts.');
-      return false;
-    }
-
-    return true;
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setFormError('');
-
-    if (!ensureCustomer()) {
-      return;
-    }
 
     if (!form.eventDate || !form.guestCount) {
       setFormError('Event date and guest count are required.');
@@ -124,6 +115,30 @@ function VenueDetails() {
 
     if (Number(form.guestCount) < 1) {
       setFormError('Guest count must be at least 1.');
+      return;
+    }
+
+    const token = getToken();
+    const user = getUser();
+
+    if (!token || !user) {
+      savePendingBooking({
+        hallId: id,
+        eventDate: form.eventDate,
+        guestCount: Number(form.guestCount),
+        specialNotes: form.specialNotes.trim(),
+      });
+      navigate('/signup', {
+        state: {
+          from: `/venues/${id}`,
+          pendingBooking: true,
+        },
+      });
+      return;
+    }
+
+    if (user.role !== 'customer') {
+      setFormError('Booking requests are available for customer accounts.');
       return;
     }
 
@@ -241,6 +256,16 @@ function VenueDetails() {
                     </div>
                   )}
                 </div>
+
+                {hallVideo && (
+                  <div className="venue-media-video">
+                    <div className="venue-media-video-head">
+                      <h2>Hall video</h2>
+                      <span>Owner uploaded preview</span>
+                    </div>
+                    <video src={hallVideo} controls preload="metadata" />
+                  </div>
+                )}
 
                 <div className="venue-book-tabs">
                   <button

@@ -26,6 +26,16 @@ const resolveImage = (image) => {
   return `${API_BASE}${image}`;
 };
 
+const resolveVideo = (video) => {
+  if (!video) {
+    return '';
+  }
+  if (video.startsWith('http') || video.startsWith('blob:')) {
+    return video;
+  }
+  return `${API_BASE}${video}`;
+};
+
 function HallForm() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -43,6 +53,9 @@ function HallForm() {
   const [existingImages, setExistingImages] = useState([]);
   const [newFiles, setNewFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
+  const [existingVideo, setExistingVideo] = useState('');
+  const [newVideoFile, setNewVideoFile] = useState(null);
+  const [videoPreview, setVideoPreview] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -84,6 +97,7 @@ function HallForm() {
           });
           setAmenities(hall.amenities || []);
           setExistingImages(hall.images || []);
+          setExistingVideo(hall.videoUrl || '');
         }
       } catch (err) {
         setError(getApiError(err, 'Unable to load form data'));
@@ -100,6 +114,17 @@ function HallForm() {
     setPreviews(urls);
     return () => urls.forEach((url) => URL.revokeObjectURL(url));
   }, [newFiles]);
+
+  useEffect(() => {
+    if (!newVideoFile) {
+      setVideoPreview('');
+      return undefined;
+    }
+
+    const url = URL.createObjectURL(newVideoFile);
+    setVideoPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [newVideoFile]);
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -135,6 +160,20 @@ function HallForm() {
     setNewFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleVideoFile = (event) => {
+    const file = event.target.files?.[0] || null;
+    if (!file) {
+      return;
+    }
+    setError('');
+    setNewVideoFile(file);
+    event.target.value = '';
+  };
+
+  const removeVideoFile = () => {
+    setNewVideoFile(null);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
@@ -155,6 +194,9 @@ function HallForm() {
       body.append('amenities', JSON.stringify(amenities));
       body.append('isAvailable', String(form.isAvailable));
       newFiles.forEach((file) => body.append('images', file));
+      if (newVideoFile) {
+        body.append('video', newVideoFile);
+      }
 
       if (isEdit) {
         await api.put(`/api/halls/${id}`, body);
@@ -179,6 +221,7 @@ function HallForm() {
       : '');
   const photoCount = newFiles.length || existingImages.length;
   const remainingSlots = Math.max(0, 5 - newFiles.length);
+  const hallVideo = videoPreview || resolveVideo(existingVideo);
 
   return (
     <div className="customer-page hall-form-page">
@@ -369,6 +412,39 @@ function HallForm() {
                   </div>
                 )}
               </div>
+
+              <div className="hall-form-upload hall-form-full">
+                <div className="hall-form-section-head">
+                  <p className="owner-field-label">Hall video</p>
+                  <span>Optional · 1 short MP4, WEBM, or MOV file</span>
+                </div>
+
+                <label className="hall-form-dropzone">
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm,video/quicktime,.mov"
+                    hidden
+                    onChange={handleVideoFile}
+                  />
+                  <strong>{hallVideo ? 'Replace video' : 'Choose video'}</strong>
+                  <span>Show the space, decor, entrance, or seating layout.</span>
+                </label>
+
+                {hallVideo && (
+                  <div className="hall-form-video-preview">
+                    <video src={hallVideo} controls preload="metadata" />
+                    {newVideoFile && (
+                      <button
+                        type="button"
+                        className="hall-form-remove-video"
+                        onClick={removeVideoFile}
+                      >
+                        Remove selected video
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
               <div className="hall-form-actions">
                 <Link to="/owner/halls" className="owner-schedule-btn">
                   Cancel
@@ -404,6 +480,11 @@ function HallForm() {
               >
                 {!coverPreview && <span>Add a cover photo</span>}
               </div>
+              {hallVideo && (
+                <div className="hall-preview-video-wrap">
+                  <video src={hallVideo} controls preload="metadata" />
+                </div>
+              )}
               <div className="hall-preview-body">
                 <p className="hall-preview-hotel">
                   {hotel?.hotelName || 'Your hotel'}
@@ -454,6 +535,7 @@ function HallForm() {
                 Amenities selected
               </li>
               <li className={photoCount > 0 ? 'is-done' : ''}>Photos added</li>
+              <li className={hallVideo ? 'is-done' : ''}>Video added</li>
             </ul>
           </aside>
         </div>

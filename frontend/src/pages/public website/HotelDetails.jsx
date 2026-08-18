@@ -97,7 +97,7 @@ function HotelDetails() {
               <div className="hh-details-hero-ornament" aria-hidden="true" />
               <div className="hh-details-hero-copy">
                 <p className="hh-eyebrow hh-details-eyebrow">
-                  Hargeisa Hall Finder
+                  HallHub
                 </p>
                 <p className="hh-details-hero-place">
                   {hotel.city}
