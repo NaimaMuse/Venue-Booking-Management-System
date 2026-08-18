@@ -74,7 +74,7 @@ function CustomerLayout() {
 
   const handleLogout = () => {
     clearAuth();
-    navigate('/login');
+    navigate('/');
   };
 
   const firstName = getFirstName(user?.fullName);
@@ -95,7 +95,7 @@ function CustomerLayout() {
           <div className="customer-sidebar-header">
             <Link to="/" className="customer-brand customer-brand-full">
               <span className="customer-brand-mark">HH</span>
-              <span className="customer-brand-text">Hargeisa Hall Finder</span>
+              <span className="customer-brand-text">HallHub</span>
             </Link>
             <button
               type="button"

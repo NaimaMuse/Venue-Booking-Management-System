@@ -1,9 +1,7 @@
 const TOKEN_KEY = 'hhf_token';
 const USER_KEY = 'hhf_user';
 
-export const API_BASE =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV ? '' : 'http://127.0.0.1:5000');
+export const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY);
 

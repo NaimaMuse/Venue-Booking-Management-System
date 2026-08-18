@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Hotel = require('../models/Hotel');
 
 const ALLOWED_REGISTER_ROLES = ['customer', 'hotel_owner'];
 
@@ -30,7 +31,18 @@ const sanitizeUser = (user) => ({
  */
 const register = async (req, res) => {
   try {
-    const { fullName, email, password, phone, role } = req.body;
+    const {
+      fullName,
+      email,
+      password,
+      phone,
+      role,
+      hotelName,
+      city,
+      address,
+      contactPhone,
+      description,
+    } = req.body;
 
     if (!fullName || !String(fullName).trim()) {
       return res.status(400).json({ message: 'Full name is required' });
@@ -60,6 +72,21 @@ const register = async (req, res) => {
       });
     }
 
+    if (requestedRole === 'hotel_owner') {
+      if (!hotelName || !String(hotelName).trim()) {
+        return res.status(400).json({ message: 'Hotel name is required' });
+      }
+      if (!city || !String(city).trim()) {
+        return res.status(400).json({ message: 'City is required' });
+      }
+      if (!address || !String(address).trim()) {
+        return res.status(400).json({ message: 'Address is required' });
+      }
+      if (!contactPhone || !String(contactPhone).trim()) {
+        return res.status(400).json({ message: 'Contact phone is required' });
+      }
+    }
+
     const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(400).json({ message: 'Email is already registered' });
@@ -75,12 +102,31 @@ const register = async (req, res) => {
       role: requestedRole,
     });
 
+    if (requestedRole === 'hotel_owner') {
+      try {
+        await Hotel.create({
+          ownerId: user._id,
+          hotelName: String(hotelName).trim(),
+          city: String(city).trim(),
+          address: String(address).trim(),
+          contactPhone: String(contactPhone).trim(),
+          description: description ? String(description).trim() : '',
+          verificationStatus: 'pending',
+          rejectionReason: '',
+        });
+      } catch (hotelError) {
+        await User.findByIdAndDelete(user._id).catch(() => null);
+        throw hotelError;
+      }
+    }
+
     const token = generateToken(user._id);
 
     return res.status(201).json({
       message: 'Registration successful',
       token,
       user: sanitizeUser(user),
+      awaitingApproval: requestedRole === 'hotel_owner',
     });
   } catch (error) {
     if (error.code === 11000) {

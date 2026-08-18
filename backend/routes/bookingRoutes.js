@@ -48,4 +48,16 @@ router.patch(
   scheduleAppointment
 );
 
+// Alias used by some frontend builds: PATCH /:id/status { status }
+router.patch('/:id/status', protect, authorize('hotel_owner'), (req, res, next) => {
+  const status = String(req.body?.status || '').toLowerCase();
+  if (status === 'accepted') return acceptBooking(req, res, next);
+  if (status === 'rejected') return rejectBooking(req, res, next);
+  if (status === 'cancelled') return cancelBooking(req, res, next);
+  if (status === 'confirmed') return confirmBooking(req, res, next);
+  return res.status(400).json({
+    message: 'status must be accepted, rejected, cancelled, or confirmed',
+  });
+});
+
 module.exports = router;

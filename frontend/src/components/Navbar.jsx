@@ -34,7 +34,7 @@ function Navbar() {
   const handleLogout = () => {
     clearAuth();
     setUser(null);
-    navigate('/login');
+    navigate('/');
   };
 
   const handleSectionClick = (event, link) => {
@@ -66,7 +66,7 @@ function Navbar() {
           handleSectionClick(event, { href: '/#home', hash: 'home' })
         }
       >
-        Hargeisa Hall Finder
+        HallHub
       </Link>
 
       <div className="nav-links">

@@ -2,46 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { API_BASE } from '../utils/auth';
-import api from '../utils/api';
-
-const MANUAL_HALLS = [
-  {
-    id: 'manual-1',
-    hallName: 'Grand Banquet Hall',
-    hotelName: 'Maansoor Hotel',
-    city: 'Hargeisa',
-    capacity: 400,
-    pricePerDay: 850,
-    image: '/banner01.png',
-    to: '/hotels',
-  },
-  {
-    id: 'manual-2',
-    hallName: 'Royal Entrance Hall',
-    hotelName: 'Ambassador Hotel',
-    city: 'Hargeisa',
-    capacity: 280,
-    pricePerDay: 620,
-    image: '/banner02.png',
-    to: '/hotels',
-  },
-  {
-    id: 'manual-3',
-    hallName: 'Garden Reception Hall',
-    hotelName: 'Maan-Soor Hotel',
-    city: 'Hargeisa',
-    capacity: 350,
-    pricePerDay: 740,
-    image: '/banner03.png',
-    to: '/hotels',
-  },
-];
+import api, { getApiError } from '../utils/api';
 
 const getHallImage = (hall) => {
-  if (hall.image) {
-    return hall.image;
-  }
-
   const firstImage = hall?.images?.[0];
   if (!firstImage) {
     return '/banner01.png';
@@ -52,38 +15,38 @@ const getHallImage = (hall) => {
   return `${API_BASE}${firstImage}`;
 };
 
-const mapDbHall = (hall) => ({
-  id: hall._id,
-  hallName: hall.hallName,
-  hotelName: hall.hotelId?.hotelName || 'Approved Hotel',
-  city: hall.hotelId?.city || 'Hargeisa',
-  capacity: hall.capacity,
-  pricePerDay: hall.pricePerDay,
-  image: getHallImage(hall),
-  to: `/venues/${hall._id}`,
-});
-
 function FeaturedVenues() {
-  const [dbHalls, setDbHalls] = useState([]);
+  const [halls, setHalls] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [start, setStart] = useState(0);
 
   useEffect(() => {
     const load = async () => {
       try {
+        setLoading(true);
+        setError('');
+
         const { data } = await api.get('/api/halls');
-        setDbHalls((data.halls || []).map(mapDbHall));
-      } catch {
-        setDbHalls([]);
+        setHalls(data.halls || []);
+        setStart(0);
+      } catch (err) {
+        setError(getApiError(err, 'Unable to load halls'));
+        setHalls([]);
+      } finally {
+        setLoading(false);
       }
     };
 
     load();
   }, []);
 
-  const halls = useMemo(() => [...MANUAL_HALLS, ...dbHalls], [dbHalls]);
   const visibleCount = 3;
   const maxStart = Math.max(0, halls.length - visibleCount);
-  const visible = halls.slice(start, start + visibleCount);
+  const visible = useMemo(
+    () => halls.slice(start, start + visibleCount),
+    [halls, start]
+  );
   const canSlide = halls.length > visibleCount;
 
   const goPrev = () => setStart((prev) => Math.max(0, prev - 1));
@@ -96,63 +59,74 @@ function FeaturedVenues() {
         <h2>Popular Halls in Hargeisa</h2>
       </div>
 
-      <div className="featured-slider">
-        {canSlide && (
-          <button
-            type="button"
-            className="featured-slider-btn is-prev"
-            onClick={goPrev}
-            disabled={start === 0}
-            aria-label="Previous halls"
-          >
-            ‹
-          </button>
-        )}
+      {loading && <p className="venues-status">Loading halls...</p>}
+      {error && <p className="venues-status venues-error">{error}</p>}
 
-        <div className="venue-grid featured-venue-grid">
-          {visible.map((hall) => (
-            <article key={hall.id} className="venue-card">
-              <div className="venue-card-image-wrap">
-                <img
-                  src={hall.image}
-                  alt={hall.hallName}
-                  className="venue-card-image"
-                  onError={(event) => {
-                    event.currentTarget.src = '/banner01.png';
-                  }}
-                />
-                <span className="capacity-badge">{hall.capacity} guests</span>
-              </div>
+      {!loading && !error && halls.length === 0 && (
+        <p className="venues-status">
+          Approved halls will appear here once hotel owners publish them.
+        </p>
+      )}
 
-              <div className="venue-card-body">
-                <h3>{hall.hallName}</h3>
-                <p className="venue-hotel">
-                  {hall.hotelName}
-                  {hall.city ? ` · ${hall.city}` : ''}
-                </p>
-                <p className="price-tag">
-                  ${Number(hall.pricePerDay).toLocaleString()}/day
-                </p>
-                <Link to={hall.to} className="venue-card-btn">
-                  View Details &amp; Reserve
-                </Link>
-              </div>
-            </article>
-          ))}
+      {!loading && !error && halls.length > 0 && (
+        <div className="featured-slider">
+          {canSlide && (
+            <button
+              type="button"
+              className="featured-slider-btn is-prev"
+              onClick={goPrev}
+              disabled={start === 0}
+              aria-label="Previous halls"
+            >
+              ‹
+            </button>
+          )}
+
+          <div className="venue-grid featured-venue-grid">
+            {visible.map((hall) => (
+              <article key={hall._id} className="venue-card">
+                <div className="venue-card-image-wrap">
+                  <img
+                    src={getHallImage(hall)}
+                    alt={hall.hallName}
+                    className="venue-card-image"
+                    onError={(event) => {
+                      event.currentTarget.src = '/banner01.png';
+                    }}
+                  />
+                  <span className="capacity-badge">{hall.capacity} guests</span>
+                </div>
+
+                <div className="venue-card-body">
+                  <h3>{hall.hallName}</h3>
+                  <p className="venue-hotel">
+                    {hall.hotelId?.hotelName || 'Approved Hotel'}
+                    {hall.hotelId?.city ? ` · ${hall.hotelId.city}` : ''}
+                  </p>
+                  <p className="price-tag">
+                    ${Number(hall.pricePerDay).toLocaleString()}/day
+                  </p>
+                  <Link to={`/venues/${hall._id}`} className="venue-card-btn">
+                    View Details &amp; Reserve
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          {canSlide && (
+            <button
+              type="button"
+              className="featured-slider-btn is-next"
+              onClick={goNext}
+              disabled={start >= maxStart}
+              aria-label="Next halls"
+            >
+              ›
+            </button>
+          )}
         </div>
-
-        {canSlide && (
-          <button
-            type="button"
-            className="featured-slider-btn is-next"
-            onClick={goNext}
-            disabled={start >= maxStart}
-            aria-label="Next halls"
-          >
-            ›
-          </button>
-        )}
-      </div>
+      )}
 
       <div className="featured-venues-cta">
         <Link to="/hotels" className="customer-gold-btn">

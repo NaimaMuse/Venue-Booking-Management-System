@@ -25,7 +25,7 @@ function ManageHalls() {
       setLoading(true);
       setError('');
 
-      const { data } = await api.get('/api/halls/my-halls');
+      const { data } = await api.get('/api/halls/mine');
       setHalls(data.halls || []);
     } catch (err) {
       setError(getApiError(err, 'Unable to load halls'));
