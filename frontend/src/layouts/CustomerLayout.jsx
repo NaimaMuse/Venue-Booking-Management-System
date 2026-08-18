@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import {
   clearAuth,
@@ -8,41 +8,50 @@ import {
   getInitials,
   getUser,
 } from '../utils/auth';
+import api from '../utils/api';
+import {
+  getNewAppointmentCount,
+  markAppointmentsSeen,
+} from '../utils/appointmentAlerts';
 
-const IconHome = () => (
+const IconDashboard = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path
-      d="M4 10.5L12 4L20 10.5V20H14.5V14H9.5V20H4V10.5Z"
+      d="M4 10.5L12 4L20 10.5V19C20 19.6 19.6 20 19 20H5C4.4 20 4 19.6 4 19V10.5Z"
       stroke="currentColor"
       strokeWidth="1.8"
       strokeLinejoin="round"
     />
+    <path d="M9.5 20V13H14.5V20" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
   </svg>
 );
 
-const IconCalendar = () => (
+const IconBrowse = () => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
+    <path d="M16 16L20 20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+);
+
+const IconBooking = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" strokeWidth="1.8" />
     <path d="M8 3.5V7M16 3.5V7M4 10H20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
   </svg>
 );
 
-const IconVisit = () => (
+const IconAppointment = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="M12 21s-6.5-5.2-6.5-10A6.5 6.5 0 0 1 12 4.5a6.5 6.5 0 0 1 6.5 6.5c0 4.8-6.5 10-6.5 10Z"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    />
-    <circle cx="12" cy="11" r="2.2" stroke="currentColor" strokeWidth="1.8" />
+    <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.8" />
+    <path d="M12 8V12.5L15 14.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
-const IconUser = () => (
+const IconProfile = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8" />
+    <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.8" />
     <path
-      d="M5.5 19.5c1.4-3.2 3.7-4.8 6.5-4.8s5.1 1.6 6.5 4.8"
+      d="M5 19.2C6.4 16.8 8.9 15.2 12 15.2C15.1 15.2 17.6 16.8 19 19.2"
       stroke="currentColor"
       strokeWidth="1.8"
       strokeLinecap="round"
@@ -50,17 +59,52 @@ const IconUser = () => (
   </svg>
 );
 
-const navItems = [
-  { label: 'Overview', to: '/customer/dashboard', end: true, icon: <IconHome /> },
-  { label: 'My Bookings', to: '/customer/my-bookings', icon: <IconCalendar /> },
-  { label: 'Appointments', to: '/customer/my-appointments', icon: <IconVisit /> },
-  { label: 'Profile', to: '/customer/profile', icon: <IconUser /> },
+const IconLogout = () => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M10 7V5.8C10 4.8 10.8 4 11.8 4H18.2C19.2 4 20 4.8 20 5.8V18.2C20 19.2 19.2 20 18.2 20H11.8C10.8 20 10 19.2 10 18.2V17"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    />
+    <path
+      d="M4 12H14M4 12L7 9M4 12L7 15"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const IconSearch = () => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
+    <path d="M16 16L20.5 20.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+);
+
+const mainNavItems = [
+  { label: 'Dashboard', to: '/customer/dashboard', end: true, icon: <IconDashboard /> },
+  { label: 'Browse Halls', to: '/hotels', end: false, icon: <IconBrowse /> },
+  { label: 'My Bookings', to: '/customer/my-bookings', icon: <IconBooking /> },
+  {
+    label: 'My Appointments',
+    to: '/customer/my-appointments',
+    icon: <IconAppointment />,
+    badgeKey: 'appointments',
+  },
+  { label: 'Profile', to: '/customer/profile', icon: <IconProfile /> },
 ];
 
 function CustomerLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState(() => getUser());
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [appointmentAlertCount, setAppointmentAlertCount] = useState(0);
+  const appointmentBookingsRef = useRef([]);
 
   useEffect(() => {
     const syncUser = () => setUser(getUser());
@@ -72,43 +116,105 @@ function CustomerLayout() {
     };
   }, []);
 
-  const handleLogout = () => {
-    clearAuth();
-    navigate('/');
+  useEffect(() => {
+    let active = true;
+
+    const loadAppointmentAlerts = async () => {
+      try {
+        const { data } = await api.get('/api/bookings/my-bookings');
+        if (!active) {
+          return;
+        }
+
+        const bookings = data.bookings || [];
+        appointmentBookingsRef.current = bookings;
+
+        if (location.pathname.startsWith('/customer/my-appointments')) {
+          markAppointmentsSeen(bookings);
+          setAppointmentAlertCount(0);
+        } else {
+          setAppointmentAlertCount(getNewAppointmentCount(bookings));
+        }
+      } catch (err) {
+        // Keep sidebar usable without alert counts.
+      }
+    };
+
+    loadAppointmentAlerts();
+
+    const onAlertsChanged = () => {
+      setAppointmentAlertCount(
+        getNewAppointmentCount(appointmentBookingsRef.current)
+      );
+    };
+
+    window.addEventListener('appointment-alerts-changed', onAlertsChanged);
+    const timer = setInterval(loadAppointmentAlerts, 20000);
+
+    return () => {
+      active = false;
+      window.removeEventListener('appointment-alerts-changed', onAlertsChanged);
+      clearInterval(timer);
+    };
+  }, [location.pathname]);
+
+  const closeSidebar = () => setSidebarOpen(false);
+
+  const handleAppointmentsClick = () => {
+    markAppointmentsSeen(appointmentBookingsRef.current);
+    setAppointmentAlertCount(0);
+    closeSidebar();
   };
 
+  const handleLogout = () => {
+    clearAuth();
+    navigate('/login');
+  };
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+    const query = search.trim();
+    navigate(query ? `/hotels?q=${encodeURIComponent(query)}` : '/hotels');
+    setSidebarOpen(false);
+  };
   const firstName = getFirstName(user?.fullName);
-  const avatarUrl = getAvatarUrl(user?.avatarUrl);
+  const fullName = user?.fullName || firstName;
   const initials = getInitials(user?.fullName);
+  const avatarSrc = getAvatarUrl(user?.avatarUrl);
 
   return (
     <div className={`customer-portal customer-portal-v2${sidebarOpen ? ' sidebar-open' : ''}`}>
-      <button
-        type="button"
-        className="customer-sidebar-backdrop"
-        aria-label="Close menu"
-        onClick={() => setSidebarOpen(false)}
-      />
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="customer-sidebar-backdrop"
+          aria-label="Close menu"
+          onClick={closeSidebar}
+        />
+      )}
 
-      <aside className="customer-sidebar">
+      <aside className="customer-sidebar" aria-label="Customer sidebar">
         <div className="customer-sidebar-top">
           <div className="customer-sidebar-header">
-            <Link to="/" className="customer-brand customer-brand-full">
-              <span className="customer-brand-mark">HH</span>
-              <span className="customer-brand-text">HallHub</span>
+            <Link to="/" className="owner-brand" onClick={closeSidebar}>
+              <span className="owner-brand-mark">HHF</span>
+              <span className="owner-brand-text">
+                <span>Hargeisa Hall</span>
+                <span>Finder</span>
+              </span>
             </Link>
             <button
               type="button"
               className="customer-sidebar-close"
-              onClick={() => setSidebarOpen(false)}
-              aria-label="Close menu"
+              aria-label="Close sidebar"
+              onClick={closeSidebar}
             >
               ×
             </button>
           </div>
 
-          <nav className="customer-sidebar-nav" aria-label="Customer">
-            {navItems.map((item) => (
+          <nav className="customer-sidebar-nav" aria-label="Main navigation">
+            {mainNavItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
@@ -116,10 +222,20 @@ function CustomerLayout() {
                 className={({ isActive }) =>
                   `customer-side-link${isActive ? ' is-active' : ''}`
                 }
-                onClick={() => setSidebarOpen(false)}
+                onClick={
+                  item.badgeKey === 'appointments'
+                    ? handleAppointmentsClick
+                    : closeSidebar
+                }
               >
                 <span className="customer-side-icon">{item.icon}</span>
                 <span className="customer-side-label">{item.label}</span>
+                {item.badgeKey === 'appointments' &&
+                  appointmentAlertCount > 0 && (
+                    <span className="owner-nav-badge">
+                      {appointmentAlertCount}
+                    </span>
+                  )}
               </NavLink>
             ))}
           </nav>
@@ -127,9 +243,9 @@ function CustomerLayout() {
 
         <div className="customer-sidebar-bottom">
           <div className="customer-sidebar-promo">
-            <p>Find a hall for your next event.</p>
-            <Link to="/hotels" className="customer-sidebar-promo-btn">
-              Browse halls
+            <p>Find your perfect event hall</p>
+            <Link to="/hotels" className="customer-sidebar-promo-btn" onClick={closeSidebar}>
+              Explore Halls
             </Link>
           </div>
           <button
@@ -137,7 +253,10 @@ function CustomerLayout() {
             className="customer-side-link customer-logout-link"
             onClick={handleLogout}
           >
-            Logout
+            <span className="customer-side-icon">
+              <IconLogout />
+            </span>
+            <span className="customer-side-label">Logout</span>
           </button>
         </div>
       </aside>
@@ -148,24 +267,48 @@ function CustomerLayout() {
             <button
               type="button"
               className="customer-menu-toggle"
-              aria-label="Open menu"
+              aria-label="Open sidebar"
               onClick={() => setSidebarOpen(true)}
             >
               <span />
               <span />
               <span />
             </button>
-            <div className="customer-topbar-title">
-              <p>Customer portal</p>
-              <strong>Welcome, {firstName}</strong>
+
+            <form className="customer-top-search" onSubmit={handleSearch}>
+              <span className="customer-top-search-icon" aria-hidden="true">
+                <IconSearch />
+              </span>
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search halls, hotels or locations..."
+              />
+            </form>
+
+            <div className="customer-top-location" aria-label="Location">
+              Hargeisa
             </div>
-            <Link to="/customer/profile" className="customer-user-chip">
-              {avatarUrl ? (
-                <img src={avatarUrl} alt="" className="customer-avatar-img" />
+
+            <Link
+              to="/customer/profile"
+              className="customer-user-chip customer-user-chip-v2"
+              title="Open profile"
+            >
+              {avatarSrc ? (
+                <img
+                  src={avatarSrc}
+                  alt={fullName}
+                  className="customer-avatar-img"
+                />
               ) : (
                 <span className="customer-avatar">{initials}</span>
               )}
-              <span className="customer-profile-name">{user?.fullName || 'Customer'}</span>
+              <span className="owner-user-meta">
+                <span className="customer-profile-name">{fullName}</span>
+                <span className="owner-user-role">Customer</span>
+              </span>
             </Link>
           </div>
         </header>

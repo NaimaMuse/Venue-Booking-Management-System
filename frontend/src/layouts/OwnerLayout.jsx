@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
-import OwnerApprovalGate from '../components/OwnerApprovalGate';
 import {
   clearAuth,
-  getAvatarUrl,
   getFirstName,
   getInitials,
   getUser,
 } from '../utils/auth';
+import api from '../utils/api';
+import OwnerApprovalGate from '../components/OwnerApprovalGate';
 
-const IconDashboard = () => (
+const IconOverview = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
     <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
@@ -22,47 +22,93 @@ const IconDashboard = () => (
 const IconHotel = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path
-      d="M4 19.5V6.8C4 5.8 4.8 5 5.8 5H14.2C15.2 5 16 5.8 16 6.8V19.5"
+      d="M4 19V8.5L12 4L20 8.5V19"
       stroke="currentColor"
       strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    <path d="M16 10H19.2C20.2 10 21 10.8 21 11.8V19.5" stroke="currentColor" strokeWidth="1.8" />
-    <path d="M3.5 19.5H20.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    <path d="M9 19V13H15V19" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
   </svg>
 );
 
-const IconHall = () => (
+const IconHalls = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <rect x="4" y="5" width="16" height="14" rx="2" stroke="currentColor" strokeWidth="1.8" />
-    <path d="M4 10H20" stroke="currentColor" strokeWidth="1.8" />
+    <path
+      d="M4 10H20V19H4V10Z"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+    />
+    <path d="M8 10V7H16V10" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+    <path d="M4 14H20" stroke="currentColor" strokeWidth="1.8" />
   </svg>
 );
 
-const IconBooking = () => (
+const IconBookings = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <rect x="4.5" y="5" width="15" height="15" rx="2" stroke="currentColor" strokeWidth="1.8" />
-    <path d="M8 3.5V6.5M16 3.5V6.5M4.5 10H19.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    <rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" strokeWidth="1.8" />
+    <path d="M8 3.5V7M16 3.5V7M4 10H20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
   </svg>
 );
 
 const IconReports = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M5 19V11M12 19V5M19 19V8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    <path
+      d="M5 19V5M5 19H19M5 19L10 12L13.5 15.5L19 8"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
-const navItems = [
-  { label: 'Dashboard', to: '/owner/dashboard', end: true, icon: <IconDashboard /> },
-  { label: 'Hotel Profile', to: '/owner/hotel-profile', icon: <IconHotel /> },
-  { label: 'Halls', to: '/owner/halls', icon: <IconHall /> },
-  { label: 'Bookings', to: '/owner/bookings', icon: <IconBooking /> },
-  { label: 'Reports', to: '/owner/reports', icon: <IconReports /> },
+const IconWebsite = () => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.8" />
+    <path
+      d="M4.5 12H19.5M12 4C14.2 6.3 15.3 9 15.3 12C15.3 15 14.2 17.7 12 20C9.8 17.7 8.7 15 8.7 12C8.7 9 9.8 6.3 12 4Z"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const IconLogout = () => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M10 7V5.8C10 4.8 10.8 4 11.8 4H18.2C19.2 4 20 4.8 20 5.8V18.2C20 19.2 19.2 20 18.2 20H11.8C10.8 20 10 19.2 10 18.2V17"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    />
+    <path
+      d="M4 12H14M4 12L7 9M4 12L7 15"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const mainNavItems = [
+  { label: 'Overview', to: '/owner/dashboard', end: true, icon: <IconOverview /> },
+  { label: 'My Hotel Profile', to: '/owner/hotel-profile', icon: <IconHotel /> },
+  { label: 'Manage Halls', to: '/owner/halls', end: true, icon: <IconHalls /> },
+  { label: 'Booking Requests', to: '/owner/bookings', icon: <IconBookings />, badgeKey: 'pending' },
+  { label: 'Hotel Report', to: '/owner/reports', icon: <IconReports /> },
 ];
 
 function OwnerLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState(() => getUser());
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     const syncUser = () => setUser(getUser());
@@ -74,70 +120,120 @@ function OwnerLayout() {
     };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+
+    const loadSidebarData = async () => {
+      try {
+        const bookingsResult = await api
+          .get('/api/bookings/owner-requests')
+          .catch((err) => err);
+
+        if (!active) {
+          return;
+        }
+
+        if (!(bookingsResult instanceof Error || bookingsResult.isAxiosError)) {
+          const bookings = bookingsResult.data?.bookings || [];
+          setPendingCount(bookings.filter((b) => b.status === 'pending').length);
+        }
+      } catch (err) {
+        // Sidebar can still render without booking meta.
+      }
+    };
+
+    loadSidebarData();
+    return () => {
+      active = false;
+    };
+  }, [location.pathname]);
+
   const handleLogout = () => {
     clearAuth();
-    navigate('/');
+    navigate('/login');
   };
 
+  const closeSidebar = () => setSidebarOpen(false);
   const firstName = getFirstName(user?.fullName);
-  const avatarUrl = getAvatarUrl(user?.avatarUrl);
   const initials = getInitials(user?.fullName);
 
   return (
     <OwnerApprovalGate>
       <div className={`customer-portal owner-portal${sidebarOpen ? ' sidebar-open' : ''}`}>
-        <button
-          type="button"
-          className="customer-sidebar-backdrop"
-          aria-label="Close menu"
-          onClick={() => setSidebarOpen(false)}
-        />
+        {sidebarOpen && (
+          <button
+            type="button"
+            className="customer-sidebar-backdrop"
+            aria-label="Close menu"
+            onClick={closeSidebar}
+          />
+        )}
 
-        <aside className="customer-sidebar">
+        <aside className="customer-sidebar" aria-label="Owner sidebar">
           <div className="customer-sidebar-top">
             <div className="customer-sidebar-header owner-sidebar-header">
-              <Link to="/" className="owner-brand">
-                <span className="owner-brand-mark">HH</span>
+              <Link
+                to="/owner/dashboard"
+                className="owner-brand"
+                onClick={closeSidebar}
+                title="Hargeisa Hall Finder"
+              >
+                <span className="owner-brand-mark">HHF</span>
                 <span className="owner-brand-text">
-                  <span>Owner</span>
-                  <span>Portal</span>
+                  <span>Hargeisa Hall</span>
+                  <span>Finder</span>
                 </span>
               </Link>
               <button
                 type="button"
                 className="customer-sidebar-close"
-                onClick={() => setSidebarOpen(false)}
-                aria-label="Close menu"
+                aria-label="Close sidebar"
+                onClick={closeSidebar}
               >
                 ×
               </button>
             </div>
 
-            <nav className="customer-sidebar-nav" aria-label="Owner">
-              {navItems.map((item) => (
+            <nav className="customer-sidebar-nav" aria-label="Owner navigation">
+              {mainNavItems.map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
                   end={item.end}
-                  className={({ isActive }) =>
-                    `customer-side-link${isActive ? ' is-active' : ''}`
-                  }
-                  onClick={() => setSidebarOpen(false)}
+                  className={({ isActive }) => {
+                    const hallsActive =
+                      item.to === '/owner/halls' &&
+                      location.pathname.startsWith('/owner/halls');
+                    return `customer-side-link${isActive || hallsActive ? ' is-active' : ''}`;
+                  }}
+                  onClick={closeSidebar}
                 >
                   <span className="customer-side-icon">{item.icon}</span>
                   <span className="customer-side-label">{item.label}</span>
+                  {item.badgeKey === 'pending' && pendingCount > 0 && (
+                    <span className="owner-nav-badge">{pendingCount}</span>
+                  )}
                 </NavLink>
               ))}
             </nav>
           </div>
 
           <div className="customer-sidebar-bottom">
+            <Link to="/" className="customer-side-link" onClick={closeSidebar}>
+              <span className="customer-side-icon">
+                <IconWebsite />
+              </span>
+              <span className="customer-side-label">Website</span>
+            </Link>
             <button
               type="button"
               className="customer-side-link customer-logout-link"
               onClick={handleLogout}
             >
-              Logout
+              <span className="customer-side-icon">
+                <IconLogout />
+              </span>
+              <span className="customer-side-label">Logout</span>
             </button>
           </div>
         </aside>
@@ -148,26 +244,23 @@ function OwnerLayout() {
               <button
                 type="button"
                 className="customer-menu-toggle"
-                aria-label="Open menu"
+                aria-label="Open sidebar"
                 onClick={() => setSidebarOpen(true)}
               >
                 <span />
                 <span />
                 <span />
               </button>
+
               <div className="customer-topbar-title owner-topbar-welcome">
-                <p>Hotel owner</p>
-                <strong>Hello, {firstName}</strong>
+                <strong>Welcome back, {firstName}</strong>
               </div>
+
               <div className="customer-user-chip owner-user-chip">
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt="" className="customer-avatar-img" />
-                ) : (
-                  <span className="customer-avatar">{initials}</span>
-                )}
+                <span className="customer-avatar">{initials}</span>
                 <span className="owner-user-meta">
-                  <span className="customer-profile-name">{user?.fullName || 'Owner'}</span>
-                  <span className="owner-user-role">Hotel owner</span>
+                  <span className="customer-profile-name">{firstName}</span>
+                  <span className="owner-user-role">Hotel Owner</span>
                 </span>
               </div>
             </div>
