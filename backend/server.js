@@ -13,6 +13,10 @@ const allowedOrigins = new Set(
   [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'http://localhost:5174',
+    'http://127.0.0.1:5174',
+    'http://localhost:5175',
+    'http://127.0.0.1:5175',
     process.env.CLIENT_URL,
     ...(process.env.CLIENT_URLS || '')
       .split(',')
@@ -31,12 +35,32 @@ const isRailwayFrontendOrigin = (origin) => {
   }
 };
 
+const isLocalViteOrigin = (origin) => {
+  try {
+    const { hostname, port, protocol } = new URL(origin);
+    const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
+    const vitePort = Number(port);
+    return (
+      protocol === 'http:' &&
+      isLocalHost &&
+      vitePort >= 5173 &&
+      vitePort <= 5180
+    );
+  } catch {
+    return false;
+  }
+};
+
 app.use(
   cors({
     origin(origin, callback) {
       // Non-browser / same-origin requests (no Origin header)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.has(origin) || isRailwayFrontendOrigin(origin)) {
+      if (
+        allowedOrigins.has(origin) ||
+        isLocalViteOrigin(origin) ||
+        isRailwayFrontendOrigin(origin)
+      ) {
         return callback(null, true);
       }
       return callback(new Error(`CORS blocked for origin: ${origin}`));
@@ -99,7 +123,7 @@ const startServer = async () => {
     process.exit(1);
   }
 
-  const server = app.listen(PORT, () => {
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
   });
 

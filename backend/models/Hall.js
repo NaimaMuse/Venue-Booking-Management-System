@@ -31,6 +31,11 @@ const hallSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    videoUrl: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     isAvailable: {
       type: Boolean,
       default: true,

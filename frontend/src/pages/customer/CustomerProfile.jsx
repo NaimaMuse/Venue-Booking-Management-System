@@ -149,7 +149,7 @@ function CustomerProfile() {
     <div className="customer-page customer-profile-page">
       <section className="customer-page-header customer-profile-hero">
         <div>
-          <p className="customer-eyebrow">Hargeisa Hall Finder</p>
+          <p className="customer-eyebrow">HallHub</p>
           <h1>My Profile</h1>
           <p>keep your account details and photo ready for booking visits.</p>
         </div>

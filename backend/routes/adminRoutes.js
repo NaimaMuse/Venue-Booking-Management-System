@@ -10,6 +10,8 @@ const {
 const {
   getReportsOverview,
   getAdminReports,
+  getAdminStats,
+  getAdminVenues,
 } = require('../controllers/adminReportsController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
@@ -19,6 +21,8 @@ router.use(protect, authorize('admin'));
 
 router.get('/reports/overview', getReportsOverview);
 router.get('/reports', getAdminReports);
+router.get('/stats', getAdminStats);
+router.get('/venues', getAdminVenues);
 
 router.get('/hotels', getAdminHotels);
 router.get('/hotels/pending', getPendingHotels);

@@ -123,6 +123,7 @@ const getReportsOverview = async (req, res) => {
         total: usersTotal,
         customers,
         hotel_owners: hotelOwnersWithHotels,
+        hotelOwners: hotelOwnersWithHotels,
         admins,
         note: 'hotel_owners counts users with role hotel_owner who own at least one hotel',
       },
@@ -135,6 +136,7 @@ const getReportsOverview = async (req, res) => {
       halls: {
         total: hallsTotal,
         available: hallsAvailable,
+        unavailable: Math.max(0, hallsTotal - hallsAvailable),
       },
       bookings,
       revenue: {
@@ -156,7 +158,70 @@ const getReportsOverview = async (req, res) => {
 /** Alias for GET /api/admin/reports */
 const getAdminReports = getReportsOverview;
 
+/**
+ * GET /api/admin/stats
+ * Shape expected by the admin dashboard KPIs.
+ */
+const getAdminStats = async (req, res) => {
+  try {
+    const [
+      pendingApprovals,
+      approvedHotels,
+      rejectedHotels,
+      totalLiveHalls,
+      platformBookings,
+    ] = await Promise.all([
+      Hotel.countDocuments({ verificationStatus: 'pending' }),
+      Hotel.countDocuments({ verificationStatus: 'approved' }),
+      Hotel.countDocuments({ verificationStatus: 'rejected' }),
+      Hall.countDocuments({ isAvailable: true }),
+      Booking.countDocuments({}),
+    ]);
+
+    return res.status(200).json({
+      stats: {
+        pendingApprovals,
+        approvedHotels,
+        rejectedHotels,
+        totalLiveHalls,
+        platformBookings,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Failed to load admin stats',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * GET /api/admin/venues
+ * All hotels + halls for the admin venues directory.
+ */
+const getAdminVenues = async (req, res) => {
+  try {
+    const [hotels, halls] = await Promise.all([
+      Hotel.find()
+        .populate('ownerId', 'fullName email phone')
+        .sort({ createdAt: -1 }),
+      Hall.find()
+        .populate('hotelId', 'hotelName city verificationStatus')
+        .sort({ hallName: 1 }),
+    ]);
+
+    return res.status(200).json({ hotels, halls });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Failed to load venues',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getReportsOverview,
   getAdminReports,
+  getAdminStats,
+  getAdminVenues,
 };

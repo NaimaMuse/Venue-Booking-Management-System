@@ -11,6 +11,9 @@ const toPublicImagePath = (filename) => `/uploads/halls/${filename}`;
 const mapUploadedImages = (files = []) =>
   files.map((file) => toPublicImagePath(file.filename));
 
+const mapUploadedVideo = (files = []) =>
+  files[0] ? toPublicImagePath(files[0].filename) : '';
+
 /**
  * Amenities may arrive as JSON string, comma-separated string, or array
  * when using multipart/form-data.
@@ -298,7 +301,8 @@ const createHall = async (req, res) => {
       return res.status(400).json({ message: 'Validation failed', errors });
     }
 
-    const images = mapUploadedImages(req.files);
+    const images = mapUploadedImages(req.files?.images || []);
+    const videoUrl = mapUploadedVideo(req.files?.video || []);
 
     const hall = await Hall.create({
       hotelId: hotel._id,
@@ -307,6 +311,7 @@ const createHall = async (req, res) => {
       pricePerDay: Number(pricePerDay),
       amenities: parseAmenities(amenities),
       images,
+      videoUrl,
       isAvailable: parseBoolean(isAvailable, true),
     });
 
@@ -390,7 +395,7 @@ const updateHall = async (req, res) => {
       touched = true;
     }
 
-    const newImages = mapUploadedImages(req.files);
+    const newImages = mapUploadedImages(req.files?.images || []);
     if (newImages.length) {
       const shouldReplace = parseBoolean(replaceImages, false);
       if (shouldReplace) {
@@ -408,10 +413,17 @@ const updateHall = async (req, res) => {
       touched = true;
     }
 
+    const newVideoUrl = mapUploadedVideo(req.files?.video || []);
+    if (newVideoUrl) {
+      unlinkHallImages(hall.videoUrl ? [hall.videoUrl] : []);
+      hall.videoUrl = newVideoUrl;
+      touched = true;
+    }
+
     if (!touched) {
       return res.status(400).json({
         message:
-          'Provide at least one field to update: hallName, capacity, pricePerDay, amenities, isAvailable, or images',
+          'Provide at least one field to update: hallName, capacity, pricePerDay, amenities, isAvailable, images, or video',
       });
     }
 
@@ -457,7 +469,7 @@ const deleteHall = async (req, res) => {
       return res.status(404).json({ message: 'Hall not found' });
     }
 
-    unlinkHallImages(hall.images);
+    unlinkHallImages([...hall.images, ...(hall.videoUrl ? [hall.videoUrl] : [])]);
 
     return res.status(200).json({
       message: 'Hall deleted successfully',

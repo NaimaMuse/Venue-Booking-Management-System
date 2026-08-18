@@ -41,7 +41,7 @@ function Hero() {
 
       <div className="hero-inner">
         <div className="hero-content">
-          <h1 className="hero-title">Hargeisa Hall Finder</h1>
+          <h1 className="hero-title">HallHub</h1>
           <p className="hero-subtitle">
             Search hotels, see every hall under them, and book with clear
             capacity and pricing — or schedule a visit before you confirm.

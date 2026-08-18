@@ -222,7 +222,7 @@ export const buildBookingInvoiceHtml = (booking) => {
   <div class="sheet">
     <div class="head">
       <div class="brand">
-        Hargeisa Hall Finder
+        HallHub
         <span>Venue booking deposit invoice</span>
       </div>
       <div class="meta">
@@ -295,7 +295,7 @@ export const buildBookingInvoiceHtml = (booking) => {
     </div>
 
     <div class="foot">
-      Thank you for booking with Hargeisa Hall Finder. Keep this invoice as proof of deposit.
+      Thank you for booking with HallHub. Keep this invoice as proof of deposit.
     </div>
   </div>
 </body>

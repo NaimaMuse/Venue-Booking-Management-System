@@ -220,7 +220,7 @@ function MyBookings() {
 
       <section className="customer-page-header my-bookings-hero">
         <div>
-          <p className="customer-eyebrow">Hargeisa Hall Finder</p>
+          <p className="customer-eyebrow">HallHub</p>
           <h1>My Bookings</h1>
           <p>Review requests, visit schedules, and confirmed deposits.</p>
         </div>

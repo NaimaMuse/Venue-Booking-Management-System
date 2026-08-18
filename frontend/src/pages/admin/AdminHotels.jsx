@@ -125,12 +125,20 @@ function AdminHotels() {
       setError('');
       setRejectError('');
 
-      const { data } = await api.patch(`/api/admin/hotels/${hotelId}/status`, {
-        status,
-        rejectionReason: reason,
-      });
+      // Backend expects verificationStatus: approved | rejected | pending
+      const { data } = await api.patch(
+        `/api/admin/hotels/${hotelId}/status`,
+        {
+          verificationStatus: status,
+          rejectionReason: reason,
+        }
+      );
 
-      const updated = data.hotel;
+      const updated = data?.hotel;
+      if (!updated) {
+        throw new Error(data?.message || 'Hotel update response was empty');
+      }
+
       setHotels((prev) => {
         const nextHotels = prev.map((item) =>
           item._id === hotelId ? updated : item

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { API_BASE } from '../utils/auth';
@@ -19,6 +19,7 @@ function FeaturedVenues() {
   const [halls, setHalls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [start, setStart] = useState(0);
 
   useEffect(() => {
     const load = async () => {
@@ -27,9 +28,11 @@ function FeaturedVenues() {
         setError('');
 
         const { data } = await api.get('/api/halls');
-        setHalls((data.halls || []).slice(0, 3));
+        setHalls(data.halls || []);
+        setStart(0);
       } catch (err) {
         setError(getApiError(err, 'Unable to load halls'));
+        setHalls([]);
       } finally {
         setLoading(false);
       }
@@ -37,6 +40,17 @@ function FeaturedVenues() {
 
     load();
   }, []);
+
+  const visibleCount = 3;
+  const maxStart = Math.max(0, halls.length - visibleCount);
+  const visible = useMemo(
+    () => halls.slice(start, start + visibleCount),
+    [halls, start]
+  );
+  const canSlide = halls.length > visibleCount;
+
+  const goPrev = () => setStart((prev) => Math.max(0, prev - 1));
+  const goNext = () => setStart((prev) => Math.min(maxStart, prev + 1));
 
   return (
     <section className="featured-venues-section" id="venues">
@@ -55,36 +69,62 @@ function FeaturedVenues() {
       )}
 
       {!loading && !error && halls.length > 0 && (
-        <div className="venue-grid featured-venue-grid">
-          {halls.map((hall) => (
-            <article key={hall._id} className="venue-card">
-              <div className="venue-card-image-wrap">
-                <img
-                  src={getHallImage(hall)}
-                  alt={hall.hallName}
-                  className="venue-card-image"
-                  onError={(event) => {
-                    event.currentTarget.src = '/banner01.png';
-                  }}
-                />
-                <span className="capacity-badge">{hall.capacity} guests</span>
-              </div>
+        <div className="featured-slider">
+          {canSlide && (
+            <button
+              type="button"
+              className="featured-slider-btn is-prev"
+              onClick={goPrev}
+              disabled={start === 0}
+              aria-label="Previous halls"
+            >
+              ‹
+            </button>
+          )}
 
-              <div className="venue-card-body">
-                <h3>{hall.hallName}</h3>
-                <p className="venue-hotel">
-                  {hall.hotelId?.hotelName || 'Approved Hotel'}
-                  {hall.hotelId?.city ? ` · ${hall.hotelId.city}` : ''}
-                </p>
-                <p className="price-tag">
-                  ${Number(hall.pricePerDay).toLocaleString()}/day
-                </p>
-                <Link to={`/venues/${hall._id}`} className="venue-card-btn">
-                  View Details &amp; Reserve
-                </Link>
-              </div>
-            </article>
-          ))}
+          <div className="venue-grid featured-venue-grid">
+            {visible.map((hall) => (
+              <article key={hall._id} className="venue-card">
+                <div className="venue-card-image-wrap">
+                  <img
+                    src={getHallImage(hall)}
+                    alt={hall.hallName}
+                    className="venue-card-image"
+                    onError={(event) => {
+                      event.currentTarget.src = '/banner01.png';
+                    }}
+                  />
+                  <span className="capacity-badge">{hall.capacity} guests</span>
+                </div>
+
+                <div className="venue-card-body">
+                  <h3>{hall.hallName}</h3>
+                  <p className="venue-hotel">
+                    {hall.hotelId?.hotelName || 'Approved Hotel'}
+                    {hall.hotelId?.city ? ` · ${hall.hotelId.city}` : ''}
+                  </p>
+                  <p className="price-tag">
+                    ${Number(hall.pricePerDay).toLocaleString()}/day
+                  </p>
+                  <Link to={`/venues/${hall._id}`} className="venue-card-btn">
+                    View Details &amp; Reserve
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          {canSlide && (
+            <button
+              type="button"
+              className="featured-slider-btn is-next"
+              onClick={goNext}
+              disabled={start >= maxStart}
+              aria-label="Next halls"
+            >
+              ›
+            </button>
+          )}
         </div>
       )}
 
