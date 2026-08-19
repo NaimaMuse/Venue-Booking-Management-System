@@ -113,6 +113,40 @@ app.use((err, req, res, next) => {
   });
 });
 
+const seedAdmin = async () => {
+  const { ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_NAME, ADMIN_PHONE } = process.env;
+  if (!ADMIN_EMAIL || !ADMIN_PASSWORD) return;
+
+  try {
+    const bcrypt = require('bcryptjs');
+    const User = require('./models/User');
+
+    const existing = await User.findOne({ email: ADMIN_EMAIL.toLowerCase() });
+    if (existing) {
+      if (existing.role !== 'admin') {
+        existing.role = 'admin';
+        await existing.save();
+        console.log(`Updated ${ADMIN_EMAIL} to admin role`);
+      } else {
+        console.log(`Admin ${ADMIN_EMAIL} already exists`);
+      }
+      return;
+    }
+
+    const hashed = await bcrypt.hash(ADMIN_PASSWORD, 12);
+    await User.create({
+      fullName: ADMIN_NAME || 'HallHub Admin',
+      email: ADMIN_EMAIL.toLowerCase(),
+      password: hashed,
+      phone: ADMIN_PHONE || '',
+      role: 'admin',
+    });
+    console.log(`Admin account created: ${ADMIN_EMAIL}`);
+  } catch (err) {
+    console.error('Admin seed error:', err.message);
+  }
+};
+
 const startServer = async () => {
   const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
 
@@ -122,6 +156,8 @@ const startServer = async () => {
     console.error('Failed to connect to MongoDB:', err.message);
     process.exit(1);
   }
+
+  await seedAdmin();
 
   const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
