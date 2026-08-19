@@ -150,7 +150,7 @@ function OwnerLayout() {
 
   const handleLogout = () => {
     clearAuth();
-    navigate('/login');
+    navigate('/');
   };
 
   const closeSidebar = () => setSidebarOpen(false);
@@ -176,12 +176,12 @@ function OwnerLayout() {
                 to="/owner/dashboard"
                 className="owner-brand"
                 onClick={closeSidebar}
-                title="Hargeisa Hall Finder"
+                title="HallHub"
               >
-                <span className="owner-brand-mark">HHF</span>
+                <span className="owner-brand-mark">HH</span>
                 <span className="owner-brand-text">
-                  <span>Hargeisa Hall</span>
-                  <span>Finder</span>
+                  <span>Hall</span>
+                  <span>Hub</span>
                 </span>
               </Link>
               <button

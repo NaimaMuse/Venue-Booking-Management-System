@@ -168,7 +168,7 @@ function CustomerLayout() {
 
   const handleLogout = () => {
     clearAuth();
-    navigate('/login');
+    navigate('/');
   };
 
   const handleSearch = (event) => {
@@ -197,10 +197,10 @@ function CustomerLayout() {
         <div className="customer-sidebar-top">
           <div className="customer-sidebar-header">
             <Link to="/" className="owner-brand" onClick={closeSidebar}>
-              <span className="owner-brand-mark">HHF</span>
+              <span className="owner-brand-mark">HH</span>
               <span className="owner-brand-text">
-                <span>Hargeisa Hall</span>
-                <span>Finder</span>
+                <span>Hall</span>
+                <span>Hub</span>
               </span>
             </Link>
             <button
