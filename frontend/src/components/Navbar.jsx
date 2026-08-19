@@ -19,6 +19,7 @@ function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useState(() => getUser());
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const syncUser = () => setUser(getUser());
@@ -31,9 +32,14 @@ function Navbar() {
     };
   }, []);
 
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname, location.hash]);
+
   const handleLogout = () => {
     clearAuth();
     setUser(null);
+    setMenuOpen(false);
     navigate('/');
   };
 
@@ -47,6 +53,7 @@ function Navbar() {
     }
 
     event.preventDefault();
+    setMenuOpen(false);
     navigate(link.href, { replace: false });
 
     const element = document.getElementById(link.hash);
@@ -69,7 +76,20 @@ function Navbar() {
         HallHub
       </Link>
 
-      <div className="nav-links">
+      <button
+        type="button"
+        className={`nav-menu-toggle${menuOpen ? ' is-open' : ''}`}
+        aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        aria-expanded={menuOpen}
+        onClick={() => setMenuOpen((prev) => !prev)}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
+      <div className={`nav-links-wrap${menuOpen ? ' is-open' : ''}`}>
+        <div className="nav-links">
         {navLinks.map((link) => {
           const isActive = link.hash
             ? location.pathname === '/' &&
@@ -90,42 +110,43 @@ function Navbar() {
             </Link>
           );
         })}
-      </div>
-
-      {user ? (
-        <div className="nav-auth-box">
-          <Link
-            to={getDashboardPath(user.role)}
-            className="nav-profile-btn"
-            aria-label="Open dashboard"
-            title="Open dashboard"
-          >
-            <svg
-              className="nav-profile-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8" />
-              <path
-                d="M5.5 19.5c1.4-3.2 3.7-4.8 6.5-4.8s5.1 1.6 6.5 4.8"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
-            </svg>
-          </Link>
-          <button type="button" className="nav-logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
         </div>
-      ) : location.pathname === '/login' ||
-        location.pathname === '/signup' ? null : (
-        <Link to="/login" className="nav-contact-btn">
-          Sign In / Register
-        </Link>
-      )}
+
+        {user ? (
+          <div className="nav-auth-box">
+            <Link
+              to={getDashboardPath(user.role)}
+              className="nav-profile-btn"
+              aria-label="Open dashboard"
+              title="Open dashboard"
+            >
+              <svg
+                className="nav-profile-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8" />
+                <path
+                  d="M5.5 19.5c1.4-3.2 3.7-4.8 6.5-4.8s5.1 1.6 6.5 4.8"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </Link>
+            <button type="button" className="nav-logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        ) : location.pathname === '/login' ||
+          location.pathname === '/signup' ? null : (
+          <Link to="/login" className="nav-contact-btn" onClick={() => setMenuOpen(false)}>
+            Sign In / Register
+          </Link>
+        )}
+        </div>
     </nav>
   );
 }

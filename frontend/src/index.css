@@ -86,6 +86,10 @@ img {
   flex-wrap: wrap;
 }
 
+.nav-links-wrap {
+  display: contents;
+}
+
 .nav-link {
   font-size: 14px;
   font-weight: 600;
@@ -118,6 +122,39 @@ img {
 .nav-contact-btn:hover {
   background: #d2b184;
   transform: translateY(-1px);
+}
+
+.nav-menu-toggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #ead9c2;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #4a2040;
+  cursor: pointer;
+}
+
+.nav-menu-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  margin: 4px auto;
+  border-radius: 999px;
+  background: currentColor;
+  transition: transform 0.22s ease, opacity 0.22s ease;
+}
+
+.nav-menu-toggle.is-open span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.nav-menu-toggle.is-open span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-menu-toggle.is-open span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
 }
 
 /* ===== Hero Banner ===== */
@@ -576,15 +613,16 @@ img {
 @media (max-width: 1100px) {
   .navbar {
     top: 16px;
-    flex-direction: column;
     border-radius: 28px;
-    padding: 14px;
+    padding: 14px 16px;
     width: min(1180px, calc(100% - 32px));
+    align-items: center;
+    flex-wrap: wrap;
   }
 
   .hero-top,
   .venues-nav-wrap {
-    min-height: 160px;
+    min-height: 126px;
   }
 
   .nav-links {
@@ -626,11 +664,106 @@ img {
 @media (max-width: 768px) {
   .hero-top {
     padding: 16px 16px 0;
-    min-height: 160px;
+    min-height: 110px;
+  }
+
+  .navbar {
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 28px;
+  }
+
+  .nav-menu-toggle {
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .nav-links-wrap {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding-top: 8px;
+  }
+
+  .nav-links-wrap.is-open {
+    display: flex;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .nav-link {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: #f7f1f4;
+    text-align: center;
+  }
+
+  .nav-link.active {
+    background: #f0e4ec;
+    text-decoration: none;
+  }
+
+  .nav-contact-btn,
+  .nav-auth-box {
+    width: 100%;
+  }
+
+  .nav-contact-btn {
+    min-height: 48px;
+  }
+
+  .nav-auth-box {
+    justify-content: space-between;
+  }
+
+  .nav-profile-btn,
+  .nav-logout-btn {
+    flex: 1;
+    min-height: 46px;
+  }
+
+  .nav-profile-btn {
+    border-radius: 14px;
   }
 
   .hero-inner {
-    padding: 28px 16px 48px;
+    gap: 24px;
+    padding: 18px 16px 44px;
+  }
+
+  .hero-content {
+    max-width: 100%;
+  }
+
+  .hero-title {
+    font-size: clamp(38px, 11vw, 52px);
+    margin-bottom: 12px;
+  }
+
+  .hero-subtitle {
+    max-width: 100%;
+    font-size: 16px;
+    line-height: 1.65;
+    margin-bottom: 22px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .cta-btn {
+    width: 100%;
+    min-height: 52px;
   }
 
   .hero-mosaic {
@@ -669,6 +802,46 @@ img {
     grid-column: 1;
     grid-row: auto;
     min-height: 180px;
+  }
+}
+
+@media (max-width: 540px) {
+  .navbar {
+    top: 12px;
+    width: calc(100% - 20px);
+    padding: 12px;
+    border-radius: 24px;
+  }
+
+  .hero-top,
+  .venues-nav-wrap {
+    min-height: 96px;
+  }
+
+  .brand-pill {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .hero-inner {
+    padding: 14px 14px 36px;
+  }
+
+  .hero-title {
+    font-size: clamp(34px, 10.5vw, 46px);
+  }
+
+  .hero-subtitle {
+    font-size: 15px;
+  }
+
+  .hero-mosaic {
+    display: none;
+  }
+
+  .cta-btn,
+  .cta-btn-video span:first-child {
+    font-size: 14px;
   }
 }
 
