@@ -160,7 +160,7 @@ function MyBookings() {
         );
       }
 
-      return true;
+      return booking.status !== 'cancelled' && booking.status !== 'rejected';
     });
   }, [bookings, filter]);
 
