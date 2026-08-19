@@ -8,9 +8,6 @@
 
 A full-stack **MERN** venue booking platform for hotels and banquet halls in Hargeisa.
 
-**Institution:** Telesom Academy  
-**Group leader:** Naima Muse Ahmed
-
 Customers browse approved hotels and halls, request bookings, and track visits. Hotel owners list venues after admin approval, then manage halls, media, and booking requests. Admins verify hotels and review platform reports.
 
 ---
