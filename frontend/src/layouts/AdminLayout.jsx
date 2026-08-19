@@ -134,7 +134,7 @@ function AdminLayout() {
 
   const handleLogout = () => {
     clearAuth();
-    navigate('/login');
+    navigate('/');
   };
 
   const closeSidebar = () => setSidebarOpen(false);
@@ -156,8 +156,8 @@ function AdminLayout() {
         <div className="customer-sidebar-top">
           <div className="customer-sidebar-header">
             <Link to="/" className="customer-brand" onClick={closeSidebar}>
-              <span className="customer-brand-mark">HHF</span>
-              <span className="customer-brand-text">Admin Portal</span>
+              <span className="customer-brand-mark">HH</span>
+              <span className="customer-brand-text">HallHub Admin</span>
             </Link>
             <button
               type="button"
