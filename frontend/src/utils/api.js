@@ -29,6 +29,9 @@ api.interceptors.request.use((config) => {
 export const getApiError = (error, fallback = 'Request failed') => {
   if (!error.response) {
     if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+      if (import.meta.env.PROD) {
+        return 'Cannot reach the API. Set VITE_API_URL on the frontend service to your Railway backend URL, then redeploy.';
+      }
       return 'Cannot reach the API. Make sure the backend is running on port 5000, then refresh.';
     }
     return error.message || fallback;
