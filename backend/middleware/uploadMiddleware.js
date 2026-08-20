@@ -3,8 +3,10 @@ const path = require('path');
 const multer = require('multer');
 
 const hallsUploadDir = path.join(__dirname, '..', 'uploads', 'halls');
+const avatarsUploadDir = path.join(__dirname, '..', 'uploads', 'avatars');
 
 fs.mkdirSync(hallsUploadDir, { recursive: true });
+fs.mkdirSync(avatarsUploadDir, { recursive: true });
 
 const ALLOWED_MIME_TYPES = new Set([
   'image/jpeg',
@@ -62,7 +64,37 @@ const uploadHallMedia = multer({
   },
 });
 
+const avatarStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => {
+    cb(null, avatarsUploadDir);
+  },
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    cb(null, unique);
+  },
+});
+
+const avatarFileFilter = (_req, file, cb) => {
+  if (ALLOWED_MIME_TYPES.has(file.mimetype)) {
+    return cb(null, true);
+  }
+  const err = new Error('Only jpeg, png, and webp images are allowed');
+  err.status = 400;
+  return cb(err, false);
+};
+
+const uploadAvatar = multer({
+  storage: avatarStorage,
+  fileFilter: avatarFileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+});
+
 module.exports = {
   uploadHallMedia,
+  uploadAvatar,
   hallsUploadDir,
+  avatarsUploadDir,
 };

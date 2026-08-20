@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
@@ -190,9 +192,107 @@ const getMe = async (req, res) => {
   }
 };
 
+const removeLocalAvatar = (avatarUrl) => {
+  if (!avatarUrl || !String(avatarUrl).startsWith('/uploads/avatars/')) {
+    return;
+  }
+
+  const filePath = path.join(
+    __dirname,
+    '..',
+    'uploads',
+    'avatars',
+    path.basename(avatarUrl)
+  );
+  fs.unlink(filePath, () => {});
+};
+
+/**
+ * PUT /api/auth/profile — protect middleware required
+ */
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('+password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const { fullName, email, phone, password } = req.body;
+
+    if (fullName !== undefined) {
+      if (!String(fullName).trim()) {
+        return res.status(400).json({ message: 'Full name is required' });
+      }
+      user.fullName = String(fullName).trim();
+    }
+
+    if (email !== undefined) {
+      const normalizedEmail = String(email).toLowerCase().trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(normalizedEmail)) {
+        return res.status(400).json({ message: 'Please provide a valid email' });
+      }
+
+      const taken = await User.findOne({
+        email: normalizedEmail,
+        _id: { $ne: user._id },
+      });
+      if (taken) {
+        return res.status(400).json({ message: 'Email is already registered' });
+      }
+      user.email = normalizedEmail;
+    }
+
+    if (phone !== undefined) {
+      user.phone = String(phone).trim();
+    }
+
+    if (password && String(password).trim()) {
+      if (String(password).trim().length < 6) {
+        return res
+          .status(400)
+          .json({ message: 'Password must be at least 6 characters' });
+      }
+      user.password = await bcrypt.hash(String(password).trim(), 10);
+    }
+
+    if (req.file) {
+      removeLocalAvatar(user.avatarUrl);
+      user.avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      message: 'Profile updated successfully',
+      user: sanitizeUser(user),
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'Email is already registered' });
+    }
+    console.error('Update profile error:', error);
+    return res.status(500).json({ message: 'Server error updating profile' });
+  }
+};
+
+/**
+ * GET /api/auth/admin-available
+ */
+const adminAvailable = async (_req, res) => {
+  try {
+    const count = await User.countDocuments({ role: 'admin' });
+    return res.status(200).json({ adminAvailable: count === 0 });
+  } catch (error) {
+    return res.status(200).json({ adminAvailable: false });
+  }
+};
+
 module.exports = {
   register,
   login,
   getMe,
+  updateProfile,
+  adminAvailable,
   generateToken,
 };
