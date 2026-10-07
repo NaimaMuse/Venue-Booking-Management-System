@@ -163,7 +163,19 @@ const startServer = async () => {
     console.log(`Server running on port ${PORT}`);
   });
 
+  const shutdown = () => {
+    server.close(() => process.exit(0));
+  };
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
+
   server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(
+        `Port ${PORT} is already in use. Close the other backend terminal with Ctrl+C, then run npm run dev once.`
+      );
+      process.exit(1);
+    }
     console.error('Server listen error:', err.message);
     process.exit(1);
   });
