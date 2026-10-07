@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { API_BASE, getToken } from './auth';
+import { API_BASE, clearAuth, getToken } from './auth';
 
 /**
  * Shared Axios client for all frontend ↔ backend communication.
@@ -25,6 +25,16 @@ api.interceptors.request.use((config) => {
 
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      clearAuth();
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const getApiError = (error, fallback = 'Request failed') => {
   if (!error.response) {

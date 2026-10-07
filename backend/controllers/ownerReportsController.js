@@ -85,6 +85,8 @@ const getOwnerHotelReport = async (req, res) => {
     };
 
     let depositRevenue = 0;
+    let platformFee = 0;
+    let netOwnerRevenue = 0;
     let upcomingVisits = 0;
     const hallStatsMap = {};
 
@@ -98,6 +100,8 @@ const getOwnerHotelReport = async (req, res) => {
         bookings: 0,
         confirmed: 0,
         revenue: 0,
+        platformFee: 0,
+        netRevenue: 0,
       };
     });
 
@@ -110,11 +114,24 @@ const getOwnerHotelReport = async (req, res) => {
       }
 
       const deposit = Number(booking.depositAmount) || 0;
-      if (
-        (status === 'confirmed' || status === 'accepted') &&
-        deposit > 0
-      ) {
+      const isEarning = (status === 'confirmed' || status === 'accepted') && deposit > 0;
+      const fee =
+        booking.platformFee !== undefined &&
+        booking.platformFee !== null &&
+        booking.platformFee > 0
+          ? booking.platformFee
+          : Math.round(deposit * 0.05 * 100) / 100;
+      const net =
+        booking.ownerAmount !== undefined &&
+        booking.ownerAmount !== null &&
+        booking.ownerAmount > 0
+          ? booking.ownerAmount
+          : Math.round((deposit - fee) * 100) / 100;
+
+      if (isEarning) {
         depositRevenue += deposit;
+        platformFee += fee;
+        netOwnerRevenue += net;
       }
 
       if (status === 'accepted' && booking.appointment?.scheduledDate) {
@@ -127,24 +144,29 @@ const getOwnerHotelReport = async (req, res) => {
         if (status === 'confirmed') {
           hallStatsMap[hallId].confirmed += 1;
         }
-        if (
-          (status === 'confirmed' || status === 'accepted') &&
-          deposit > 0
-        ) {
+        if (isEarning) {
           hallStatsMap[hallId].revenue += deposit;
+          hallStatsMap[hallId].platformFee += fee;
+          hallStatsMap[hallId].netRevenue += net;
         }
       }
 
       const key = monthKey(booking.eventDate || booking.createdAt);
       if (!timelineMap[key]) {
-        timelineMap[key] = { key, label: monthLabel(key), bookings: 0, revenue: 0 };
+        timelineMap[key] = {
+          key,
+          label: monthLabel(key),
+          bookings: 0,
+          revenue: 0,
+          platformFee: 0,
+          netRevenue: 0,
+        };
       }
       timelineMap[key].bookings += 1;
-      if (
-        (status === 'confirmed' || status === 'accepted') &&
-        deposit > 0
-      ) {
+      if (isEarning) {
         timelineMap[key].revenue += deposit;
+        timelineMap[key].platformFee += fee;
+        timelineMap[key].netRevenue += net;
       }
     });
 
@@ -163,16 +185,32 @@ const getOwnerHotelReport = async (req, res) => {
     const conversionRate =
       totalBookings > 0 ? Math.round((won / totalBookings) * 100) : 0;
 
-    const recent = bookings.slice(0, 8).map((booking) => ({
-      id: booking._id,
-      customerName: booking.customerId?.fullName || 'Customer',
-      hallName: booking.hallId?.hallName || 'Hall',
-      eventDate: booking.eventDate,
-      status: booking.status,
-      guestCount: booking.guestCount,
-      depositAmount: booking.depositAmount || 0,
-      createdAt: booking.createdAt,
-    }));
+    const recent = bookings.slice(0, 8).map((booking) => {
+      const deposit = booking.depositAmount || 0;
+      const fee =
+        booking.platformFee !== undefined && booking.platformFee !== null
+          ? booking.platformFee
+          : Math.round(deposit * 0.05 * 100) / 100;
+      const net =
+        booking.ownerAmount !== undefined && booking.ownerAmount !== null
+          ? booking.ownerAmount
+          : Math.round((deposit - fee) * 100) / 100;
+
+      return {
+        id: booking._id,
+        customerName: booking.customerId?.fullName || 'Customer',
+        hallName: booking.hallId?.hallName || 'Hall',
+        eventDate: booking.eventDate,
+        status: booking.status,
+        guestCount: booking.guestCount,
+        depositAmount: deposit,
+        bookingAmount: booking.bookingAmount || deposit,
+        platformFee: fee,
+        ownerAmount: net,
+        commissionRate: 0.05,
+        createdAt: booking.createdAt,
+      };
+    });
 
     return res.status(200).json({
       hotel: {
@@ -193,6 +231,9 @@ const getOwnerHotelReport = async (req, res) => {
         rejected: statusCounts.rejected,
         cancelled: statusCounts.cancelled,
         depositRevenue,
+        platformFee,
+        netOwnerRevenue,
+        commissionRate: 0.05,
         upcomingVisits,
         conversionRate,
         won,

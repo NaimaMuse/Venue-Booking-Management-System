@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Booking = require('../models/Booking');
+const { calculateCommission } = Booking;
 const Hall = require('../models/Hall');
 const Hotel = require('../models/Hotel');
 
@@ -175,6 +176,9 @@ const createBooking = async (req, res) => {
       });
     }
 
+    const initialAmount = Number(hall.pricePerDay) || 0;
+    const { platformFee, ownerAmount } = calculateCommission(initialAmount, 0.05);
+
     const booking = await Booking.create({
       customerId: req.user._id,
       hallId: hall._id,
@@ -183,6 +187,10 @@ const createBooking = async (req, res) => {
       guestCount: guests,
       specialNotes: specialNotes ? String(specialNotes).trim() : '',
       status: 'pending',
+      bookingAmount: initialAmount,
+      commissionRate: 0.05,
+      platformFee,
+      ownerAmount,
     });
 
     const populated = await populateBooking(Booking.findById(booking._id));
@@ -461,11 +469,13 @@ const confirmBooking = async (req, res) => {
       });
     }
 
-    const { depositPaid, depositAmount, agreementNotes } = req.body;
+    const { depositPaid, depositAmount, bookingAmount, agreementNotes } = req.body;
 
     if (depositPaid !== undefined) {
       booking.depositPaid = parseBoolean(depositPaid, booking.depositPaid);
     }
+
+    let finalAmount = booking.bookingAmount || booking.depositAmount || 0;
 
     if (depositAmount !== undefined) {
       const amount = Number(depositAmount);
@@ -475,7 +485,24 @@ const confirmBooking = async (req, res) => {
         });
       }
       booking.depositAmount = amount;
+      finalAmount = amount;
     }
+
+    if (bookingAmount !== undefined) {
+      const amount = Number(bookingAmount);
+      if (Number.isNaN(amount) || amount < 0) {
+        return res.status(400).json({
+          message: 'bookingAmount must be a non-negative number',
+        });
+      }
+      finalAmount = amount;
+    }
+
+    const { platformFee, ownerAmount } = calculateCommission(finalAmount, 0.05);
+    booking.bookingAmount = finalAmount;
+    booking.commissionRate = 0.05;
+    booking.platformFee = platformFee;
+    booking.ownerAmount = ownerAmount;
 
     if (agreementNotes !== undefined) {
       booking.agreementNotes = String(agreementNotes).trim();
