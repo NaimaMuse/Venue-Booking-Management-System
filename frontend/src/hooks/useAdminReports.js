@@ -201,11 +201,23 @@ export function useAdminReports({
         if (to) params.to = to;
         if (hotelId) params.hotelId = hotelId;
 
-        const { data } = await api.get('/api/admin/reports', { params });
+        const [reportsRes, hotelsRes] = await Promise.all([
+          api.get('/api/admin/reports', { params }),
+          api.get('/api/admin/hotels').catch(() => ({ data: { hotels: [] } })),
+        ]);
+        const data = reportsRes.data;
 
         if (!active) {
           return;
         }
+
+        const fallbackHotelOptions = (hotelsRes.data?.hotels || []).map(
+          (hotel) => ({
+            id: String(hotel._id),
+            hotelName: hotel.hotelName,
+            city: hotel.city || '',
+          })
+        );
 
         setReports({
           ...emptyReports,
@@ -218,7 +230,10 @@ export function useAdminReports({
           timeline: data?.timeline || [],
           topHalls: data?.topHalls || [],
           topHotels: data?.topHotels || [],
-          hotelOptions: data?.hotelOptions || [],
+          hotelOptions:
+            data?.hotelOptions?.length > 0
+              ? data.hotelOptions
+              : fallbackHotelOptions,
         });
       } catch (err) {
         if (!active) {
