@@ -68,6 +68,7 @@ function OwnerOverview() {
   const [hotel, setHotel] = useState(null);
   const [halls, setHalls] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [plusData, setPlusData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [toast, setToast] = useState(location.state?.toast || '');
@@ -93,11 +94,13 @@ function OwnerOverview() {
         setLoading(true);
         setError('');
 
-        const [hotelResult, hallsResult, bookingsResult] = await Promise.all([
-          api.get('/api/hotels/my-hotel').catch((err) => err),
-          api.get('/api/halls/my-halls').catch((err) => err),
-          api.get('/api/bookings/owner-requests').catch((err) => err),
-        ]);
+        const [hotelResult, hallsResult, bookingsResult, plusResult] =
+          await Promise.all([
+            api.get('/api/hotels/my-hotel').catch((err) => err),
+            api.get('/api/halls/my-halls').catch((err) => err),
+            api.get('/api/bookings/owner-requests').catch((err) => err),
+            api.get('/api/plus/my-subscription').catch((err) => err),
+          ]);
 
         if (hotelResult instanceof Error || hotelResult.isAxiosError) {
           if (hotelResult.response?.status !== 404) {
@@ -128,6 +131,12 @@ function OwnerOverview() {
           setBookings([]);
         } else {
           setBookings(bookingsResult.data.bookings || []);
+        }
+
+        if (plusResult instanceof Error || plusResult.isAxiosError) {
+          setPlusData(null);
+        } else {
+          setPlusData(plusResult.data || null);
         }
       } catch (err) {
         setError(getApiError(err, 'Unable to load dashboard'));
@@ -364,6 +373,122 @@ function OwnerOverview() {
               </div>
             </article>
           </section>
+
+          {hotel && (
+            <section
+              className={`customer-panel hh-owner-plus-card${
+                plusData?.hasActivePlus ? ' is-active-plus' : ''
+              }`}
+            >
+              {plusData?.hasActivePlus ? (
+                <div className="hh-plus-card-body">
+                  <div className="hh-plus-card-top">
+                    <div>
+                      <div className="hh-plus-kicker-row">
+                        <span className="hh-plus-active-tag">Status: Active</span>
+                        {plusData.daysRemaining !== undefined && (
+                          <span className="hh-plus-days-tag">
+                            {plusData.daysRemaining} days left
+                          </span>
+                        )}
+                      </div>
+                      <h2>HallHub Plus — Active ⭐</h2>
+                      <p className="hh-plus-desc">
+                        Your hotel and halls are currently boosted across search
+                        and featured on the homepage.
+                      </p>
+                    </div>
+                    <Link to="/owner/plus" className="customer-gold-btn hh-plus-btn">
+                      Manage Plan
+                    </Link>
+                  </div>
+
+                  <div className="hh-plus-benefits-list">
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>Featured badge</span>
+                    </div>
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>Search boost</span>
+                    </div>
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>Homepage featured</span>
+                    </div>
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>More photos</span>
+                    </div>
+                  </div>
+
+                  <div className="hh-plus-meta-strip">
+                    <div className="hh-plus-meta-item">
+                      <span>Plan</span>
+                      <strong>
+                        {plusData.activeSubscription?.planName ||
+                          'HallHub Plus (Monthly)'}
+                      </strong>
+                    </div>
+                    <div className="hh-plus-meta-item">
+                      <span>Start date</span>
+                      <strong>
+                        {formatDate(plusData.activeSubscription?.startedAt)}
+                      </strong>
+                    </div>
+                    <div className="hh-plus-meta-item">
+                      <span>Expiration date</span>
+                      <strong>
+                        {formatDate(plusData.activeSubscription?.expiresAt)}
+                      </strong>
+                    </div>
+                    <div className="hh-plus-meta-item">
+                      <span>Current status</span>
+                      <strong className="hh-status-active-pill">Active</strong>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="hh-plus-card-body">
+                  <div className="hh-plus-card-top">
+                    <div>
+                      <span className="hh-plus-pill">⭐ Premium Promotion</span>
+                      <h2>HallHub Plus ⭐</h2>
+                      <p className="hh-plus-desc">
+                        Get more customers and make your venue more visible.
+                      </p>
+                    </div>
+                    <Link to="/owner/plus" className="customer-gold-btn hh-plus-btn">
+                      Upgrade to HallHub Plus
+                    </Link>
+                  </div>
+
+                  <div className="hh-plus-benefits-list hh-plus-benefits-5">
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>More profile photos</span>
+                    </div>
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>Higher search placement</span>
+                    </div>
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>Featured badge</span>
+                    </div>
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>Homepage promotion</span>
+                    </div>
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>Promote your halls</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
 
           <section className="owner-dash-grid">
             {canAddHalls && (

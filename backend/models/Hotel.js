@@ -54,6 +54,14 @@ const hotelSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
+    featuredExpiresAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );
@@ -62,6 +70,7 @@ hotelSchema.index({ ownerId: 1 });
 hotelSchema.index({ city: 1 });
 hotelSchema.index({ verificationStatus: 1 });
 hotelSchema.index({ ownerId: 1, verificationStatus: 1 });
+hotelSchema.index({ isFeatured: -1 });
 
 module.exports = mongoose.model('Hotel', hotelSchema);
 module.exports.HOTEL_STATUSES = HOTEL_STATUSES;

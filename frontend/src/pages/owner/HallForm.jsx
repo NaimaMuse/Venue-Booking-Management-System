@@ -142,17 +142,28 @@ function HallForm() {
     );
   };
 
+  const isPlus = Boolean(
+    hotel?.isFeatured &&
+    hotel?.featuredExpiresAt &&
+    new Date(hotel.featuredExpiresAt) > new Date()
+  );
+  const maxPhotosAllowed = isPlus ? 15 : 5;
+
   const handleFiles = (event) => {
     const files = Array.from(event.target.files || []);
-    const capped = files.slice(0, Math.max(0, 5 - newFiles.length));
+    const capped = files.slice(0, Math.max(0, maxPhotosAllowed - newFiles.length));
 
     if (files.length > capped.length) {
-      setError('You can upload a maximum of 5 images.');
+      setError(
+        `You can upload a maximum of ${maxPhotosAllowed} images.${
+          !isPlus ? ' Upgrade to HallHub Plus to upload up to 15 photos.' : ''
+        }`
+      );
     } else {
       setError('');
     }
 
-    setNewFiles((prev) => [...prev, ...capped].slice(0, 5));
+    setNewFiles((prev) => [...prev, ...capped].slice(0, maxPhotosAllowed));
     event.target.value = '';
   };
 
@@ -220,7 +231,7 @@ function HallForm() {
       ? resolveImage(existingImages[0])
       : '');
   const photoCount = newFiles.length || existingImages.length;
-  const remainingSlots = Math.max(0, 5 - newFiles.length);
+  const remainingSlots = Math.max(0, maxPhotosAllowed - newFiles.length);
   const hallVideo = videoPreview || resolveVideo(existingVideo);
 
   return (
@@ -369,7 +380,10 @@ function HallForm() {
               <div className="hall-form-upload hall-form-full">
                 <div className="hall-form-section-head">
                   <p className="owner-field-label">Gallery images</p>
-                  <span>Up to 5 photos · {remainingSlots} left</span>
+                  <span>
+                    {isPlus ? '⭐ Plus Member: Up to 15 photos' : 'Up to 5 photos'} ·{' '}
+                    {remainingSlots} left
+                  </span>
                 </div>
 
                 <label className="hall-form-dropzone">

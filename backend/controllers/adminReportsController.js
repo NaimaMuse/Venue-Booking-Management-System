@@ -3,6 +3,7 @@ const Hotel = require('../models/Hotel');
 const Hall = require('../models/Hall');
 const Booking = require('../models/Booking');
 const User = require('../models/User');
+const PlusSubscription = require('../models/PlusSubscription');
 
 const BOOKING_STATUSES = [
   'pending',
@@ -483,13 +484,25 @@ const getAdminStats = async (req, res) => {
       rejectedHotels,
       totalLiveHalls,
       platformBookings,
+      activePlusSubscriptions,
+      paidPlusSubs,
     ] = await Promise.all([
       Hotel.countDocuments({ verificationStatus: 'pending' }),
       Hotel.countDocuments({ verificationStatus: 'approved' }),
       Hotel.countDocuments({ verificationStatus: 'rejected' }),
       Hall.countDocuments({ isAvailable: true }),
       Booking.countDocuments({}),
+      Hotel.countDocuments({
+        isFeatured: true,
+        featuredExpiresAt: { $gt: new Date() },
+      }),
+      PlusSubscription.find({ paymentStatus: 'paid' }).select('price'),
     ]);
+
+    const plusRevenue = paidPlusSubs.reduce(
+      (sum, s) => sum + (Number(s.price) || 0),
+      0
+    );
 
     return res.status(200).json({
       stats: {
@@ -498,6 +511,8 @@ const getAdminStats = async (req, res) => {
         rejectedHotels,
         totalLiveHalls,
         platformBookings,
+        activePlusSubscriptions,
+        plusRevenue,
       },
     });
   } catch (error) {
