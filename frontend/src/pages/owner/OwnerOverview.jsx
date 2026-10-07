@@ -185,6 +185,15 @@ function OwnerOverview() {
       (sum, booking) => sum + (Number(booking.depositAmount) || 0),
       0
     );
+    const platformFee = accepted.reduce(
+      (sum, booking) =>
+        sum +
+        (booking.platformFee !== undefined
+          ? booking.platformFee
+          : Math.round((Number(booking.depositAmount) || 0) * 0.05 * 100) / 100),
+      0
+    );
+    const netRevenue = Math.round((revenue - platformFee) * 100) / 100;
     const occupancy =
       halls.length > 0
         ? Math.min(100, Math.round((accepted.length / halls.length) * 100))
@@ -194,6 +203,8 @@ function OwnerOverview() {
       newBookings: thisMonth.length,
       acceptedBookings: accepted.length,
       revenue,
+      platformFee,
+      netRevenue,
       occupancy,
     };
   }, [bookings, halls.length]);
@@ -435,8 +446,14 @@ function OwnerOverview() {
                   <strong>{monthOverview.acceptedBookings}</strong>
                 </li>
                 <li>
-                  <span>Deposit revenue</span>
+                  <span>Gross deposit</span>
                   <strong>${monthOverview.revenue.toLocaleString()}</strong>
+                </li>
+                <li>
+                  <span>Net payout (95%)</span>
+                  <strong style={{ color: '#1f7a3f' }}>
+                    ${monthOverview.netRevenue.toLocaleString()}
+                  </strong>
                 </li>
                 <li>
                   <span>Occupancy signal</span>

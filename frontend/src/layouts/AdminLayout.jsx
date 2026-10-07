@@ -123,14 +123,21 @@ function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    const syncUser = () => setUser(getUser());
+    const syncUser = () => {
+      const currentUser = getUser();
+      if (!currentUser) {
+        navigate('/login', { replace: true });
+        return;
+      }
+      setUser(currentUser);
+    };
     window.addEventListener('auth-changed', syncUser);
     window.addEventListener('storage', syncUser);
     return () => {
       window.removeEventListener('auth-changed', syncUser);
       window.removeEventListener('storage', syncUser);
     };
-  }, []);
+  }, [navigate]);
 
   const handleLogout = () => {
     clearAuth();

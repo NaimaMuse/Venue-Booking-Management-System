@@ -73,6 +73,26 @@ const bookingSchema = new mongoose.Schema(
       default: 0,
       min: [0, 'Deposit amount cannot be negative'],
     },
+    bookingAmount: {
+      type: Number,
+      default: 0,
+      min: [0, 'Booking amount cannot be negative'],
+    },
+    commissionRate: {
+      type: Number,
+      default: 0.05,
+      min: [0, 'Commission rate cannot be negative'],
+    },
+    platformFee: {
+      type: Number,
+      default: 0,
+      min: [0, 'Platform fee cannot be negative'],
+    },
+    ownerAmount: {
+      type: Number,
+      default: 0,
+      min: [0, 'Owner amount cannot be negative'],
+    },
     agreementNotes: {
       type: String,
       trim: true,
@@ -88,6 +108,38 @@ const bookingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const round2 = (val) => Math.round((Number(val) || 0) * 100) / 100;
+
+const calculateCommission = (bookingAmount, rate = 0.05) => {
+  const amount = round2(bookingAmount);
+  const platformFee = round2(amount * rate);
+  const ownerAmount = round2(amount - platformFee);
+  return {
+    bookingAmount: amount,
+    commissionRate: rate,
+    platformFee,
+    ownerAmount,
+  };
+};
+
+// Automatically calculate 5% platform fee and 95% owner amount before save
+bookingSchema.pre('save', function (next) {
+  if ((!this.bookingAmount || this.bookingAmount === 0) && this.depositAmount > 0) {
+    this.bookingAmount = this.depositAmount;
+  }
+  const base = this.bookingAmount || this.depositAmount || 0;
+  const rate =
+    this.commissionRate !== undefined && this.commissionRate !== null
+      ? this.commissionRate
+      : 0.05;
+  const computed = calculateCommission(base, rate);
+  this.platformFee = computed.platformFee;
+  this.ownerAmount = computed.ownerAmount;
+  if (typeof next === 'function') {
+    next();
+  }
+});
+
 // Conflict checks: one active booking per hall per event date
 bookingSchema.index({ hallId: 1, eventDate: 1 });
 bookingSchema.index({ customerId: 1, createdAt: -1 });
@@ -96,3 +148,4 @@ bookingSchema.index({ status: 1 });
 
 module.exports = mongoose.model('Booking', bookingSchema);
 module.exports.BOOKING_STATUSES = BOOKING_STATUSES;
+module.exports.calculateCommission = calculateCommission;

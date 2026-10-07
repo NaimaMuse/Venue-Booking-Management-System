@@ -409,12 +409,40 @@ function OwnerBookings() {
                         <strong>{formatDate(booking.createdAt)}</strong>
                       </div>
                       {booking.status === 'confirmed' && booking.depositPaid && (
-                        <div>
-                          <span>Deposit</span>
-                          <strong>
-                            ${Number(booking.depositAmount || 0).toLocaleString()}
-                          </strong>
-                        </div>
+                        <>
+                          <div>
+                            <span>Gross Paid</span>
+                            <strong>
+                              ${Number(booking.depositAmount || 0).toLocaleString()}
+                            </strong>
+                          </div>
+                          <div>
+                            <span>Fee (5%)</span>
+                            <strong style={{ color: '#c5a070' }}>
+                              ${Number(
+                                booking.platformFee !== undefined
+                                  ? booking.platformFee
+                                  : (booking.depositAmount || 0) * 0.05
+                              ).toLocaleString(undefined, {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 2,
+                              })}
+                            </strong>
+                          </div>
+                          <div>
+                            <span>Net (95%)</span>
+                            <strong style={{ color: '#1f7a3f' }}>
+                              ${Number(
+                                booking.ownerAmount !== undefined
+                                  ? booking.ownerAmount
+                                  : (booking.depositAmount || 0) * 0.95
+                              ).toLocaleString(undefined, {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 2,
+                              })}
+                            </strong>
+                          </div>
+                        </>
                       )}
                     </div>
 
@@ -658,6 +686,78 @@ function OwnerBookings() {
                   required
                 />
               </label>
+
+              {Number(confirmForm.depositAmount) > 0 && (
+                <div
+                  style={{
+                    background: '#fcf9fb',
+                    border: '1px solid #eadfe6',
+                    borderRadius: '8px',
+                    padding: '12px 14px',
+                    margin: '8px 0 16px',
+                    fontSize: '13px',
+                    lineHeight: '1.5',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      color: '#6b6570',
+                    }}
+                  >
+                    <span>Booking amount:</span>
+                    <strong>
+                      $
+                      {Number(confirmForm.depositAmount).toLocaleString(
+                        undefined,
+                        { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+                      )}
+                    </strong>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      color: '#c5a070',
+                      marginTop: '4px',
+                    }}
+                  >
+                    <span>HallHub commission (5%):</span>
+                    <strong>
+                      -$
+                      {(
+                        Number(confirmForm.depositAmount) * 0.05
+                      ).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </strong>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      color: '#1f7a3f',
+                      fontWeight: '700',
+                      borderTop: '1px solid #eadfe6',
+                      paddingTop: '6px',
+                      marginTop: '6px',
+                    }}
+                  >
+                    <span>You receive (95%):</span>
+                    <span>
+                      $
+                      {(
+                        Number(confirmForm.depositAmount) * 0.95
+                      ).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               <label className="owner-deposit-toggle">
                 <span>Deposit Paid</span>
