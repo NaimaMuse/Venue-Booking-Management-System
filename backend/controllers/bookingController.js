@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Booking = require('../models/Booking');
-const { calculateCommission } = Booking;
 const Hall = require('../models/Hall');
 const Hotel = require('../models/Hotel');
 
@@ -177,7 +176,6 @@ const createBooking = async (req, res) => {
     }
 
     const initialAmount = Number(hall.pricePerDay) || 0;
-    const { platformFee, ownerAmount } = calculateCommission(initialAmount, 0.05);
 
     const booking = await Booking.create({
       customerId: req.user._id,
@@ -188,9 +186,6 @@ const createBooking = async (req, res) => {
       specialNotes: specialNotes ? String(specialNotes).trim() : '',
       status: 'pending',
       bookingAmount: initialAmount,
-      commissionRate: 0.05,
-      platformFee,
-      ownerAmount,
     });
 
     const populated = await populateBooking(Booking.findById(booking._id));
@@ -498,11 +493,7 @@ const confirmBooking = async (req, res) => {
       finalAmount = amount;
     }
 
-    const { platformFee, ownerAmount } = calculateCommission(finalAmount, 0.05);
     booking.bookingAmount = finalAmount;
-    booking.commissionRate = 0.05;
-    booking.platformFee = platformFee;
-    booking.ownerAmount = ownerAmount;
 
     if (agreementNotes !== undefined) {
       booking.agreementNotes = String(agreementNotes).trim();

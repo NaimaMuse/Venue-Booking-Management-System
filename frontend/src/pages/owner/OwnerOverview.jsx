@@ -194,15 +194,6 @@ function OwnerOverview() {
       (sum, booking) => sum + (Number(booking.depositAmount) || 0),
       0
     );
-    const platformFee = accepted.reduce(
-      (sum, booking) =>
-        sum +
-        (booking.platformFee !== undefined
-          ? booking.platformFee
-          : Math.round((Number(booking.depositAmount) || 0) * 0.05 * 100) / 100),
-      0
-    );
-    const netRevenue = Math.round((revenue - platformFee) * 100) / 100;
     const occupancy =
       halls.length > 0
         ? Math.min(100, Math.round((accepted.length / halls.length) * 100))
@@ -212,8 +203,6 @@ function OwnerOverview() {
       newBookings: thisMonth.length,
       acceptedBookings: accepted.length,
       revenue,
-      platformFee,
-      netRevenue,
       occupancy,
     };
   }, [bookings, halls.length]);
@@ -575,12 +564,6 @@ function OwnerOverview() {
                   <strong>${monthOverview.revenue.toLocaleString()}</strong>
                 </li>
                 <li>
-                  <span>Net payout (95%)</span>
-                  <strong style={{ color: '#1f7a3f' }}>
-                    ${monthOverview.netRevenue.toLocaleString()}
-                  </strong>
-                </li>
-                <li>
                   <span>Occupancy signal</span>
                   <strong>{monthOverview.occupancy}%</strong>
                 </li>
@@ -593,110 +576,7 @@ function OwnerOverview() {
             </section>
           </section>
 
-          <section className="owner-dash-grid owner-dash-grid-bottom">
-            <section className="customer-panel">
-              <div className="customer-panel-head">
-                <h2>Recent Bookings</h2>
-                <Link to="/owner/bookings">View all</Link>
-              </div>
-
-              {recent.length === 0 ? (
-                <div className="owner-empty-bookings">
-                  <IconCalendar />
-                  <p>No booking requests yet</p>
-                  <span>
-                    Once customers request your halls, they will show here.
-                  </span>
-                </div>
-              ) : (
-                <div className="customer-table-wrap">
-                  <table className="customer-table">
-                    <thead>
-                      <tr>
-                        <th>Customer</th>
-                        <th>Hall</th>
-                        <th>Event Date</th>
-                        <th>Guests</th>
-                        <th>Status</th>
-                        <th>Requested On</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recent.map((booking) => (
-                        <tr key={booking._id}>
-                          <td>
-                            <strong>
-                              {booking.customerId?.fullName || 'Customer'}
-                            </strong>
-                            <span>{booking.customerId?.email || ''}</span>
-                          </td>
-                          <td>{booking.hallId?.hallName || 'Hall'}</td>
-                          <td>{formatDate(booking.eventDate)}</td>
-                          <td>{booking.guestCount || '—'}</td>
-                          <td>
-                            <span
-                              className={`status-badge ${statusClass[booking.status] || ''}`}
-                            >
-                              {booking.status}
-                            </span>
-                          </td>
-                          <td>{formatDate(booking.createdAt)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
-
-            <section className="customer-panel owner-status-panel">
-              <div className="customer-panel-head">
-                <h2>Booking Status</h2>
-              </div>
-              {chartHasData ? (
-                <div className="owner-status-chart">
-                  <ResponsiveContainer width="100%" height={220}>
-                    <PieChart>
-                      <Pie
-                        data={statusChart}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={52}
-                        outerRadius={78}
-                        paddingAngle={3}
-                      >
-                        {statusChart.map((entry) => (
-                          <Cell
-                            key={entry.key}
-                            fill={CHART_COLORS[entry.key]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <ul className="owner-status-legend">
-                    {statusChart.map((item) => (
-                      <li key={item.key}>
-                        <span
-                          className="owner-status-dot"
-                          style={{ background: CHART_COLORS[item.key] }}
-                        />
-                        <span>{item.name}</span>
-                        <strong>{item.percent}%</strong>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : (
-                <div className="owner-empty-bookings">
-                  <p>No booking status data yet</p>
-                  <span>Stats will appear once requests start coming in.</span>
-                </div>
-              )}
-            </section>
-          </section>
+         
         </>
       )}
     </div>

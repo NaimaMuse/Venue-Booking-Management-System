@@ -151,6 +151,340 @@ function AdminPlus() {
 
   return (
     <div className="customer-page admin-plus-page">
+      {/* Component Specific CSS Styles */}
+      <style>{`
+        .admin-plus-page {
+          padding: 2rem;
+          max-width: 1300px;
+          margin: 0 auto;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          color: #1e293b;
+        }
+
+        .admin-plus-hero {
+          background: linear-gradient(135deg, #4a2040 0%, #1e293b 100%);
+          color: #ffffff;
+          padding: 2.5rem;
+          border-radius: 16px;
+          margin-bottom: 2rem;
+          box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.2);
+        }
+
+        .customer-eyebrow {
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          font-size: 0.825rem;
+          font-weight: 700;
+          color: #f59e0b;
+          margin: 0 0 0.5rem 0;
+        }
+
+        .admin-plus-hero h1 {
+          margin: 0 0 0.75rem 0;
+          font-size: 2.25rem;
+          font-weight: 800;
+        }
+
+        .admin-plus-hero p {
+          margin: 0;
+          color: #94a3b8;
+          max-width: 650px;
+          line-height: 1.6;
+          font-size: 1rem;
+        }
+
+        /* Notifications */
+        .auth-error {
+          background-color: #e63dd2;
+          border: 1px solid #fecaca;
+          color: #dc2626;
+          padding: 1rem 1.25rem;
+          border-radius: 10px;
+          font-weight: 500;
+        }
+
+        .profile-success {
+          background-color: #4a2040;
+          border: 1px solid #bbf7d0;
+          color: #16a34a;
+          padding: 1rem 1.25rem;
+          border-radius: 10px;
+          font-weight: 500;
+        }
+
+        /* KPI Cards */
+        .admin-plus-kpi-row {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 1.25rem;
+          margin-bottom: 2rem;
+        }
+
+        .owner-metric-card {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 14px;
+          padding: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 1.25rem;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .owner-metric-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .owner-metric-icon {
+          font-size: 2rem;
+          background: #f8fafc;
+          padding: 0.75rem;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .owner-metric-card p {
+          margin: 0 0 0.25rem 0;
+          font-size: 0.875rem;
+          color: #64748b;
+          font-weight: 500;
+        }
+
+        .owner-metric-card strong {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #0f172a;
+        }
+
+        /* Table & Filters Panel */
+        .admin-plus-table-panel {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 16px;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+          overflow: hidden;
+        }
+
+        .admin-plus-panel-head {
+          padding: 1.25rem 1.5rem;
+          border-bottom: 1px solid #e2e8f0;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1rem;
+          background: #f8fafc;
+        }
+
+        .admin-plus-filters {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .admin-filter-pill {
+          background: #ffffff;
+          border: 1px solid #cbd5e1;
+          color: #475569;
+          padding: 0.5rem 1rem;
+          border-radius: 20px;
+          font-size: 0.875rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .admin-filter-pill:hover {
+          background: #f1f5f9;
+          color: #0f172a;
+        }
+
+        .admin-filter-pill.is-active {
+          background: #0f172a;
+          color: #ffffff;
+          border-color: #0f172a;
+        }
+
+        .admin-search-input {
+          padding: 0.55rem 1rem;
+          border: 1px solid #cbd5e1;
+          border-radius: 8px;
+          font-size: 0.875rem;
+          width: 260px;
+          outline: none;
+          transition: border-color 0.2s ease;
+        }
+
+        .admin-search-input:focus {
+          border-color: #2563eb;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .customer-status, .customer-empty {
+          padding: 3rem;
+          text-align: center;
+          color: #64748b;
+          font-size: 1rem;
+          margin: 0;
+        }
+
+        /* Table */
+        .admin-plus-table-responsive {
+          width: 100%;
+          overflow-x: auto;
+        }
+
+        .hh-plus-table {
+          width: 100%;
+          border-collapse: collapse;
+          text-align: left;
+          font-size: 0.875rem;
+        }
+
+        .hh-plus-table th {
+          background: #f8fafc;
+          color: #475569;
+          font-weight: 600;
+          padding: 0.875rem 1rem;
+          border-bottom: 1px solid #e2e8f0;
+          white-space: nowrap;
+        }
+
+        .hh-plus-table td {
+          padding: 1rem;
+          border-bottom: 1px solid #f1f5f9;
+          vertical-align: middle;
+        }
+
+        .hh-plus-table tr:hover {
+          background: #fafafa;
+        }
+
+        .hh-table-sub {
+          display: block;
+          font-size: 0.75rem;
+          color: #64748b;
+          margin-top: 0.15rem;
+        }
+
+        .hh-plan-tag {
+          background: #e0f2fe;
+          color: #0369a1;
+          font-weight: 600;
+          padding: 0.25rem 0.6rem;
+          border-radius: 6px;
+          font-size: 0.75rem;
+          display: inline-block;
+        }
+
+        code {
+          background: #f1f5f9;
+          padding: 0.2rem 0.4rem;
+          border-radius: 4px;
+          font-family: monospace;
+          font-size: 0.8rem;
+          color: #334155;
+        }
+
+        .hh-expired-date {
+          color: #dc2626;
+          font-weight: 600;
+        }
+
+        /* Status Badges */
+        .status-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 0.35rem 0.75rem;
+          border-radius: 50px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          line-height: 1;
+          white-space: nowrap;
+        }
+
+        .status-badge-confirmed {
+          background: #dcfce7;
+          color: #15803d;
+        }
+
+        .status-badge-pending {
+          background: #fef3c7;
+          color: #b45309;
+        }
+
+        .status-badge-cancelled {
+          background: #f1f5f9;
+          color: #64748b;
+        }
+
+        .status-badge-rejected {
+          background: #fee2e2;
+          color: #b91c1c;
+        }
+
+        /* Actions Cell & Buttons */
+        .admin-actions-cell {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          white-space: nowrap;
+        }
+
+        .hh-action-btn-sm {
+          padding: 0.4rem 0.75rem;
+          border-radius: 6px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          cursor: pointer;
+          border: 1px solid transparent;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.15s ease;
+        }
+
+        .hh-action-btn-sm:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .customer-gold-btn {
+          background: #f59e0b;
+          color: #ffffff;
+        }
+
+        .customer-gold-btn:hover:not(:disabled) {
+          background: #d97706;
+        }
+
+        .owner-reject-btn {
+          background: #ffffff;
+          border-color: #fca5a5;
+          color: #dc2626;
+        }
+
+        .owner-reject-btn:hover:not(:disabled) {
+          background: #fef2f2;
+        }
+
+        .owner-schedule-btn {
+          background: #ffffff;
+          border-color: #cbd5e1;
+          color: #334155;
+        }
+
+        .owner-schedule-btn:hover {
+          background: #f8fafc;
+          border-color: #94a3b8;
+        }
+      `}</style>
+
       <section className="customer-page-header admin-plus-hero">
         <div>
           <p className="customer-eyebrow">Admin Management</p>

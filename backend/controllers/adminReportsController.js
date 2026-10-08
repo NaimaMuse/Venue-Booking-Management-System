@@ -47,9 +47,6 @@ const loadValidBookings = async () =>
         depositPaid: 1,
         depositAmount: 1,
         bookingAmount: 1,
-        platformFee: 1,
-        ownerAmount: 1,
-        commissionRate: 1,
         pricePerDay: '$hallDoc.pricePerDay',
       },
     },
@@ -107,8 +104,6 @@ const getReportsOverview = async (req, res) => {
 
     let depositsCollected = 0;
     let confirmedHallValue = 0;
-    let platformFeeTotal = 0;
-    let ownerPayoutTotal = 0;
 
     validBookings.forEach((booking) => {
       const status = String(booking.status || '').toLowerCase();
@@ -123,20 +118,6 @@ const getReportsOverview = async (req, res) => {
         if (booking.depositPaid) {
           const deposit = Number(booking.depositAmount) || 0;
           depositsCollected += deposit;
-          const fee =
-            booking.platformFee !== undefined &&
-            booking.platformFee !== null &&
-            booking.platformFee > 0
-              ? booking.platformFee
-              : Math.round(deposit * 0.05 * 100) / 100;
-          const ownerNet =
-            booking.ownerAmount !== undefined &&
-            booking.ownerAmount !== null &&
-            booking.ownerAmount > 0
-              ? booking.ownerAmount
-              : Math.round((deposit - fee) * 100) / 100;
-          platformFeeTotal += fee;
-          ownerPayoutTotal += ownerNet;
         }
       }
     });
@@ -164,13 +145,10 @@ const getReportsOverview = async (req, res) => {
       bookings,
       revenue: {
         definition:
-          'Primary total is depositsCollected: sum of depositAmount on confirmed bookings where depositPaid is true. confirmedHallValue is the sum of linked hall pricePerDay for all confirmed bookings (estimated booking value). Platform fee is 5% commission; owner payout is the remaining 95%.',
+          'Primary total is depositsCollected: sum of depositAmount on confirmed bookings where depositPaid is true. confirmedHallValue is the sum of linked hall pricePerDay for all confirmed bookings (estimated booking value).',
         depositsCollected,
         confirmedHallValue,
         total: depositsCollected,
-        platformFeeTotal,
-        ownerPayoutTotal,
-        commissionRate: 0.05,
       },
     });
   } catch (error) {
@@ -259,9 +237,6 @@ const loadReportBookings = async () =>
         depositPaid: 1,
         depositAmount: 1,
         bookingAmount: 1,
-        platformFee: 1,
-        ownerAmount: 1,
-        commissionRate: 1,
         eventDate: 1,
         createdAt: 1,
         hotelId: 1,
@@ -338,8 +313,6 @@ const getAdminReports = async (req, res) => {
     const byHallMap = new Map();
     const byMonthMap = new Map();
     let revenueTotal = 0;
-    let platformFeeTotal = 0;
-    let ownerPayoutTotal = 0;
 
     filteredBookings.forEach((booking) => {
       const status = String(booking.status || '').toLowerCase();
@@ -348,22 +321,8 @@ const getAdminReports = async (req, res) => {
       }
 
       const revenue = bookingRevenue(booking);
-      const fee =
-        booking.platformFee !== undefined &&
-        booking.platformFee !== null &&
-        booking.platformFee > 0
-          ? booking.platformFee
-          : Math.round(revenue * 0.05 * 100) / 100;
-      const ownerAmt =
-        booking.ownerAmount !== undefined &&
-        booking.ownerAmount !== null &&
-        booking.ownerAmount > 0
-          ? booking.ownerAmount
-          : Math.round((revenue - fee) * 100) / 100;
 
       revenueTotal += revenue;
-      platformFeeTotal += fee;
-      ownerPayoutTotal += ownerAmt;
 
       const hid = String(booking.hotelId);
       const hotelRow = byHotelMap.get(hid) || {
@@ -372,13 +331,9 @@ const getAdminReports = async (req, res) => {
         city: booking.city || '',
         bookings: 0,
         revenue: 0,
-        platformFee: 0,
-        ownerAmount: 0,
       };
       hotelRow.bookings += 1;
       hotelRow.revenue += revenue;
-      hotelRow.platformFee += fee;
-      hotelRow.ownerAmount += ownerAmt;
       byHotelMap.set(hid, hotelRow);
 
       const lid = String(booking.hallId);
@@ -388,13 +343,9 @@ const getAdminReports = async (req, res) => {
         hotelName: booking.hotelName || 'Hotel',
         bookings: 0,
         revenue: 0,
-        platformFee: 0,
-        ownerAmount: 0,
       };
       hallRow.bookings += 1;
       hallRow.revenue += revenue;
-      hallRow.platformFee += fee;
-      hallRow.ownerAmount += ownerAmt;
       byHallMap.set(lid, hallRow);
 
       const month = monthLabel(booking.eventDate || booking.createdAt);
@@ -402,13 +353,9 @@ const getAdminReports = async (req, res) => {
         month,
         bookings: 0,
         revenue: 0,
-        platformFee: 0,
-        ownerAmount: 0,
       };
       monthRow.bookings += 1;
       monthRow.revenue += revenue;
-      monthRow.platformFee += fee;
-      monthRow.ownerAmount += ownerAmt;
       byMonthMap.set(month, monthRow);
     });
 
@@ -447,9 +394,6 @@ const getAdminReports = async (req, res) => {
       bookings,
       revenue: {
         total: revenueTotal,
-        platformFeeTotal,
-        ownerPayoutTotal,
-        commissionRate: 0.05,
         byHotel,
         byMonth: timeline,
       },

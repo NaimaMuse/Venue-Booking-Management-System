@@ -126,26 +126,6 @@ function AdminRevenueReports() {
             </div>
             <ul className="revenue-hero-stats">
               <li>
-                <span>HallHub Fee (5%)</span>
-                <strong style={{ color: '#c5a070' }}>
-                  {money(
-                    reports.revenue.platformFeeTotal !== undefined
-                      ? reports.revenue.platformFeeTotal
-                      : reports.revenue.total * 0.05
-                  )}
-                </strong>
-              </li>
-              <li>
-                <span>Owner Payout (95%)</span>
-                <strong>
-                  {money(
-                    reports.revenue.ownerPayoutTotal !== undefined
-                      ? reports.revenue.ownerPayoutTotal
-                      : reports.revenue.total * 0.95
-                  )}
-                </strong>
-              </li>
-              <li>
                 <span>Accepted</span>
                 <strong>{bookingStats.accepted}</strong>
               </li>
@@ -160,8 +140,8 @@ function AdminRevenueReports() {
             <article className="revenue-board">
               <header className="revenue-board-head">
                 <div>
-                  <p>Contribution &amp; Commission</p>
-                  <h3>Hotel earnings &amp; 5% fee</h3>
+                  <p>Contribution</p>
+                  <h3>Hotel earnings</h3>
                 </div>
                 {hotelId ? (
                   <button
@@ -184,8 +164,6 @@ function AdminRevenueReports() {
                     <span>Hotel</span>
                     <span>Bookings</span>
                     <span>Gross</span>
-                    <span>Fee (5%)</span>
-                    <span>Owner (95%)</span>
                     <span>Share</span>
                   </div>
                   {hotelEarnings.map((hotel, index) => {
@@ -194,14 +172,6 @@ function AdminRevenueReports() {
                           (hotel.revenue / reports.revenue.total) * 100
                         )
                       : 0;
-                    const fee =
-                      hotel.platformFee !== undefined
-                        ? hotel.platformFee
-                        : Math.round(hotel.revenue * 0.05 * 100) / 100;
-                    const ownerNet =
-                      hotel.ownerAmount !== undefined
-                        ? hotel.ownerAmount
-                        : Math.round((hotel.revenue - fee) * 100) / 100;
                     const active = hotelId === hotel.hotelId;
                     return (
                       <button
@@ -222,12 +192,6 @@ function AdminRevenueReports() {
                         <span>{hotel.bookings}</span>
                         <span className="revenue-table-money">
                           {money(hotel.revenue)}
-                        </span>
-                        <span className="revenue-table-money" style={{ color: '#c5a070', fontWeight: 600 }}>
-                          {money(fee)}
-                        </span>
-                        <span className="revenue-table-money">
-                          {money(ownerNet)}
                         </span>
                         <span className="revenue-table-share">
                           <b>{share}%</b>
