@@ -87,6 +87,7 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/owner', require('./routes/ownerRoutes'));
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 app.use('/api/plus', require('./routes/plusRoutes'));
+app.use('/api/reviews', require('./routes/reviewRoutes'));
 
 // Unknown API routes
 app.use('/api', (req, res) => {
