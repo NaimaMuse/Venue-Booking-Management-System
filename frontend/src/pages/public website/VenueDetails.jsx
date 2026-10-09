@@ -195,7 +195,12 @@ function VenueDetails() {
                   {hall.hotelId?.hotelName || 'Approved Hotel'}
                   {hall.hotelId?.city ? ` · ${hall.hotelId.city}` : ''}
                 </p>
-                <h1>{hall.hallName}</h1>
+                <div className="venue-book-title-wrap">
+                  <h1>{hall.hallName}</h1>
+                  {hall.isFeatured || hall.hotelId?.isFeatured ? (
+                    <span className="hh-featured-badge">⭐ Featured Venue</span>
+                  ) : null}
+                </div>
                 <div className="venue-book-meta-line">
                   <span className="venue-book-chip">{hall.capacity} Guests</span>
                   <span className="venue-book-address">
@@ -218,7 +223,9 @@ function VenueDetails() {
                         event.currentTarget.src = '/banner01.png';
                       }}
                     />
-                    <span className="venue-book-featured">Featured</span>
+                    {hall.isFeatured || hall.hotelId?.isFeatured ? (
+                      <span className="venue-book-featured">⭐ Featured</span>
+                    ) : null}
                     {images.length > 1 && (
                       <>
                         <button

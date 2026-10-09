@@ -226,15 +226,20 @@ function Hotels() {
               return (
                 <section
                   key={hotel._id}
-                  className="hh-hotel"
+                  className={`hh-hotel${hotel.isFeatured ? ' is-featured-hotel' : ''}`}
                   style={{ animationDelay: `${hotelIndex * 60}ms` }}
                 >
                   <header className="hh-hotel-head">
                     <div className="hh-hotel-head-main">
-                      <p className="hh-hotel-place">
-                        {hotel.city}
-                        {hotel.address ? ` · ${hotel.address}` : ''}
-                      </p>
+                      <div className="hh-hotel-badges-row">
+                        <p className="hh-hotel-place">
+                          {hotel.city}
+                          {hotel.address ? ` · ${hotel.address}` : ''}
+                        </p>
+                        {hotel.isFeatured ? (
+                          <span className="hh-featured-badge">⭐ Featured</span>
+                        ) : null}
+                      </div>
                       <h2>
                         <Link
                           to={`/hotels/${hotel._id}`}
@@ -267,7 +272,7 @@ function Hotels() {
                       {halls.map((hall, hallIndex) => (
                         <article
                           key={hall._id}
-                          className="hh-hall-card"
+                          className={`hh-hall-card${hotel.isFeatured ? ' is-featured-hall' : ''}`}
                           style={{
                             animationDelay: `${hotelIndex * 60 + hallIndex * 40}ms`,
                           }}
@@ -282,6 +287,11 @@ function Hotels() {
                               alt=""
                               loading="lazy"
                             />
+                            {hotel.isFeatured || hall.isFeatured ? (
+                              <span className="hh-hall-featured-pill">
+                                ⭐ Featured
+                              </span>
+                            ) : null}
                             <span className="hh-hall-photo-shade" />
                           </Link>
 

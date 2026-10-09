@@ -34,7 +34,7 @@ router.post(
   protect,
   authorize('hotel_owner'),
   uploadHallMedia.fields([
-    { name: 'images', maxCount: 5 },
+    { name: 'images', maxCount: 15 },
     { name: 'video', maxCount: 1 },
   ]),
   createHall
@@ -45,7 +45,7 @@ router.put(
   protect,
   authorize('hotel_owner'),
   uploadHallMedia.fields([
-    { name: 'images', maxCount: 5 },
+    { name: 'images', maxCount: 15 },
     { name: 'video', maxCount: 1 },
   ]),
   updateHall
@@ -55,7 +55,7 @@ router.patch(
   protect,
   authorize('hotel_owner'),
   uploadHallMedia.fields([
-    { name: 'images', maxCount: 5 },
+    { name: 'images', maxCount: 15 },
     { name: 'video', maxCount: 1 },
   ]),
   updateHall

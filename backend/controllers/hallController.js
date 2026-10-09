@@ -153,12 +153,30 @@ const getHalls = async (req, res) => {
     }
 
     const halls = await Hall.find(filter)
-      .populate('hotelId', 'hotelName city address verificationStatus')
+      .populate(
+        'hotelId',
+        'hotelName city address verificationStatus isFeatured featuredExpiresAt'
+      )
       .sort({ hallName: 1 });
 
+    const now = new Date();
+    const hallsWithFeatured = halls.map((h) => {
+      const plain = typeof h.toObject === 'function' ? h.toObject() : h;
+      const hotel = plain.hotelId;
+      const isFeatured = Boolean(
+        hotel?.isFeatured &&
+        hotel?.featuredExpiresAt &&
+        new Date(hotel.featuredExpiresAt) > now
+      );
+      return {
+        ...plain,
+        isFeatured,
+      };
+    });
+
     return res.status(200).json({
-      count: halls.length,
-      halls,
+      count: hallsWithFeatured.length,
+      halls: hallsWithFeatured,
     });
   } catch (error) {
     return res.status(500).json({
@@ -247,7 +265,7 @@ const getHallById = async (req, res) => {
 
     const hall = await Hall.findById(id).populate(
       'hotelId',
-      'hotelName city address contactPhone verificationStatus ownerId'
+      'hotelName city address contactPhone verificationStatus ownerId isFeatured featuredExpiresAt'
     );
 
     if (!hall || !hall.hotelId) {
@@ -274,7 +292,21 @@ const getHallById = async (req, res) => {
       return res.status(404).json({ message: 'Hall not found' });
     }
 
-    return res.status(200).json({ hall });
+    const now = new Date();
+    const isFeatured = Boolean(
+      hotel.isFeatured &&
+      hotel.featuredExpiresAt &&
+      new Date(hotel.featuredExpiresAt) > now
+    );
+
+    const plainHall = typeof hall.toObject === 'function' ? hall.toObject() : hall;
+
+    return res.status(200).json({
+      hall: {
+        ...plainHall,
+        isFeatured,
+      },
+    });
   } catch (error) {
     return res.status(500).json({
       message: 'Failed to get hall',
@@ -285,6 +317,7 @@ const getHallById = async (req, res) => {
 
 /**
  * Owner: create a hall for their hotel (pending or approved is fine).
+ * Plus subscribers can upload up to 15 photos (vs 5 normal limit).
  */
 const createHall = async (req, res) => {
   try {
@@ -301,7 +334,23 @@ const createHall = async (req, res) => {
       return res.status(400).json({ message: 'Validation failed', errors });
     }
 
+    const now = new Date();
+    const isPlus = Boolean(
+      hotel.isFeatured &&
+      hotel.featuredExpiresAt &&
+      new Date(hotel.featuredExpiresAt) > now
+    );
+    const maxAllowedImages = isPlus ? 15 : 5;
+
     const images = mapUploadedImages(req.files?.images || []);
+    if (images.length > maxAllowedImages) {
+      return res.status(400).json({
+        message: `A hall can have at most ${maxAllowedImages} images${
+          !isPlus ? '. Upgrade to HallHub Plus to upload up to 15 images.' : ''
+        }`,
+      });
+    }
+
     const videoUrl = mapUploadedVideo(req.files?.video || []);
 
     const hall = await Hall.create({
@@ -395,17 +444,34 @@ const updateHall = async (req, res) => {
       touched = true;
     }
 
+    const now = new Date();
+    const isPlus = Boolean(
+      hotel.isFeatured &&
+      hotel.featuredExpiresAt &&
+      new Date(hotel.featuredExpiresAt) > now
+    );
+    const maxAllowedImages = isPlus ? 15 : 5;
+
     const newImages = mapUploadedImages(req.files?.images || []);
     if (newImages.length) {
       const shouldReplace = parseBoolean(replaceImages, false);
       if (shouldReplace) {
+        if (newImages.length > maxAllowedImages) {
+          return res.status(400).json({
+            message: `A hall can have at most ${maxAllowedImages} images${
+              !isPlus ? '. Upgrade to HallHub Plus to upload up to 15 images.' : ''
+            }`,
+          });
+        }
         unlinkHallImages(hall.images);
         hall.images = newImages;
       } else {
         const merged = [...hall.images, ...newImages];
-        if (merged.length > 5) {
+        if (merged.length > maxAllowedImages) {
           return res.status(400).json({
-            message: `A hall can have at most 5 images (currently ${hall.images.length})`,
+            message: `A hall can have at most ${maxAllowedImages} images (currently ${hall.images.length})${
+              !isPlus ? '. Upgrade to HallHub Plus to upload up to 15 images.' : ''
+            }`,
           });
         }
         hall.images = merged;

@@ -43,9 +43,6 @@ export const emptyReports = {
   },
   revenue: {
     total: 0,
-    platformFeeTotal: 0,
-    ownerPayoutTotal: 0,
-    commissionRate: 0.05,
     byHotel: [],
     byMonth: [],
   },
@@ -132,8 +129,6 @@ export const exportReportsCsv = (reports, filter, filenamePrefix) => {
     ['Bookings', 'Accepted', reports.bookings.accepted],
     ['Bookings', 'Rejected', reports.bookings.rejected],
     ['Revenue', 'Total Gross Revenue', reports.revenue.total],
-    ['Revenue', 'Platform Fee (5% Commission)', reports.revenue.platformFeeTotal || 0],
-    ['Revenue', 'Owner Payouts (95%)', reports.revenue.ownerPayoutTotal || 0],
     ['Users', 'Customers', reports.users.customers],
     ['Users', 'Hotel Owners', reports.users.hotelOwners],
     [],
@@ -155,13 +150,11 @@ export const exportReportsCsv = (reports, filter, filenamePrefix) => {
       item.revenue || 0,
     ]),
     [],
-    ['Revenue By Hotel', 'Hotel', 'Gross Revenue', 'Platform Fee (5%)', 'Owner Share (95%)'],
+    ['Revenue By Hotel', 'Hotel', 'Gross Revenue'],
     ...reports.revenue.byHotel.map((item) => [
       'Revenue',
       item.hotelName,
       item.revenue,
-      item.platformFee || 0,
-      item.ownerAmount || 0,
     ]),
   ];
 

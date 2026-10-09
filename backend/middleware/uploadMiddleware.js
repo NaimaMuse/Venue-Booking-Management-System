@@ -52,14 +52,14 @@ const hallMediaFileFilter = (_req, file, cb) => {
 
 /**
  * Multipart fields:
- * - `images` up to 5 files
+ * - `images` up to 15 files (for HallHub Plus, 5 for normal)
  * - `video` up to 1 file
  */
 const uploadHallMedia = multer({
   storage: hallImageStorage,
   fileFilter: hallMediaFileFilter,
   limits: {
-    files: 6,
+    files: 16,
     fileSize: 25 * 1024 * 1024, // allow one short hall video
   },
 });

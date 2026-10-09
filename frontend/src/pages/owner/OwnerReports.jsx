@@ -181,26 +181,6 @@ function OwnerReports() {
               <strong>{money(summary.depositRevenue)}</strong>
             </article>
             <article className="is-green">
-              <span>Net Payout (95%)</span>
-              <strong>
-                {money(
-                  summary.netOwnerRevenue !== undefined
-                    ? summary.netOwnerRevenue
-                    : (summary.depositRevenue || 0) * 0.95
-                )}
-              </strong>
-            </article>
-            <article className="is-gold">
-              <span>HallHub Fee (5%)</span>
-              <strong>
-                {money(
-                  summary.platformFee !== undefined
-                    ? summary.platformFee
-                    : (summary.depositRevenue || 0) * 0.05
-                )}
-              </strong>
-            </article>
-            <article className="is-green">
               <span>Confirmed</span>
               <strong>{summary.confirmed || 0}</strong>
             </article>
@@ -316,49 +296,31 @@ function OwnerReports() {
                       <th>Bookings</th>
                       <th>Confirmed</th>
                       <th>Gross Revenue</th>
-                      <th>Fee (5%)</th>
-                      <th>Net (95%)</th>
                       <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {report.byHall.map((hall) => {
-                      const fee =
-                        hall.platformFee !== undefined
-                          ? hall.platformFee
-                          : Math.round(hall.revenue * 0.05 * 100) / 100;
-                      const net =
-                        hall.netRevenue !== undefined
-                          ? hall.netRevenue
-                          : Math.round((hall.revenue - fee) * 100) / 100;
-                      return (
-                        <tr key={hall.hallId}>
-                          <td>
-                            <strong>{hall.hallName}</strong>
-                          </td>
-                          <td>{hall.capacity} guests</td>
-                          <td>{money(hall.pricePerDay)}</td>
-                          <td>{hall.bookings}</td>
-                          <td>{hall.confirmed}</td>
-                          <td>{money(hall.revenue)}</td>
-                          <td style={{ color: '#c5a070', fontWeight: 600 }}>
-                            {money(fee)}
-                          </td>
-                          <td style={{ color: '#1f7a3f', fontWeight: 600 }}>
-                            {money(net)}
-                          </td>
-                          <td>
-                            <span
-                              className={`admin-venue-avail${
-                                hall.isAvailable ? ' is-on' : ' is-off'
-                              }`}
-                            >
-                              {hall.isAvailable ? 'Available' : 'Unavailable'}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {report.byHall.map((hall) => (
+                      <tr key={hall.hallId}>
+                        <td>
+                          <strong>{hall.hallName}</strong>
+                        </td>
+                        <td>{hall.capacity} guests</td>
+                        <td>{money(hall.pricePerDay)}</td>
+                        <td>{hall.bookings}</td>
+                        <td>{hall.confirmed}</td>
+                        <td>{money(hall.revenue)}</td>
+                        <td>
+                          <span
+                            className={`admin-venue-avail${
+                              hall.isAvailable ? ' is-on' : ' is-off'
+                            }`}
+                          >
+                            {hall.isAvailable ? 'Available' : 'Unavailable'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -386,22 +348,12 @@ function OwnerReports() {
                       <th>Event date</th>
                       <th>Guests</th>
                       <th>Gross Paid</th>
-                      <th>Fee (5%)</th>
-                      <th>Net (95%)</th>
                       <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {report.recent.map((booking) => {
                       const deposit = booking.depositAmount || 0;
-                      const fee =
-                        booking.platformFee !== undefined
-                          ? booking.platformFee
-                          : Math.round(deposit * 0.05 * 100) / 100;
-                      const net =
-                        booking.ownerAmount !== undefined
-                          ? booking.ownerAmount
-                          : Math.round((deposit - fee) * 100) / 100;
                       return (
                         <tr key={booking.id}>
                           <td>
@@ -411,12 +363,6 @@ function OwnerReports() {
                           <td>{formatDate(booking.eventDate)}</td>
                           <td>{booking.guestCount || '—'}</td>
                           <td>{money(deposit)}</td>
-                          <td style={{ color: '#c5a070', fontWeight: 600 }}>
-                            {money(fee)}
-                          </td>
-                          <td style={{ color: '#1f7a3f', fontWeight: 600 }}>
-                            {money(net)}
-                          </td>
                           <td>
                             <span
                               className={`status-badge status-badge-${booking.status}`}

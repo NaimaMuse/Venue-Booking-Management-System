@@ -95,8 +95,21 @@ const IconLogout = () => (
   </svg>
 );
 
+const IconPlus = () => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 const mainNavItems = [
   { label: 'Overview', to: '/owner/dashboard', end: true, icon: <IconOverview /> },
+  { label: '⭐ HallHub Plus', to: '/owner/plus', icon: <IconPlus /> },
   { label: 'My Hotel Profile', to: '/owner/hotel-profile', icon: <IconHotel /> },
   { label: 'Manage Halls', to: '/owner/halls', end: true, icon: <IconHalls /> },
   { label: 'Booking Requests', to: '/owner/bookings', icon: <IconBookings />, badgeKey: 'pending' },

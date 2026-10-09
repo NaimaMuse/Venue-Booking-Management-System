@@ -99,12 +99,22 @@ function HotelDetails() {
                 <p className="hh-eyebrow hh-details-eyebrow">
                   HallHub
                 </p>
-                <p className="hh-details-hero-place">
-                  {hotel.city}
-                  {hotel.address ? ` · ${hotel.address}` : ''}
-                </p>
+                <div className="hh-details-title-row">
+                  <p className="hh-details-hero-place">
+                    {hotel.city}
+                    {hotel.address ? ` · ${hotel.address}` : ''}
+                  </p>
+                  {hotel.isFeatured ? (
+                    <span className="hh-featured-badge">⭐ Featured Venue</span>
+                  ) : null}
+                </div>
                 <h1>{hotel.hotelName}</h1>
                 <div className="hh-details-hero-meta-row">
+                  {hotel.isFeatured ? (
+                    <span className="hh-details-hero-pill is-featured-pill">
+                      ⭐ HallHub Plus Partner
+                    </span>
+                  ) : null}
                   <button
                     type="button"
                     className="hh-details-hero-pill"

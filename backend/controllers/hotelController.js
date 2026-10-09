@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Hotel = require('../models/Hotel');
 const Hall = require('../models/Hall');
 const User = require('../models/User');
+const { syncExpiredSubscriptions } = require('./plusController');
 
 const OWNER_UPDATABLE_FIELDS = [
   'hotelName',
@@ -40,9 +41,13 @@ const attachHallCounts = async (hotels) => {
 
 /**
  * Public: list approved hotels (+ halls). Optional ?q= ?minCapacity= ?maxPrice=
+ * Active HallHub Plus hotels receive a search boost (placement higher than normal hotels)
+ * while strictly respecting all filters.
  */
 const getHotels = async (req, res) => {
   try {
+    await syncExpiredSubscriptions();
+
     const filter = { verificationStatus: 'approved' };
     const q = (req.query.q || req.query.search || '').trim();
     const minCapacity = Number(req.query.minCapacity || req.query.capacity);
@@ -54,9 +59,10 @@ const getHotels = async (req, res) => {
       filter.$or = [{ hotelName: regex }, { city: regex }];
     }
 
+    // Active Plus hotels are boosted to the top of matching results
     const hotels = await Hotel.find(filter)
       .populate('ownerId', 'fullName email phone')
-      .sort({ hotelName: 1 });
+      .sort({ isFeatured: -1, hotelName: 1 });
 
     const hotelIds = hotels.map((hotel) => hotel._id);
     const hallFilter = {
@@ -98,14 +104,24 @@ const getHotels = async (req, res) => {
       (Number.isFinite(maxPrice) && maxPrice >= 0) ||
       (Number.isFinite(minPrice) && minPrice >= 0);
 
+    const now = new Date();
     const hotelsWithHalls = hotels
       .map((hotel) => {
         const plain =
           typeof hotel.toObject === 'function' ? hotel.toObject() : hotel;
         const hotelHalls = hallsByHotel.get(String(plain._id)) || [];
+        const isActivePlus = Boolean(
+          plain.isFeatured &&
+          plain.featuredExpiresAt &&
+          new Date(plain.featuredExpiresAt) > now
+        );
         return {
           ...plain,
-          halls: hotelHalls,
+          isFeatured: isActivePlus,
+          halls: hotelHalls.map((hall) => ({
+            ...hall,
+            isFeatured: isActivePlus,
+          })),
           hallCount: hotelHalls.length,
         };
       })
@@ -156,10 +172,26 @@ const getHotelById = async (req, res) => {
     }
 
     const halls = await Hall.find({ hotelId: hotel._id }).sort({ hallName: 1 });
+    const plainHotel = typeof hotel.toObject === 'function' ? hotel.toObject() : hotel;
+    const now = new Date();
+    const isFeatured = Boolean(
+      plainHotel.isFeatured &&
+      plainHotel.featuredExpiresAt &&
+      new Date(plainHotel.featuredExpiresAt) > now
+    );
 
     return res.status(200).json({
-      hotel,
-      halls,
+      hotel: {
+        ...plainHotel,
+        isFeatured,
+      },
+      halls: halls.map((hall) => {
+        const plainHall = typeof hall.toObject === 'function' ? hall.toObject() : hall;
+        return {
+          ...plainHall,
+          isFeatured,
+        };
+      }),
       hallCount: halls.length,
     });
   } catch (error) {
@@ -252,16 +284,30 @@ const getMyHotel = async (req, res) => {
     const owner =
       plain.ownerId && typeof plain.ownerId === 'object' ? plain.ownerId : null;
 
+    const now = new Date();
+    const isFeatured = Boolean(
+      plain.isFeatured &&
+      plain.featuredExpiresAt &&
+      new Date(plain.featuredExpiresAt) > now
+    );
+
     return res.status(200).json({
       hotel: {
         ...plain,
+        isFeatured,
         verificationStatus: String(plain.verificationStatus || 'pending')
           .trim()
           .toLowerCase(),
         // Convenience for older frontend checks that read this on hotel
         hasSeenApprovalAlert: owner?.hasSeenApprovalAlert === true,
       },
-      halls,
+      halls: halls.map((hall) => {
+        const plainHall = typeof hall.toObject === 'function' ? hall.toObject() : hall;
+        return {
+          ...plainHall,
+          isFeatured,
+        };
+      }),
       hallCount: halls.length,
     });
   } catch (error) {
