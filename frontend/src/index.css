@@ -12669,5 +12669,340 @@ button.hh-details-hero-pill:focus-visible {
   color: #4a2040;
 }
 
+/* ==========================================================================
+   Comprehensive Mobile Responsiveness & Adaptive Screen Layouts
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  /* Public Navbar Mobile Enhancements */
+  .navbar {
+    top: 10px;
+    width: calc(100% - 20px);
+    padding: 10px 16px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 10px 30px rgba(42, 18, 38, 0.12);
+  }
+
+  .nav-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-links-wrap {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding-top: 12px;
+    margin-top: 10px;
+    border-top: 1px solid #ebdbe4;
+  }
+
+  .nav-links-wrap.is-open {
+    display: flex;
+    animation: hhFadeUp 0.25s ease both;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .nav-link {
+    display: block;
+    width: 100%;
+    padding: 11px 16px;
+    border-radius: 12px;
+    background: #fbf7fa;
+    text-align: left;
+    font-size: 14.5px;
+  }
+
+  .nav-link.active {
+    background: #f1e4ee;
+    color: #4a2040;
+    font-weight: 700;
+  }
+
+  .nav-auth-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 6px;
+    width: 100%;
+  }
+
+  .nav-contact-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 16px;
+    font-size: 14px;
+    border-radius: 12px;
+  }
+
+  .nav-logout-btn {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* 4-Col Hotel Header on Tablet/Mobile */
+  .hh-4col-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .hh-4col-nav-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Hotel Details Hero & Spacing */
+  .hh-details-body {
+    padding-top: 86px;
+    padding-inline: 14px;
+  }
+
+  .hh-details-hero {
+    min-height: 280px;
+    margin-top: 4px;
+    margin-bottom: 20px;
+    border-radius: 18px;
+  }
+
+  .hh-details-hero img {
+    height: 320px;
+    object-position: center;
+  }
+
+  .hh-details-hero-ornament {
+    inset: 8px;
+    border-radius: 14px;
+  }
+
+  .hh-details-hero-copy {
+    padding: 20px 16px 18px;
+  }
+
+  .hh-details-hero-copy h1 {
+    font-size: clamp(1.8rem, 6vw, 2.6rem);
+    margin-bottom: 10px;
+  }
+
+  .hh-details-hero-meta-row {
+    gap: 6px;
+  }
+
+  .hh-details-hero-pill {
+    padding: 6px 12px;
+    font-size: 11.5px;
+  }
+
+  .hh-details-strip {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 18px;
+  }
+
+  .hh-details-strip-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  /* Rating Breakdown on Mobile */
+  .hh-rating-summary-card {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 18px 16px;
+    border-radius: 16px;
+  }
+
+  .hh-rating-score-box {
+    padding-bottom: 18px;
+    border-bottom: 1px solid #ebdbe4;
+  }
+
+  .hh-rating-large-number {
+    font-size: 3.2rem;
+  }
+
+  .hh-breakdown-row {
+    gap: 10px;
+  }
+
+  .hh-breakdown-star-label {
+    min-width: 32px;
+    font-size: 12.5px;
+  }
+
+  .hh-breakdown-count {
+    min-width: 58px;
+    font-size: 12px;
+  }
+
+  /* Review Head on Mobile */
+  .hh-reviews-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .hh-write-review-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hh-review-card {
+    padding: 16px 14px;
+  }
+
+  .hh-review-card-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  /* 4-Col Grid Section on Mobile */
+  .hh-4col-hotels-section {
+    padding: 36px 14px 30px;
+  }
+
+  .hh-4col-hotel-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .hh-hotel-card-image-wrap {
+    height: 200px;
+  }
+
+  .hh-hotel-card-body {
+    padding: 14px 14px 16px;
+  }
+
+  .hh-hotel-card-title {
+    font-size: 1.35rem;
+  }
+
+  /* Customer Portal on Mobile */
+  .customer-topbar-inner {
+    padding: 10px 14px;
+    gap: 10px;
+  }
+
+  .customer-main {
+    padding: 16px 14px 60px;
+  }
+
+  .customer-reviews-container {
+    padding: 0;
+  }
+
+  .customer-reviews-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .customer-eligible-list {
+    grid-template-columns: 1fr;
+  }
+
+  .customer-eligible-card {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .customer-eligible-img {
+    width: 100%;
+    height: 160px;
+  }
+
+  .customer-submitted-review-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .customer-submitted-rating-box {
+    align-items: flex-start;
+  }
+
+  /* Review Modal on Mobile */
+  .review-modal-overlay {
+    padding: 12px;
+    align-items: flex-end;
+  }
+
+  .review-modal-dialog {
+    padding: 22px 18px;
+    border-radius: 20px 20px 16px 16px;
+    max-height: 88vh;
+    width: 100%;
+  }
+
+  .review-modal-actions,
+  .hh-review-modal-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .review-modal-actions button,
+  .hh-review-modal-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hh-review-stars-wrap {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-pill {
+    padding: 8px 12px;
+    font-size: 13.5px;
+  }
+
+  .hh-details-strip-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .hh-4col-arrow-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+
+  .hh-hotel-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .hh-hotel-card-btn {
+    width: 100%;
+  }
+
+  .customer-submitted-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .customer-submitted-actions button {
+    width: 100%;
+  }
+}
+
+
 
 
