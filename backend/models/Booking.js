@@ -44,6 +44,11 @@ const bookingSchema = new mongoose.Schema(
       type: Date,
       required: [true, 'Event date is required'],
     },
+    eventTime: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     guestCount: {
       type: Number,
       required: [true, 'Guest count is required'],

@@ -38,6 +38,24 @@ const formatUnavailableLabel = (isoDate) => {
   });
 };
 
+const formatTimeDisplay = (timeStr) => {
+  if (!timeStr) return '';
+  const [hStr, mStr] = timeStr.split(':');
+  const h = parseInt(hStr, 10);
+  if (Number.isNaN(h)) return timeStr;
+  const m = mStr || '00';
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const formattedHour = h % 12 === 0 ? 12 : h % 12;
+  return `${formattedHour}:${m} ${ampm}`;
+};
+
+const TIME_SLOTS = [
+  { label: 'Morning', time: '09:00', icon: '🌅' },
+  { label: 'Afternoon', time: '14:00', icon: '☀️' },
+  { label: 'Evening', time: '18:00', icon: '🌙' },
+  { label: 'Night', time: '20:00', icon: '🌟' },
+];
+
 function VenueDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -48,8 +66,11 @@ function VenueDetails() {
   const [activeTab, setActiveTab] = useState('about');
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const [modalError, setModalError] = useState('');
   const [form, setForm] = useState({
     eventDate: '',
+    eventTime: '',
     guestCount: '',
     specialNotes: '',
   });
@@ -97,12 +118,13 @@ function VenueDetails() {
   const canRequestBooking = !currentUser || currentUser.role === 'customer';
   const dateConflict = form.eventDate && unavailableSet.has(form.eventDate);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     setFormError('');
+    setModalError('');
 
-    if (!form.eventDate || !form.guestCount) {
-      setFormError('Event date and guest count are required.');
+    if (!form.eventDate || !form.guestCount || !form.eventTime) {
+      setFormError('Event date, event time, and guest count are required.');
       return;
     }
 
@@ -118,6 +140,25 @@ function VenueDetails() {
       return;
     }
 
+    const user = getUser();
+    if (user && user.role !== 'customer') {
+      setFormError('Booking requests are available for customer accounts.');
+      return;
+    }
+
+    setShowSummaryModal(true);
+  };
+
+  const handleCloseModal = () => {
+    if (!submitting) {
+      setShowSummaryModal(false);
+      setModalError('');
+    }
+  };
+
+  const handleConfirmBooking = async () => {
+    setModalError('');
+
     const token = getToken();
     const user = getUser();
 
@@ -125,9 +166,11 @@ function VenueDetails() {
       savePendingBooking({
         hallId: id,
         eventDate: form.eventDate,
+        eventTime: form.eventTime,
         guestCount: Number(form.guestCount),
         specialNotes: form.specialNotes.trim(),
       });
+      setShowSummaryModal(false);
       navigate('/signup', {
         state: {
           from: `/venues/${id}`,
@@ -138,7 +181,7 @@ function VenueDetails() {
     }
 
     if (user.role !== 'customer') {
-      setFormError('Booking requests are available for customer accounts.');
+      setModalError('Booking requests are available for customer accounts.');
       return;
     }
 
@@ -148,15 +191,17 @@ function VenueDetails() {
       await api.post('/api/bookings', {
         hallId: id,
         eventDate: form.eventDate,
+        eventTime: form.eventTime || undefined,
         guestCount: Number(form.guestCount),
         specialNotes: form.specialNotes.trim() || undefined,
       });
 
+      setShowSummaryModal(false);
       navigate('/customer/my-bookings', {
         state: { toast: 'Booking request submitted successfully.' },
       });
     } catch (err) {
-      setFormError(getApiError(err, 'Unable to submit booking right now'));
+      setModalError(getApiError(err, 'Unable to submit booking right now'));
     } finally {
       setSubmitting(false);
     }
@@ -400,6 +445,55 @@ function VenueDetails() {
                       )}
                     </label>
 
+                    <div className="booking-field">
+                      <div className="booking-field-head-row">
+                        <span className="booking-field-label">Event Time</span>
+                        {form.eventTime && (
+                          <span className="booking-time-preview">
+                            {formatTimeDisplay(form.eventTime)}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="booking-time-slots">
+                        {TIME_SLOTS.map((slot) => {
+                          const isSelected = form.eventTime === slot.time;
+                          return (
+                            <button
+                              key={slot.time}
+                              type="button"
+                              className={`booking-time-chip${isSelected ? ' is-selected' : ''}`}
+                              onClick={() =>
+                                setForm((prev) => ({
+                                  ...prev,
+                                  eventTime: slot.time,
+                                }))
+                              }
+                            >
+                              <span>{slot.icon}</span>
+                              <strong>{slot.label}</strong>
+                              <small>{formatTimeDisplay(slot.time)}</small>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className="booking-custom-time-wrap">
+                        <span className="booking-custom-time-label">Or exact time:</span>
+                        <input
+                          type="time"
+                          value={form.eventTime}
+                          onChange={(event) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              eventTime: event.target.value,
+                            }))
+                          }
+                          required
+                        />
+                      </div>
+                    </div>
+
                     <label className="booking-field">
                       <span className="booking-field-label">
                         Number of Guests
@@ -444,6 +538,7 @@ function VenueDetails() {
                         disabled={
                           submitting ||
                           !form.eventDate ||
+                          !form.eventTime ||
                           unavailableSet.has(form.eventDate)
                         }
                       >
@@ -458,44 +553,112 @@ function VenueDetails() {
                     )}
                   </form>
                 </section>
-
-                <section className="venue-book-summary">
-                  <h3>Booking Summary</h3>
-                  <div className="venue-book-summary-hall">
-                    <img src={images[0]} alt="" />
-                    <div>
-                      <strong>{hall.hallName}</strong>
-                      <span>{hall.hotelId?.hotelName || 'Hotel'}</span>
-                    </div>
-                  </div>
-                  <ul>
-                    <li>
-                      <span>Event date</span>
-                      <strong>
-                        {form.eventDate
-                          ? formatUnavailableLabel(form.eventDate)
-                          : 'Not selected'}
-                      </strong>
-                    </li>
-                    <li>
-                      <span>Guests</span>
-                      <strong>{form.guestCount || '—'}</strong>
-                    </li>
-                    <li>
-                      <span>Day rate</span>
-                      <strong>${dayRate.toLocaleString()}</strong>
-                    </li>
-                  </ul>
-                  <div className="venue-book-summary-total">
-                    <span>Estimated total</span>
-                    <strong>${dayRate.toLocaleString()}</strong>
-                  </div>
-                </section>
               </aside>
             </div>
           </>
         )}
       </section>
+
+      {showSummaryModal && hall && (
+        <div
+          className="booking-modal-overlay"
+          role="presentation"
+          onClick={handleCloseModal}
+        >
+          <div
+            className="booking-modal venue-summary-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="summary-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="booking-modal-head">
+              <div className="booking-modal-intro">
+                <p className="hh-eyebrow booking-modal-eyebrow">Review Request</p>
+                <h2 id="summary-modal-title">Booking Summary</h2>
+              </div>
+              <button
+                type="button"
+                className="booking-modal-close"
+                onClick={handleCloseModal}
+                aria-label="Close"
+                disabled={submitting}
+              >
+                ×
+              </button>
+            </div>
+
+            {modalError && (
+              <p className="booking-form-error" style={{ marginBottom: 14 }}>
+                {modalError}
+              </p>
+            )}
+
+            <div className="venue-book-summary-hall">
+              <img
+                src={images[0]}
+                alt={hall.hallName}
+                onError={(event) => {
+                  event.currentTarget.src = '/banner01.png';
+                }}
+              />
+              <div>
+                <strong>{hall.hallName}</strong>
+                <span>{hall.hotelId?.hotelName || 'Hotel'}</span>
+              </div>
+            </div>
+
+            <ul className="venue-summary-modal-list">
+              <li>
+                <span>Event date</span>
+                <strong>{formatUnavailableLabel(form.eventDate)}</strong>
+              </li>
+              <li>
+                <span>Event time</span>
+                <strong>{formatTimeDisplay(form.eventTime)}</strong>
+              </li>
+              <li>
+                <span>Guests</span>
+                <strong>{form.guestCount}</strong>
+              </li>
+              <li>
+                <span>Day rate</span>
+                <strong>${dayRate.toLocaleString()}</strong>
+              </li>
+              {form.specialNotes?.trim() ? (
+                <li className="venue-summary-modal-notes">
+                  <span>Special notes</span>
+                  <strong>{form.specialNotes.trim()}</strong>
+                </li>
+              ) : null}
+            </ul>
+
+            <div className="venue-book-summary-total">
+              <span>Estimated total</span>
+              <strong>${dayRate.toLocaleString()}</strong>
+            </div>
+
+            <div className="venue-summary-modal-actions">
+              <button
+                type="button"
+                className="venue-summary-cancel-btn"
+                onClick={handleCloseModal}
+                disabled={submitting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="venue-summary-ok-btn"
+                onClick={handleConfirmBooking}
+                disabled={submitting}
+              >
+                {submitting ? 'Submitting…' : 'OK'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

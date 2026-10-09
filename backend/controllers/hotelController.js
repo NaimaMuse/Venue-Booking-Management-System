@@ -59,10 +59,10 @@ const getHotels = async (req, res) => {
       filter.$or = [{ hotelName: regex }, { city: regex }];
     }
 
-    // Active Plus hotels are boosted to the top of matching results
+    // Hotels are displayed in descending order based on star ratings (highest-rated first)
     const hotels = await Hotel.find(filter)
       .populate('ownerId', 'fullName email phone')
-      .sort({ isFeatured: -1, hotelName: 1 });
+      .sort({ averageRating: -1, reviewCount: -1, isFeatured: -1, hotelName: 1 });
 
     const hotelIds = hotels.map((hotel) => hotel._id);
     const hallFilter = {
@@ -115,9 +115,27 @@ const getHotels = async (req, res) => {
           plain.featuredExpiresAt &&
           new Date(plain.featuredExpiresAt) > now
         );
+
+        let minPriceVal = null;
+        let maxCapacityVal = 0;
+        hotelHalls.forEach((h) => {
+          const price = Number(h.pricePerDay) || 0;
+          if (price > 0 && (minPriceVal === null || price < minPriceVal)) {
+            minPriceVal = price;
+          }
+          const cap = Number(h.capacity) || 0;
+          if (cap > maxCapacityVal) {
+            maxCapacityVal = cap;
+          }
+        });
+
         return {
           ...plain,
           isFeatured: isActivePlus,
+          averageRating: plain.averageRating || 0,
+          reviewCount: plain.reviewCount || 0,
+          minPrice: minPriceVal,
+          maxCapacity: maxCapacityVal,
           halls: hotelHalls.map((hall) => ({
             ...hall,
             isFeatured: isActivePlus,
@@ -183,6 +201,8 @@ const getHotelById = async (req, res) => {
     return res.status(200).json({
       hotel: {
         ...plainHotel,
+        averageRating: plainHotel.averageRating || 0,
+        reviewCount: plainHotel.reviewCount || 0,
         isFeatured,
       },
       halls: halls.map((hall) => {

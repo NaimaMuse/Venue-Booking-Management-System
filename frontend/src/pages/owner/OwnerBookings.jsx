@@ -8,6 +8,17 @@ const getNameLetter = (fullName = '') => {
   return first.charAt(0).toUpperCase() || 'C';
 };
 
+const formatTimeDisplay = (timeStr) => {
+  if (!timeStr) return '';
+  const [hStr, mStr] = timeStr.split(':');
+  const h = parseInt(hStr, 10);
+  if (Number.isNaN(h)) return timeStr;
+  const m = mStr || '00';
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const formattedHour = h % 12 === 0 ? 12 : h % 12;
+  return `${formattedHour}:${m} ${ampm}`;
+};
+
 const statusClass = {
   pending: 'status-badge-pending',
   accepted: 'status-badge-accepted',
@@ -397,8 +408,11 @@ function OwnerBookings() {
 
                     <div className="owner-request-meta">
                       <div>
-                        <span>Event date</span>
-                        <strong>{formatDate(booking.eventDate)}</strong>
+                        <span>Event date &amp; time</span>
+                        <strong>
+                          {formatDate(booking.eventDate)}
+                          {booking.eventTime ? ` · ${formatTimeDisplay(booking.eventTime)}` : ''}
+                        </strong>
                       </div>
                       <div>
                         <span>Guests</span>

@@ -117,7 +117,7 @@ const getUnavailableDates = async (req, res) => {
  */
 const createBooking = async (req, res) => {
   try {
-    const { hallId, eventDate, guestCount, specialNotes } = req.body;
+    const { hallId, eventDate, eventTime, guestCount, specialNotes } = req.body;
 
     if (!hallId || !eventDate || guestCount === undefined || guestCount === null || guestCount === '') {
       return res.status(400).json({
@@ -182,6 +182,7 @@ const createBooking = async (req, res) => {
       hallId: hall._id,
       hotelId: hotel._id,
       eventDate: range.start,
+      eventTime: eventTime ? String(eventTime).trim() : '',
       guestCount: guests,
       specialNotes: specialNotes ? String(specialNotes).trim() : '',
       status: 'pending',

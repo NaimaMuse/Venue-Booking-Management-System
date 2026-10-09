@@ -430,7 +430,7 @@ img {
   display: inline-block;
   margin-bottom: 10px;
   color: #c5a070;
-  font-size: 14px;
+  font-size: 16.5px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1934,7 +1934,7 @@ img {
 }
 
 .customer-sidebar-promo {
-  margin: 0 1rem 0.75rem;
+  margin: 1.25rem 1rem 0.75rem;
   padding: 16px;
   border-radius: 16px;
   background:
@@ -4232,6 +4232,114 @@ img {
   font-size: 1.6rem;
 }
 
+/* Venue booking summary modal popup */
+.venue-summary-modal {
+  width: min(450px, 100%);
+  padding: 24px;
+  margin-top: 48px;
+}
+
+.venue-summary-modal .venue-book-summary-hall {
+  margin: 16px 0 14px;
+}
+
+.venue-summary-modal-list {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.venue-summary-modal-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.venue-summary-modal-list li span {
+  color: #8a8190;
+}
+
+.venue-summary-modal-list li strong {
+  color: #4a2040;
+}
+
+.venue-summary-modal-notes {
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 4px !important;
+  background: #fdf8fb;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #eadfe6;
+}
+
+.venue-summary-modal-notes span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.venue-summary-modal-notes strong {
+  font-weight: 500;
+  color: #554a52 !important;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.venue-summary-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.venue-summary-cancel-btn {
+  padding: 11px 20px;
+  border-radius: 999px;
+  border: 1px solid #eadfe6;
+  background: #fffafc;
+  color: #6b6570;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.venue-summary-cancel-btn:hover:not(:disabled) {
+  background: #f4ebf1;
+  color: #4a2040;
+}
+
+.venue-summary-ok-btn {
+  min-width: 100px;
+  padding: 11px 24px;
+  border: none;
+  border-radius: 999px;
+  background: #c5a070;
+  color: #2a1528;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(197, 160, 112, 0.35);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.venue-summary-ok-btn:hover:not(:disabled) {
+  background: #d4b37a;
+  transform: translateY(-1px);
+}
+
+.venue-summary-ok-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 @media (max-width: 980px) {
   .venue-book-layout {
     grid-template-columns: 1fr;
@@ -4454,7 +4562,7 @@ img {
 .booking-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 80;
+  z-index: 1200;
   background: rgba(30, 12, 40, 0.58);
   backdrop-filter: blur(4px);
   display: grid;
@@ -4783,6 +4891,87 @@ img {
   font-weight: 700;
   letter-spacing: 0.02em;
   color: #4a2040;
+}
+
+.booking-field-head-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.booking-time-preview {
+  font-size: 12px;
+  font-weight: 700;
+  color: #8a4a78;
+  background: #fbf2f8;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(138, 74, 120, 0.2);
+}
+
+.booking-time-slots {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.booking-time-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid #eadfe6;
+  background: #fffafc;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.booking-time-chip:hover {
+  border-color: #c5a070;
+  background: #fff8ef;
+}
+
+.booking-time-chip.is-selected {
+  border-color: #8a4a78;
+  background: #fbf2f8;
+  box-shadow: 0 0 0 2px rgba(138, 74, 120, 0.18);
+}
+
+.booking-time-chip span {
+  font-size: 14px;
+}
+
+.booking-time-chip strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4a2040;
+}
+
+.booking-time-chip small {
+  font-size: 11px;
+  color: #8a8190;
+}
+
+.booking-custom-time-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.booking-custom-time-label {
+  font-size: 12px;
+  color: #6b6570;
+  white-space: nowrap;
+}
+
+.booking-custom-time-wrap input[type="time"] {
+  flex: 1;
 }
 
 .booking-form input,
@@ -8749,7 +8938,7 @@ img {
 }
 
 .hh-details-body {
-  padding-top: 20px;
+  padding-top: 108px;
 }
 
 .hotel-details-page {
@@ -8800,6 +8989,7 @@ img {
   position: relative;
   border-radius: 28px;
   overflow: hidden;
+  margin-top: 8px;
   margin-bottom: 26px;
   min-height: 420px;
   background: #1a0f18;
@@ -10550,12 +10740,19 @@ button.hh-details-hero-pill:focus-visible {
 .hh-featured-header-kicker {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   margin-bottom: 8px;
 }
 
 .hh-featured-star {
-  font-size: 15px;
+  font-size: 19px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.hh-featured-header-kicker .section-label {
+  font-size: 17px;
+  margin-bottom: 0;
 }
 
 .hh-featured-subtitle {
@@ -11375,5 +11572,1102 @@ button.hh-details-hero-pill:focus-visible {
   font-size: 12px !important;
   white-space: nowrap;
 }
+
+/* ==========================================================================
+   HOTEL LISTINGS (4-COLUMN LAYOUT), STAR RATINGS & CUSTOMER REVIEWS
+   ========================================================================== */
+
+/* --- 4-Column Hotel Grid & Section --- */
+.hh-4col-hotels-section {
+  padding: 60px 24px 50px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.hh-4col-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.hh-4col-header-left {
+  flex: 1 1 300px;
+}
+
+.hh-4col-header-left h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2rem, 3.5vw, 2.7rem);
+  font-weight: 600;
+  color: #3a1834;
+  margin: 6px 0 4px;
+}
+
+.hh-4col-nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hh-4col-page-indicator {
+  font-size: 13.5px;
+  color: #7b6f79;
+  font-weight: 600;
+}
+
+.hh-4col-arrow-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.featured-slider-btn,
+.hh-4col-arrow-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid #d4b37a;
+  background: #ffffff;
+  color: #4a2040;
+  font-size: 24px;
+  line-height: 1;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(74, 32, 64, 0.08);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.featured-slider-btn:hover:not(:disabled),
+.hh-4col-arrow-btn:hover:not(:disabled) {
+  background: #4a2040;
+  color: #f7dfa5;
+  border-color: #4a2040;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(74, 32, 64, 0.18);
+}
+
+.featured-slider-btn:disabled,
+.hh-4col-arrow-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: #ebdbe4;
+  color: #a89fa8;
+  box-shadow: none;
+}
+
+/* 4-Column Hotel Grid (4 per row) */
+.hh-4col-hotel-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 1100px) {
+  .hh-4col-hotel-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hh-4col-hotel-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.hh-4col-pagination-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.hh-4col-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ebdbe4;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.hh-4col-dot.is-active {
+  width: 26px;
+  border-radius: 999px;
+  background: #4a2040;
+}
+
+/* --- Hotel Card Item --- */
+.hh-hotel-card-item {
+  background: #ffffff;
+  border: 1px solid #ebdbe4;
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 20px rgba(74, 32, 64, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  position: relative;
+}
+
+.hh-hotel-card-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(74, 32, 64, 0.12);
+  border-color: #d4b37a;
+}
+
+.is-featured-hotel-card {
+  border-color: #ebd8b6;
+  background: linear-gradient(180deg, #fffdfa 0%, #ffffff 100%);
+}
+
+.is-featured-hotel-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #d4b37a, #4a2040, #d4b37a);
+  z-index: 3;
+}
+
+.hh-hotel-card-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  background: #2a1125;
+}
+
+.hh-hotel-card-photo-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hh-hotel-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.hh-hotel-card-item:hover .hh-hotel-card-img {
+  transform: scale(1.05);
+}
+
+.hh-hotel-card-badge.is-featured {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: rgba(42, 17, 37, 0.9);
+  color: #f7dfa5;
+  border: 1px solid #d4b37a;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  backdrop-filter: blur(4px);
+}
+
+.hh-hotel-card-rating-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 2;
+  background: rgba(42, 17, 37, 0.92);
+  color: #ffffff;
+  border: 1px solid rgba(217, 158, 50, 0.6);
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  backdrop-filter: blur(4px);
+}
+
+.hh-hotel-star-icon {
+  color: #d99e32;
+  font-size: 12px;
+}
+
+.hh-hotel-star-reviews {
+  color: #d8c9d4;
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+.hh-hotel-card-capacity {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.hh-hotel-card-body {
+  padding: 16px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.hh-hotel-card-meta-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #7d7582;
+}
+
+.hh-hotel-card-halls {
+  background: #f5edf2;
+  color: #4a2040;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-weight: 700;
+}
+
+.hh-hotel-card-title {
+  margin: 0 0 4px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.45rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.hh-hotel-card-name-link {
+  color: #3a1834;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.hh-hotel-card-name-link:hover {
+  color: #a05286;
+}
+
+.hh-hotel-card-address {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  color: #7a6f78;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hh-hotel-card-rating-row {
+  margin-bottom: 14px;
+}
+
+.hh-hotel-card-footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px dashed #eee3ea;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.hh-hotel-price-label {
+  display: block;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  color: #8c8290;
+  letter-spacing: 0.04em;
+  margin-bottom: 1px;
+}
+
+.hh-hotel-price-val {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: #4a2040;
+}
+
+.hh-hotel-card-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 14px;
+  background: #4a2040;
+  color: #f7dfa5;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.hh-hotel-card-btn:hover {
+  background: #c5a070;
+  color: #2a1528;
+  transform: translateY(-1px);
+}
+
+/* --- Public Hotels Page Toolbar Controls --- */
+.hh-results-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hh-sort-indicator-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fdf6e6;
+  border: 1px solid #ebd498;
+  color: #8a5710;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.hh-view-controls {
+  display: inline-flex;
+  border: 1px solid #ebdbe4;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.hh-view-toggle-btn {
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  color: #685f6e;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.hh-view-toggle-btn.is-active {
+  background: #4a2040;
+  color: #ffffff;
+}
+
+.hh-4col-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 10px 16px;
+  background: #faf6f8;
+  border-radius: 12px;
+  border: 1px solid #ebdbe4;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hh-4col-status-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a2040;
+}
+
+.hh-search-select {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid #ebdbe4;
+  background: #ffffff;
+  color: #3a1834;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+.hh-search-select:focus {
+  border-color: #c5a070;
+}
+
+.hh-hotel-badges-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* --- Hotel Details Reviews Section --- */
+.hh-details-reviews-section {
+  margin-top: 40px;
+  padding-top: 36px;
+  border-top: 1px solid #ebdbe4;
+}
+
+.hh-reviews-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.hh-reviews-head-sub {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #7d7582;
+}
+
+.hh-write-review-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+.hh-rating-summary-card {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 32px;
+  background: #ffffff;
+  border: 1px solid #ebdbe4;
+  border-radius: 20px;
+  padding: 28px;
+  margin-bottom: 30px;
+  box-shadow: 0 6px 24px rgba(74, 32, 64, 0.05);
+}
+
+@media (max-width: 768px) {
+  .hh-rating-summary-card {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+}
+
+.hh-rating-score-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-right: 28px;
+  border-right: 1px solid #ebdbe4;
+}
+
+@media (max-width: 768px) {
+  .hh-rating-score-box {
+    padding-right: 0;
+    padding-bottom: 20px;
+    border-right: none;
+    border-bottom: 1px solid #ebdbe4;
+  }
+}
+
+.hh-rating-large-number {
+  font-size: 52px;
+  font-weight: 800;
+  color: #3a1834;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.hh-rating-score-label {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: #7d7582;
+  font-weight: 600;
+}
+
+.hh-rating-breakdown {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.hh-breakdown-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.hh-breakdown-star-label {
+  width: 38px;
+  font-weight: 700;
+  color: #4a2040;
+}
+
+.hh-breakdown-bar-track {
+  flex: 1;
+  height: 10px;
+  background: #f2edf1;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.hh-breakdown-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #d99e32, #f2c779);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.hh-breakdown-count {
+  width: 65px;
+  text-align: right;
+  font-size: 12px;
+  color: #7d7582;
+  font-weight: 600;
+}
+
+/* Reviews List */
+.hh-reviews-list {
+  display: grid;
+  gap: 18px;
+}
+
+.hh-review-card {
+  background: #ffffff;
+  border: 1px solid #ebdbe4;
+  border-radius: 16px;
+  padding: 20px 22px;
+  box-shadow: 0 4px 16px rgba(74, 32, 64, 0.04);
+}
+
+.hh-review-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hh-reviewer-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hh-reviewer-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #4a2040;
+  color: #f7dfa5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  overflow: hidden;
+}
+
+.hh-reviewer-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hh-reviewer-name {
+  display: block;
+  font-size: 15px;
+  color: #3a1834;
+}
+
+.hh-review-date {
+  display: block;
+  font-size: 12px;
+  color: #8c8290;
+  margin-top: 1px;
+}
+
+.hh-review-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4b424d;
+}
+
+.hh-empty-reviews-box {
+  background: #faf6f8;
+  border: 1px dashed #d4b37a;
+  border-radius: 16px;
+  padding: 36px 24px;
+  text-align: center;
+}
+
+.hh-empty-reviews-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #4a2040;
+  margin: 0 0 6px;
+}
+
+.hh-empty-reviews-sub {
+  font-size: 13.5px;
+  color: #7d7582;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.hh-details-hero-pill.is-rating-pill {
+  background: #ffffff;
+  color: #3a1834;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  border: 1px solid #ebdbe4;
+}
+
+.hh-hero-pill-star {
+  color: #d99e32;
+  font-size: 14px;
+}
+
+/* --- Customer Dashboard Reviews Panel --- */
+.customer-dash-reviews-panel {
+  margin-bottom: 28px;
+  background: #ffffff;
+  border: 1px solid #ebdbe4;
+  border-radius: 18px;
+  padding: 24px;
+}
+
+.hh-dash-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  background: #e2f6e9;
+  color: #0f6b35;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.customer-dash-eligible-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.customer-dash-eligible-card {
+  border: 1px solid #ebdbe4;
+  background: #faf6f8;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.customer-dash-eligible-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.customer-dash-eligible-date {
+  color: #7d7582;
+  font-weight: 600;
+}
+
+.customer-dash-eligible-card h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  color: #4a2040;
+}
+
+.customer-dash-eligible-hall {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: #685f6e;
+}
+
+.customer-dash-unreviewed-box {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px dashed #ebdbe4;
+}
+
+.customer-dash-unreviewed-prompt {
+  font-size: 12.5px;
+  color: #4a2040;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.customer-rate-btn {
+  width: 100%;
+  padding: 8px 14px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.customer-dash-reviewed-box {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px dashed #ebdbe4;
+}
+
+.customer-dash-reviewed-snippet {
+  font-size: 12.5px;
+  color: #4b424d;
+  font-style: italic;
+  margin: 4px 0 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.customer-edit-review-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #a05286;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* --- Review Modal Overlay & Styles --- */
+.hh-review-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(42, 29, 51, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 2100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.hh-review-modal {
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  padding: 28px 30px;
+}
+
+.hh-review-context-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: #faf6f8;
+  border: 1px solid #ebdbe4;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.hh-review-hotel-name {
+  margin: 0 0 2px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #4a2040;
+}
+
+.hh-review-event-details {
+  margin: 0;
+  font-size: 12.5px;
+  color: #7d7582;
+}
+
+.hh-review-field {
+  margin-bottom: 18px;
+}
+
+.hh-review-label {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #4a2040;
+  margin-bottom: 8px;
+}
+
+.hh-required {
+  color: #b42318;
+}
+
+.hh-review-stars-wrap {
+  padding: 10px 14px;
+  background: #fffdfa;
+  border: 1px solid #ebd8b6;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.hh-review-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ebdbe4;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.hh-review-textarea:focus {
+  outline: none;
+  border-color: #d4b37a;
+  box-shadow: 0 0 0 3px rgba(212, 179, 122, 0.2);
+}
+
+.hh-review-char-count {
+  display: block;
+  text-align: right;
+  font-size: 11.5px;
+  color: #8c8290;
+  margin-top: 4px;
+}
+
+.hh-review-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid #ebdbe4;
+}
+
+.hh-review-submit-btn {
+  padding: 10px 22px;
+}
+
+/* --- Dedicated Customer Reviews Page Styles --- */
+.customer-reviews-hero {
+  margin-bottom: 20px;
+}
+
+.hh-eligibility-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 20px;
+  background: #fdfaf6;
+  border: 1px solid #d4b37a;
+  border-radius: 14px;
+  margin-bottom: 24px;
+}
+
+.hh-eligibility-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.hh-eligibility-banner h4 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  color: #4a2040;
+}
+
+.hh-eligibility-banner p {
+  margin: 0;
+  font-size: 13px;
+  color: #685f6e;
+  line-height: 1.45;
+}
+
+.customer-reviews-toolbar {
+  margin-bottom: 20px;
+}
+
+.customer-eligible-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.customer-eligible-card {
+  display: flex;
+  gap: 16px;
+  background: #ffffff;
+  border: 1px solid #ebdbe4;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(74, 32, 64, 0.04);
+}
+
+@media (max-width: 500px) {
+  .customer-eligible-card {
+    flex-direction: column;
+  }
+}
+
+.customer-eligible-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.customer-eligible-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.customer-eligible-meta-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.customer-eligible-info h3 {
+  margin: 0 0 2px;
+  font-size: 16px;
+  color: #3a1834;
+}
+
+.customer-eligible-sub {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  color: #7d7582;
+}
+
+.customer-eligible-actions {
+  margin-top: auto;
+}
+
+/* Submitted Reviews Cards */
+.customer-submitted-reviews-list {
+  display: grid;
+  gap: 16px;
+}
+
+.customer-submitted-review-card {
+  background: #ffffff;
+  border: 1px solid #ebdbe4;
+  border-radius: 16px;
+  padding: 20px 22px;
+  box-shadow: 0 4px 16px rgba(74, 32, 64, 0.04);
+}
+
+.customer-submitted-review-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.customer-submitted-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #e2f6e9;
+  color: #0f6b35;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.customer-submitted-review-head h3 {
+  margin: 0 0 2px;
+  font-size: 17px;
+  color: #4a2040;
+}
+
+.customer-submitted-hotel-place {
+  margin: 0;
+  font-size: 12.5px;
+  color: #8c8290;
+}
+
+.customer-submitted-rating-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.customer-submitted-date {
+  font-size: 11.5px;
+  color: #8c8290;
+}
+
+.customer-submitted-comment {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #4b424d;
+}
+
+.customer-submitted-no-comment {
+  margin: 0 0 16px;
+  color: #8c8290;
+  font-size: 13px;
+}
+
+.customer-submitted-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-top: 14px;
+  border-top: 1px solid #f0e6ec;
+}
+
+.mb-btn-gold {
+  background: #d4b37a !important;
+  color: #2a1528 !important;
+  font-weight: 700 !important;
+  border: 1px solid #c5a070 !important;
+}
+
+.mb-btn-gold:hover {
+  background: #c5a070 !important;
+}
+
+.mb-detail-review {
+  background: #fdfaf6 !important;
+  border-left-color: #d4b37a !important;
+}
+
+.mb-review-snippet-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: #4a2040;
+}
+
 
 

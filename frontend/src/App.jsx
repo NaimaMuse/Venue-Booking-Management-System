@@ -15,6 +15,7 @@ import Signup from './pages/public website/Signup';
 import CustomerOverview from './pages/customer/CustomerOverview';
 import MyBookings from './pages/customer/MyBookings';
 import MyAppointments from './pages/customer/MyAppointments';
+import CustomerReviews from './pages/customer/CustomerReviews';
 import CustomerProfile from './pages/customer/CustomerProfile';
 import OwnerOverview from './pages/owner/OwnerOverview';
 import HotelProfile from './pages/owner/HotelProfile';
@@ -87,6 +88,7 @@ function App() {
             <Route path="dashboard" element={<CustomerOverview />} />
             <Route path="my-bookings" element={<MyBookings />} />
             <Route path="my-appointments" element={<MyAppointments />} />
+            <Route path="reviews" element={<CustomerReviews />} />
             <Route path="profile" element={<CustomerProfile />} />
           </Route>
 
