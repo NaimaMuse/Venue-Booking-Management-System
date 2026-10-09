@@ -1,56 +1,56 @@
-require('dotenv').config({ path: require('path').join(__dirname, '.env') });
-
+require('dotenv').config();
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const { connectDB, disconnectDB } = require('./config/db');
 const User = require('./models/User');
 
-const seedAdmin = async () => {
-  const email = (process.env.ADMIN_EMAIL || 'admin@hargeisahallfinder.com')
-    .toLowerCase()
-    .trim();
-  const password = process.env.ADMIN_PASSWORD || 'AdminPass123!';
-  const fullName = process.env.ADMIN_NAME || 'System Admin';
-  const phone = process.env.ADMIN_PHONE || '';
+const {
+  MONGODB_URI,
+  ADMIN_EMAIL,
+  ADMIN_PASSWORD,
+  ADMIN_NAME,
+  ADMIN_PHONE,
+} = process.env;
 
-  if (!password || password.length < 6) {
-    throw new Error('ADMIN_PASSWORD must be at least 6 characters');
-  }
+if (!MONGODB_URI) {
+  console.error('MONGODB_URI is not set');
+  process.exit(1);
+}
+if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+  console.error('ADMIN_EMAIL and ADMIN_PASSWORD must be set');
+  process.exit(1);
+}
 
-  await connectDB(process.env.MONGODB_URI || process.env.MONGO_URI);
+async function seed() {
+  await mongoose.connect(MONGODB_URI);
+  console.log('Connected to MongoDB');
 
-  const existing = await User.findOne({ email });
+  const existing = await User.findOne({ email: ADMIN_EMAIL.toLowerCase() });
   if (existing) {
     if (existing.role !== 'admin') {
       existing.role = 'admin';
       await existing.save();
-      console.log(`Updated existing user to admin: ${email}`);
+      console.log(`Updated existing user ${ADMIN_EMAIL} to admin role`);
     } else {
-      console.log(`Admin already exists: ${email}`);
+      console.log(`Admin ${ADMIN_EMAIL} already exists — skipping`);
     }
+    await mongoose.disconnect();
     return;
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
+  const hashed = await bcrypt.hash(ADMIN_PASSWORD, 12);
   await User.create({
-    fullName,
-    email,
-    password: hashedPassword,
-    phone,
+    fullName: ADMIN_NAME || 'HallHub Admin',
+    email: ADMIN_EMAIL.toLowerCase(),
+    password: hashed,
+    phone: ADMIN_PHONE || '',
     role: 'admin',
   });
 
-  console.log('Admin user created successfully');
-  console.log(`  Email: ${email}`);
-  console.log(`  Password: ${password}`);
-  console.log('Change ADMIN_PASSWORD in .env for production.');
-};
+  console.log(`Admin account created: ${ADMIN_EMAIL}`);
+  await mongoose.disconnect();
+}
 
-seedAdmin()
-  .catch((err) => {
-    console.error('Seed admin failed:', err.message);
-    process.exitCode = 1;
-  })
-  .finally(async () => {
-    await disconnectDB();
-  });
+seed().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

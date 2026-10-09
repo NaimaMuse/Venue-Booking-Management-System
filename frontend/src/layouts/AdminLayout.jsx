@@ -108,10 +108,23 @@ const IconLogout = () => (
   </svg>
 );
 
+const IconStar = () => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 const mainNavItems = [
   { label: 'Overview', to: '/admin/dashboard', end: true, icon: <IconOverview /> },
   { label: 'Pending Approvals', to: '/admin/hotels', icon: <IconApprovals /> },
   { label: 'All Venues', to: '/admin/venues', icon: <IconVenues /> },
+  { label: '⭐ HallHub Plus', to: '/admin/plus', icon: <IconStar /> },
   { label: 'Operations Reports', to: '/admin/reports/operations', icon: <IconReports /> },
   { label: 'Revenue Reports', to: '/admin/reports/revenue', icon: <IconRevenue /> },
   { label: 'Performance Reports', to: '/admin/reports/performance', icon: <IconGrowth /> },
@@ -123,18 +136,25 @@ function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    const syncUser = () => setUser(getUser());
+    const syncUser = () => {
+      const currentUser = getUser();
+      if (!currentUser) {
+        navigate('/login', { replace: true });
+        return;
+      }
+      setUser(currentUser);
+    };
     window.addEventListener('auth-changed', syncUser);
     window.addEventListener('storage', syncUser);
     return () => {
       window.removeEventListener('auth-changed', syncUser);
       window.removeEventListener('storage', syncUser);
     };
-  }, []);
+  }, [navigate]);
 
   const handleLogout = () => {
     clearAuth();
-    navigate('/login');
+    navigate('/');
   };
 
   const closeSidebar = () => setSidebarOpen(false);
@@ -156,8 +176,8 @@ function AdminLayout() {
         <div className="customer-sidebar-top">
           <div className="customer-sidebar-header">
             <Link to="/" className="customer-brand" onClick={closeSidebar}>
-              <span className="customer-brand-mark">HHF</span>
-              <span className="customer-brand-text">Admin Portal</span>
+              <span className="customer-brand-mark">HH</span>
+              <span className="customer-brand-text">HallHub Admin</span>
             </Link>
             <button
               type="button"

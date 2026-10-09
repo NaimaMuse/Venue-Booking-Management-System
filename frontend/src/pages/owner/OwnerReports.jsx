@@ -176,8 +176,8 @@ function OwnerReports() {
               <span>Total bookings</span>
               <strong>{summary.totalBookings || 0}</strong>
             </article>
-            <article className="is-gold">
-              <span>Deposit revenue</span>
+            <article>
+              <span>Gross revenue</span>
               <strong>{money(summary.depositRevenue)}</strong>
             </article>
             <article className="is-green">
@@ -187,17 +187,6 @@ function OwnerReports() {
             <article>
               <span>Conversion</span>
               <strong>{summary.conversionRate || 0}%</strong>
-            </article>
-            <article>
-              <span>Pending</span>
-              <strong>{summary.pending || 0}</strong>
-            </article>
-            <article>
-              <span>Halls</span>
-              <strong>
-                {summary.availableHalls || 0}
-                <small>/{summary.totalHalls || 0}</small>
-              </strong>
             </article>
           </section>
           
@@ -306,7 +295,7 @@ function OwnerReports() {
                       <th>Price / day</th>
                       <th>Bookings</th>
                       <th>Confirmed</th>
-                      <th>Deposit revenue</th>
+                      <th>Gross Revenue</th>
                       <th>Status</th>
                     </tr>
                   </thead>
@@ -358,29 +347,32 @@ function OwnerReports() {
                       <th>Hall</th>
                       <th>Event date</th>
                       <th>Guests</th>
-                      <th>Deposit</th>
+                      <th>Gross Paid</th>
                       <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {report.recent.map((booking) => (
-                      <tr key={booking.id}>
-                        <td>
-                          <strong>{booking.customerName}</strong>
-                        </td>
-                        <td>{booking.hallName}</td>
-                        <td>{formatDate(booking.eventDate)}</td>
-                        <td>{booking.guestCount || '—'}</td>
-                        <td>{money(booking.depositAmount)}</td>
-                        <td>
-                          <span
-                            className={`status-badge status-badge-${booking.status}`}
-                          >
-                            {booking.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                    {report.recent.map((booking) => {
+                      const deposit = booking.depositAmount || 0;
+                      return (
+                        <tr key={booking.id}>
+                          <td>
+                            <strong>{booking.customerName}</strong>
+                          </td>
+                          <td>{booking.hallName}</td>
+                          <td>{formatDate(booking.eventDate)}</td>
+                          <td>{booking.guestCount || '—'}</td>
+                          <td>{money(deposit)}</td>
+                          <td>
+                            <span
+                              className={`status-badge status-badge-${booking.status}`}
+                            >
+                              {booking.status}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

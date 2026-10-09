@@ -44,6 +44,11 @@ const bookingSchema = new mongoose.Schema(
       type: Date,
       required: [true, 'Event date is required'],
     },
+    eventTime: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     guestCount: {
       type: Number,
       required: [true, 'Guest count is required'],
@@ -72,6 +77,11 @@ const bookingSchema = new mongoose.Schema(
       type: Number,
       default: 0,
       min: [0, 'Deposit amount cannot be negative'],
+    },
+    bookingAmount: {
+      type: Number,
+      default: 0,
+      min: [0, 'Booking amount cannot be negative'],
     },
     agreementNotes: {
       type: String,

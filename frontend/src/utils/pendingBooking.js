@@ -26,6 +26,7 @@ export const submitPendingBookingIfAny = async (apiClient) => {
   await apiClient.post('/api/bookings', {
     hallId: draft.hallId,
     eventDate: draft.eventDate,
+    eventTime: draft.eventTime || undefined,
     guestCount: Number(draft.guestCount),
     specialNotes: draft.specialNotes || undefined,
   });

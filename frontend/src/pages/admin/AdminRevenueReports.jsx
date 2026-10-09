@@ -110,7 +110,7 @@ function AdminRevenueReports() {
                 <IconMoney />
               </span>
               <div>
-                <p>Total earned</p>
+                <p>Gross Booking Volume</p>
                 <h2>{money(reports.revenue.total)}</h2>
                 <small>
                   {selectedHotel
@@ -132,10 +132,6 @@ function AdminRevenueReports() {
               <li>
                 <span>Avg / booking</span>
                 <strong>{money(avgPerBooking)}</strong>
-              </li>
-              <li>
-                <span>Requests</span>
-                <strong>{bookingStats.total}</strong>
               </li>
             </ul>
           </section>
@@ -167,7 +163,7 @@ function AdminRevenueReports() {
                   <div className="revenue-table-head">
                     <span>Hotel</span>
                     <span>Bookings</span>
-                    <span>Revenue</span>
+                    <span>Gross</span>
                     <span>Share</span>
                   </div>
                   {hotelEarnings.map((hotel, index) => {

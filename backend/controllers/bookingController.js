@@ -117,7 +117,7 @@ const getUnavailableDates = async (req, res) => {
  */
 const createBooking = async (req, res) => {
   try {
-    const { hallId, eventDate, guestCount, specialNotes } = req.body;
+    const { hallId, eventDate, eventTime, guestCount, specialNotes } = req.body;
 
     if (!hallId || !eventDate || guestCount === undefined || guestCount === null || guestCount === '') {
       return res.status(400).json({
@@ -175,14 +175,18 @@ const createBooking = async (req, res) => {
       });
     }
 
+    const initialAmount = Number(hall.pricePerDay) || 0;
+
     const booking = await Booking.create({
       customerId: req.user._id,
       hallId: hall._id,
       hotelId: hotel._id,
       eventDate: range.start,
+      eventTime: eventTime ? String(eventTime).trim() : '',
       guestCount: guests,
       specialNotes: specialNotes ? String(specialNotes).trim() : '',
       status: 'pending',
+      bookingAmount: initialAmount,
     });
 
     const populated = await populateBooking(Booking.findById(booking._id));
@@ -461,11 +465,13 @@ const confirmBooking = async (req, res) => {
       });
     }
 
-    const { depositPaid, depositAmount, agreementNotes } = req.body;
+    const { depositPaid, depositAmount, bookingAmount, agreementNotes } = req.body;
 
     if (depositPaid !== undefined) {
       booking.depositPaid = parseBoolean(depositPaid, booking.depositPaid);
     }
+
+    let finalAmount = booking.bookingAmount || booking.depositAmount || 0;
 
     if (depositAmount !== undefined) {
       const amount = Number(depositAmount);
@@ -475,7 +481,20 @@ const confirmBooking = async (req, res) => {
         });
       }
       booking.depositAmount = amount;
+      finalAmount = amount;
     }
+
+    if (bookingAmount !== undefined) {
+      const amount = Number(bookingAmount);
+      if (Number.isNaN(amount) || amount < 0) {
+        return res.status(400).json({
+          message: 'bookingAmount must be a non-negative number',
+        });
+      }
+      finalAmount = amount;
+    }
+
+    booking.bookingAmount = finalAmount;
 
     if (agreementNotes !== undefined) {
       booking.agreementNotes = String(agreementNotes).trim();

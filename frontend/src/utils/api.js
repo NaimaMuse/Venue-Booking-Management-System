@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { API_BASE, getToken } from './auth';
+import { API_BASE, clearAuth, getToken } from './auth';
 
 /**
  * Shared Axios client for all frontend ↔ backend communication.
@@ -26,9 +26,22 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      clearAuth();
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const getApiError = (error, fallback = 'Request failed') => {
   if (!error.response) {
     if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+      if (import.meta.env.PROD) {
+        return 'Cannot reach the API. Set VITE_API_URL on the frontend service to your Railway backend URL, then redeploy.';
+      }
       return 'Cannot reach the API. Make sure the backend is running on port 5000, then refresh.';
     }
     return error.message || fallback;

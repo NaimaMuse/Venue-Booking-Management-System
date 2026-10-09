@@ -68,6 +68,7 @@ function OwnerOverview() {
   const [hotel, setHotel] = useState(null);
   const [halls, setHalls] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [plusData, setPlusData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [toast, setToast] = useState(location.state?.toast || '');
@@ -93,11 +94,13 @@ function OwnerOverview() {
         setLoading(true);
         setError('');
 
-        const [hotelResult, hallsResult, bookingsResult] = await Promise.all([
-          api.get('/api/hotels/my-hotel').catch((err) => err),
-          api.get('/api/halls/my-halls').catch((err) => err),
-          api.get('/api/bookings/owner-requests').catch((err) => err),
-        ]);
+        const [hotelResult, hallsResult, bookingsResult, plusResult] =
+          await Promise.all([
+            api.get('/api/hotels/my-hotel').catch((err) => err),
+            api.get('/api/halls/my-halls').catch((err) => err),
+            api.get('/api/bookings/owner-requests').catch((err) => err),
+            api.get('/api/plus/my-subscription').catch((err) => err),
+          ]);
 
         if (hotelResult instanceof Error || hotelResult.isAxiosError) {
           if (hotelResult.response?.status !== 404) {
@@ -128,6 +131,12 @@ function OwnerOverview() {
           setBookings([]);
         } else {
           setBookings(bookingsResult.data.bookings || []);
+        }
+
+        if (plusResult instanceof Error || plusResult.isAxiosError) {
+          setPlusData(null);
+        } else {
+          setPlusData(plusResult.data || null);
         }
       } catch (err) {
         setError(getApiError(err, 'Unable to load dashboard'));
@@ -354,6 +363,122 @@ function OwnerOverview() {
             </article>
           </section>
 
+          {hotel && (
+            <section
+              className={`customer-panel hh-owner-plus-card${
+                plusData?.hasActivePlus ? ' is-active-plus' : ''
+              }`}
+            >
+              {plusData?.hasActivePlus ? (
+                <div className="hh-plus-card-body">
+                  <div className="hh-plus-card-top">
+                    <div>
+                      <div className="hh-plus-kicker-row">
+                        <span className="hh-plus-active-tag">Status: Active</span>
+                        {plusData.daysRemaining !== undefined && (
+                          <span className="hh-plus-days-tag">
+                            {plusData.daysRemaining} days left
+                          </span>
+                        )}
+                      </div>
+                      <h2>HallHub Plus — Active ⭐</h2>
+                      <p className="hh-plus-desc">
+                        Your hotel and halls are currently boosted across search
+                        and featured on the homepage.
+                      </p>
+                    </div>
+                    <Link to="/owner/plus" className="customer-gold-btn hh-plus-btn">
+                      Manage Plan
+                    </Link>
+                  </div>
+
+                  <div className="hh-plus-benefits-list">
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>Featured badge</span>
+                    </div>
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>Search boost</span>
+                    </div>
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>Homepage featured</span>
+                    </div>
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>More photos</span>
+                    </div>
+                  </div>
+
+                  <div className="hh-plus-meta-strip">
+                    <div className="hh-plus-meta-item">
+                      <span>Plan</span>
+                      <strong>
+                        {plusData.activeSubscription?.planName ||
+                          'HallHub Plus (Monthly)'}
+                      </strong>
+                    </div>
+                    <div className="hh-plus-meta-item">
+                      <span>Start date</span>
+                      <strong>
+                        {formatDate(plusData.activeSubscription?.startedAt)}
+                      </strong>
+                    </div>
+                    <div className="hh-plus-meta-item">
+                      <span>Expiration date</span>
+                      <strong>
+                        {formatDate(plusData.activeSubscription?.expiresAt)}
+                      </strong>
+                    </div>
+                    <div className="hh-plus-meta-item">
+                      <span>Current status</span>
+                      <strong className="hh-status-active-pill">Active</strong>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="hh-plus-card-body">
+                  <div className="hh-plus-card-top">
+                    <div>
+                      <span className="hh-plus-pill">⭐ Premium Promotion</span>
+                      <h2>HallHub Plus ⭐</h2>
+                      <p className="hh-plus-desc">
+                        Get more customers and make your venue more visible.
+                      </p>
+                    </div>
+                    <Link to="/owner/plus" className="customer-gold-btn hh-plus-btn">
+                      Upgrade to HallHub Plus
+                    </Link>
+                  </div>
+
+                  <div className="hh-plus-benefits-list hh-plus-benefits-5">
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>More profile photos</span>
+                    </div>
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>Higher search placement</span>
+                    </div>
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>Featured badge</span>
+                    </div>
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>Homepage promotion</span>
+                    </div>
+                    <div className="hh-plus-benefit">
+                      <span className="hh-check">✓</span>
+                      <span>Promote your halls</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+
           <section className="owner-dash-grid">
             {canAddHalls && (
               <section className="customer-panel owner-halls-panel">
@@ -435,7 +560,7 @@ function OwnerOverview() {
                   <strong>{monthOverview.acceptedBookings}</strong>
                 </li>
                 <li>
-                  <span>Deposit revenue</span>
+                  <span>Gross deposit</span>
                   <strong>${monthOverview.revenue.toLocaleString()}</strong>
                 </li>
                 <li>
@@ -451,110 +576,7 @@ function OwnerOverview() {
             </section>
           </section>
 
-          <section className="owner-dash-grid owner-dash-grid-bottom">
-            <section className="customer-panel">
-              <div className="customer-panel-head">
-                <h2>Recent Bookings</h2>
-                <Link to="/owner/bookings">View all</Link>
-              </div>
-
-              {recent.length === 0 ? (
-                <div className="owner-empty-bookings">
-                  <IconCalendar />
-                  <p>No booking requests yet</p>
-                  <span>
-                    Once customers request your halls, they will show here.
-                  </span>
-                </div>
-              ) : (
-                <div className="customer-table-wrap">
-                  <table className="customer-table">
-                    <thead>
-                      <tr>
-                        <th>Customer</th>
-                        <th>Hall</th>
-                        <th>Event Date</th>
-                        <th>Guests</th>
-                        <th>Status</th>
-                        <th>Requested On</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recent.map((booking) => (
-                        <tr key={booking._id}>
-                          <td>
-                            <strong>
-                              {booking.customerId?.fullName || 'Customer'}
-                            </strong>
-                            <span>{booking.customerId?.email || ''}</span>
-                          </td>
-                          <td>{booking.hallId?.hallName || 'Hall'}</td>
-                          <td>{formatDate(booking.eventDate)}</td>
-                          <td>{booking.guestCount || '—'}</td>
-                          <td>
-                            <span
-                              className={`status-badge ${statusClass[booking.status] || ''}`}
-                            >
-                              {booking.status}
-                            </span>
-                          </td>
-                          <td>{formatDate(booking.createdAt)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
-
-            <section className="customer-panel owner-status-panel">
-              <div className="customer-panel-head">
-                <h2>Booking Status</h2>
-              </div>
-              {chartHasData ? (
-                <div className="owner-status-chart">
-                  <ResponsiveContainer width="100%" height={220}>
-                    <PieChart>
-                      <Pie
-                        data={statusChart}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={52}
-                        outerRadius={78}
-                        paddingAngle={3}
-                      >
-                        {statusChart.map((entry) => (
-                          <Cell
-                            key={entry.key}
-                            fill={CHART_COLORS[entry.key]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <ul className="owner-status-legend">
-                    {statusChart.map((item) => (
-                      <li key={item.key}>
-                        <span
-                          className="owner-status-dot"
-                          style={{ background: CHART_COLORS[item.key] }}
-                        />
-                        <span>{item.name}</span>
-                        <strong>{item.percent}%</strong>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : (
-                <div className="owner-empty-bookings">
-                  <p>No booking status data yet</p>
-                  <span>Stats will appear once requests start coming in.</span>
-                </div>
-              )}
-            </section>
-          </section>
+         
         </>
       )}
     </div>

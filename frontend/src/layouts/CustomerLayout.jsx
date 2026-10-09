@@ -84,6 +84,17 @@ const IconSearch = () => (
   </svg>
 );
 
+const IconStar = () => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 const mainNavItems = [
   { label: 'Dashboard', to: '/customer/dashboard', end: true, icon: <IconDashboard /> },
   { label: 'Browse Halls', to: '/hotels', end: false, icon: <IconBrowse /> },
@@ -94,6 +105,7 @@ const mainNavItems = [
     icon: <IconAppointment />,
     badgeKey: 'appointments',
   },
+  { label: 'Reviews & Ratings', to: '/customer/reviews', icon: <IconStar /> },
   { label: 'Profile', to: '/customer/profile', icon: <IconProfile /> },
 ];
 
@@ -107,14 +119,21 @@ function CustomerLayout() {
   const appointmentBookingsRef = useRef([]);
 
   useEffect(() => {
-    const syncUser = () => setUser(getUser());
+    const syncUser = () => {
+      const currentUser = getUser();
+      if (!currentUser) {
+        navigate('/login', { replace: true });
+        return;
+      }
+      setUser(currentUser);
+    };
     window.addEventListener('auth-changed', syncUser);
     window.addEventListener('storage', syncUser);
     return () => {
       window.removeEventListener('auth-changed', syncUser);
       window.removeEventListener('storage', syncUser);
     };
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     let active = true;
@@ -168,7 +187,7 @@ function CustomerLayout() {
 
   const handleLogout = () => {
     clearAuth();
-    navigate('/login');
+    navigate('/');
   };
 
   const handleSearch = (event) => {
@@ -197,10 +216,10 @@ function CustomerLayout() {
         <div className="customer-sidebar-top">
           <div className="customer-sidebar-header">
             <Link to="/" className="owner-brand" onClick={closeSidebar}>
-              <span className="owner-brand-mark">HHF</span>
+              <span className="owner-brand-mark">HH</span>
               <span className="owner-brand-text">
-                <span>Hargeisa Hall</span>
-                <span>Finder</span>
+                <span>Hall</span>
+                <span>Hub</span>
               </span>
             </Link>
             <button

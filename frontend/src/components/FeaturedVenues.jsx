@@ -1,136 +1,152 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-
-import { API_BASE } from '../utils/auth';
-import api, { getApiError } from '../utils/api';
-
-const getHallImage = (hall) => {
-  const firstImage = hall?.images?.[0];
-  if (!firstImage) {
-    return '/banner01.png';
-  }
-  if (firstImage.startsWith('http')) {
-    return firstImage;
-  }
-  return `${API_BASE}${firstImage}`;
-};
+import HotelCard from './HotelCard';
+import api from '../utils/api';
 
 function FeaturedVenues() {
-  const [halls, setHalls] = useState([]);
+  const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [start, setStart] = useState(0);
 
   useEffect(() => {
-    const load = async () => {
+    let isMounted = true;
+
+    const loadHotels = async () => {
       try {
         setLoading(true);
-        setError('');
-
-        const { data } = await api.get('/api/halls');
-        setHalls(data.halls || []);
-        setStart(0);
+        // Load approved hotels sorted by rating
+        const { data } = await api.get('/api/hotels');
+        if (isMounted) {
+          const list = data.hotels || [];
+          // Ensure sorted descending by average star rating
+          list.sort((a, b) => (Number(b.averageRating) || 0) - (Number(a.averageRating) || 0));
+          setHotels(list);
+          setStart(0);
+        }
       } catch (err) {
-        setError(getApiError(err, 'Unable to load halls'));
-        setHalls([]);
+        if (isMounted) {
+          setHotels([]);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    load();
+    loadHotels();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const visibleCount = 3;
-  const maxStart = Math.max(0, halls.length - visibleCount);
-  const visible = useMemo(
-    () => halls.slice(start, start + visibleCount),
-    [halls, start]
-  );
-  const canSlide = halls.length > visibleCount;
+  if (loading) {
+    return (
+      <section className="featured-venues-section hh-4col-hotels-section" id="venues">
+        <div className="section-header hh-4col-header">
+          <div className="hh-4col-header-left">
+            <span className="section-label">Top Rated Listings</span>
+            <h2>Hotels &amp; Event Venues</h2>
+          </div>
+        </div>
+        <div className="hh-4col-hotel-grid">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="hh-skeleton-block" style={{ height: 360, borderRadius: 20 }} />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
-  const goPrev = () => setStart((prev) => Math.max(0, prev - 1));
-  const goNext = () => setStart((prev) => Math.min(maxStart, prev + 1));
+  if (hotels.length === 0) {
+    return null;
+  }
+
+  // 4-column layout: 4 hotels per row
+  const visibleCount = 4;
+  const maxStart = Math.max(0, hotels.length - visibleCount);
+  const visibleHotels = hotels.slice(start, start + visibleCount);
+  const canSlide = hotels.length > visibleCount;
+
+  const goPrev = () => setStart((prev) => Math.max(0, prev - visibleCount));
+  const goNext = () => setStart((prev) => Math.min(maxStart, prev + visibleCount));
+
+  const currentEnd = Math.min(start + visibleCount, hotels.length);
+  const totalPages = Math.ceil(hotels.length / visibleCount);
+  const currentPage = Math.floor(start / visibleCount) + 1;
 
   return (
-    <section className="featured-venues-section" id="venues">
-      <div className="section-header">
-        <span className="section-label">Featured Halls</span>
-        <h2>Popular Halls in Hargeisa</h2>
+    <section className="featured-venues-section hh-4col-hotels-section" id="venues">
+      <div className="section-header hh-4col-header">
+        <div className="hh-4col-header-left">
+          <div className="hh-featured-header-kicker">
+            <span className="hh-featured-star">⭐</span>
+            <span className="section-label">Top Rated Venues</span>
+          </div>
+          <h2>Hotels &amp; Event Halls in Hargeisa</h2>
+          <p className="hh-featured-subtitle">
+            Ranked by authentic customer service reviews and star ratings
+          </p>
+        </div>
+
+        {canSlide && (
+          <div className="hh-4col-nav-controls">
+            <span className="hh-4col-page-indicator">
+              Showing {start + 1}–{currentEnd} of {hotels.length} hotels
+            </span>
+            <div className="hh-4col-arrow-group">
+              <button
+                type="button"
+                className="featured-slider-btn is-prev"
+                onClick={goPrev}
+                disabled={start === 0}
+                aria-label="Previous 4 hotels"
+                title="Previous hotels"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                className="featured-slider-btn is-next"
+                onClick={goNext}
+                disabled={start + visibleCount >= hotels.length}
+                aria-label="Next 4 hotels"
+                title="Next hotels (forward)"
+              >
+                ›
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {loading && <p className="venues-status">Loading halls...</p>}
-      {error && <p className="venues-status venues-error">{error}</p>}
+      <div className="hh-4col-hotel-grid">
+        {visibleHotels.map((hotel) => (
+          <HotelCard key={hotel._id} hotel={hotel} />
+        ))}
+      </div>
 
-      {!loading && !error && halls.length === 0 && (
-        <p className="venues-status">
-          Approved halls will appear here once hotel owners publish them.
-        </p>
-      )}
-
-      {!loading && !error && halls.length > 0 && (
-        <div className="featured-slider">
-          {canSlide && (
-            <button
-              type="button"
-              className="featured-slider-btn is-prev"
-              onClick={goPrev}
-              disabled={start === 0}
-              aria-label="Previous halls"
-            >
-              ‹
-            </button>
-          )}
-
-          <div className="venue-grid featured-venue-grid">
-            {visible.map((hall) => (
-              <article key={hall._id} className="venue-card">
-                <div className="venue-card-image-wrap">
-                  <img
-                    src={getHallImage(hall)}
-                    alt={hall.hallName}
-                    className="venue-card-image"
-                    onError={(event) => {
-                      event.currentTarget.src = '/banner01.png';
-                    }}
-                  />
-                  <span className="capacity-badge">{hall.capacity} guests</span>
-                </div>
-
-                <div className="venue-card-body">
-                  <h3>{hall.hallName}</h3>
-                  <p className="venue-hotel">
-                    {hall.hotelId?.hotelName || 'Approved Hotel'}
-                    {hall.hotelId?.city ? ` · ${hall.hotelId.city}` : ''}
-                  </p>
-                  <p className="price-tag">
-                    ${Number(hall.pricePerDay).toLocaleString()}/day
-                  </p>
-                  <Link to={`/venues/${hall._id}`} className="venue-card-btn">
-                    View Details &amp; Reserve
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          {canSlide && (
-            <button
-              type="button"
-              className="featured-slider-btn is-next"
-              onClick={goNext}
-              disabled={start >= maxStart}
-              aria-label="Next halls"
-            >
-              ›
-            </button>
-          )}
+      {totalPages > 1 && (
+        <div className="hh-4col-pagination-dots" aria-label="Hotel page indicator">
+          {Array.from({ length: totalPages }).map((_, pageIdx) => {
+            const pageStart = pageIdx * visibleCount;
+            const isActive = start === pageStart;
+            return (
+              <button
+                key={pageIdx}
+                type="button"
+                className={`hh-4col-dot${isActive ? ' is-active' : ''}`}
+                onClick={() => setStart(pageStart)}
+                aria-label={`Go to hotel set ${pageIdx + 1}`}
+              />
+            );
+          })}
         </div>
       )}
 
       <div className="featured-venues-cta">
         <Link to="/hotels" className="customer-gold-btn">
-          Browse Hotels &amp; Halls
+          Explore All Hotels &amp; Halls ({hotels.length})
         </Link>
       </div>
     </section>

@@ -3,11 +3,11 @@ const USER_KEY = 'hhf_user';
 
 export const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
-export const getToken = () => localStorage.getItem(TOKEN_KEY);
+export const getToken = () => sessionStorage.getItem(TOKEN_KEY);
 
 export const getUser = () => {
   try {
-    const raw = localStorage.getItem(USER_KEY);
+    const raw = sessionStorage.getItem(USER_KEY);
     return raw ? JSON.parse(raw) : null;
   } catch (error) {
     return null;
@@ -15,15 +15,28 @@ export const getUser = () => {
 };
 
 export const saveAuth = (token, user) => {
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  sessionStorage.setItem(TOKEN_KEY, token);
+  sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+  } catch {
+    // Ignore storage errors
+  }
   window.dispatchEvent(new Event('auth-changed'));
 };
 
 export const clearAuth = () => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
-  localStorage.removeItem('hhf_seen_appointment_ids');
+  sessionStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(USER_KEY);
+  sessionStorage.removeItem('hhf_seen_appointment_ids');
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem('hhf_seen_appointment_ids');
+  } catch {
+    // Ignore storage errors
+  }
   window.dispatchEvent(new Event('auth-changed'));
 };
 

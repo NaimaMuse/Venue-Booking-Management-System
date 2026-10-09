@@ -88,6 +88,9 @@ function AdminOverview() {
           <Link to="/admin/hotels" className="customer-gold-btn">
             Review Approvals
           </Link>
+          <Link to="/admin/plus" className="owner-schedule-btn">
+            ⭐ HallHub Plus
+          </Link>
           <Link to="/admin/venues" className="owner-schedule-btn">
             All Venues
           </Link>
@@ -116,6 +119,15 @@ function AdminOverview() {
               <div>
                 <p>Approved hotels</p>
                 <strong>{stats.approvedHotels || 0}</strong>
+              </div>
+            </article>
+            <article>
+              <span className="admin-dash-kpi-icon is-gold">
+                ⭐
+              </span>
+              <div>
+                <p>Active Plus partners</p>
+                <strong>{stats.activePlusSubscriptions || 0}</strong>
               </div>
             </article>
             <article>

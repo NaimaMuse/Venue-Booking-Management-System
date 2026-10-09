@@ -54,6 +54,25 @@ const hotelSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
+    featuredExpiresAt: {
+      type: Date,
+      default: null,
+    },
+    averageRating: {
+      type: Number,
+      default: 0,
+      min: [0, 'Rating cannot be negative'],
+      max: [5, 'Rating cannot exceed 5'],
+    },
+    reviewCount: {
+      type: Number,
+      default: 0,
+      min: [0, 'Review count cannot be negative'],
+    },
   },
   { timestamps: true }
 );
@@ -62,6 +81,9 @@ hotelSchema.index({ ownerId: 1 });
 hotelSchema.index({ city: 1 });
 hotelSchema.index({ verificationStatus: 1 });
 hotelSchema.index({ ownerId: 1, verificationStatus: 1 });
+hotelSchema.index({ isFeatured: -1 });
+hotelSchema.index({ averageRating: -1 });
+hotelSchema.index({ averageRating: -1, reviewCount: -1 });
 
 module.exports = mongoose.model('Hotel', hotelSchema);
 module.exports.HOTEL_STATUSES = HOTEL_STATUSES;

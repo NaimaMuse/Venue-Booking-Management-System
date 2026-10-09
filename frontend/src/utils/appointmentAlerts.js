@@ -2,7 +2,7 @@ const STORAGE_KEY = 'hhf_seen_appointment_ids';
 
 const readSeenIds = () => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = sessionStorage.getItem(STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
     return Array.isArray(parsed) ? parsed.map(String) : [];
   } catch (error) {
@@ -11,7 +11,7 @@ const readSeenIds = () => {
 };
 
 const writeSeenIds = (ids) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([...new Set(ids.map(String))]));
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify([...new Set(ids.map(String))]));
   window.dispatchEvent(new Event('appointment-alerts-changed'));
 };
 
@@ -41,6 +41,11 @@ export const markAppointmentsSeen = (bookings = []) => {
 };
 
 export const clearAppointmentAlertsStorage = () => {
-  localStorage.removeItem(STORAGE_KEY);
+  sessionStorage.removeItem(STORAGE_KEY);
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Ignore storage errors
+  }
   window.dispatchEvent(new Event('appointment-alerts-changed'));
 };

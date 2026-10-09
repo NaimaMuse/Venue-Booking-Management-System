@@ -22,7 +22,7 @@ const protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id || decoded.userId;
+    const userId = decoded.id || decoded.userId || decoded._id;
 
     if (!userId) {
       return res.status(401).json({ message: 'Not authorized, invalid token' });
@@ -58,7 +58,7 @@ const optionalProtect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id || decoded.userId;
+    const userId = decoded.id || decoded.userId || decoded._id;
     if (!userId) {
       return next();
     }

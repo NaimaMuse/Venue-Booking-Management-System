@@ -41,7 +41,11 @@ export const emptyReports = {
     cancelled: 0,
     rejected: 0,
   },
-  revenue: { total: 0, byHotel: [], byMonth: [] },
+  revenue: {
+    total: 0,
+    byHotel: [],
+    byMonth: [],
+  },
   users: { customers: 0, hotelOwners: 0 },
   timeline: [],
   topHalls: [],
@@ -124,7 +128,7 @@ export const exportReportsCsv = (reports, filter, filenamePrefix) => {
     ['Bookings', 'Pending', reports.bookings.pending],
     ['Bookings', 'Accepted', reports.bookings.accepted],
     ['Bookings', 'Rejected', reports.bookings.rejected],
-    ['Revenue', 'Total Accepted Value', reports.revenue.total],
+    ['Revenue', 'Total Gross Revenue', reports.revenue.total],
     ['Users', 'Customers', reports.users.customers],
     ['Users', 'Hotel Owners', reports.users.hotelOwners],
     [],
@@ -146,7 +150,7 @@ export const exportReportsCsv = (reports, filter, filenamePrefix) => {
       item.revenue || 0,
     ]),
     [],
-    ['Revenue By Hotel', 'Hotel', 'Revenue'],
+    ['Revenue By Hotel', 'Hotel', 'Gross Revenue'],
     ...reports.revenue.byHotel.map((item) => [
       'Revenue',
       item.hotelName,
@@ -201,11 +205,23 @@ export function useAdminReports({
         if (to) params.to = to;
         if (hotelId) params.hotelId = hotelId;
 
-        const { data } = await api.get('/api/admin/reports', { params });
+        const [reportsRes, hotelsRes] = await Promise.all([
+          api.get('/api/admin/reports', { params }),
+          api.get('/api/admin/hotels').catch(() => ({ data: { hotels: [] } })),
+        ]);
+        const data = reportsRes.data;
 
         if (!active) {
           return;
         }
+
+        const fallbackHotelOptions = (hotelsRes.data?.hotels || []).map(
+          (hotel) => ({
+            id: String(hotel._id),
+            hotelName: hotel.hotelName,
+            city: hotel.city || '',
+          })
+        );
 
         setReports({
           ...emptyReports,
@@ -218,7 +234,10 @@ export function useAdminReports({
           timeline: data?.timeline || [],
           topHalls: data?.topHalls || [],
           topHotels: data?.topHotels || [],
-          hotelOptions: data?.hotelOptions || [],
+          hotelOptions:
+            data?.hotelOptions?.length > 0
+              ? data.hotelOptions
+              : fallbackHotelOptions,
         });
       } catch (err) {
         if (!active) {

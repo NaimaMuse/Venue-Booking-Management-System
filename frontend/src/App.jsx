@@ -15,6 +15,7 @@ import Signup from './pages/public website/Signup';
 import CustomerOverview from './pages/customer/CustomerOverview';
 import MyBookings from './pages/customer/MyBookings';
 import MyAppointments from './pages/customer/MyAppointments';
+import CustomerReviews from './pages/customer/CustomerReviews';
 import CustomerProfile from './pages/customer/CustomerProfile';
 import OwnerOverview from './pages/owner/OwnerOverview';
 import HotelProfile from './pages/owner/HotelProfile';
@@ -22,9 +23,11 @@ import ManageHalls from './pages/owner/ManageHalls';
 import HallForm from './pages/owner/HallForm';
 import OwnerBookings from './pages/owner/OwnerBookings';
 import OwnerReports from './pages/owner/OwnerReports';
+import OwnerPlus from './pages/owner/OwnerPlus';
 import AdminOverview from './pages/admin/AdminOverview';
 import AdminHotels from './pages/admin/AdminHotels';
 import AdminVenues from './pages/admin/AdminVenues';
+import AdminPlus from './pages/admin/AdminPlus';
 import AdminReports from './pages/admin/AdminReports';
 import AdminOperationsReports from './pages/admin/AdminOperationsReports';
 import AdminRevenueReports from './pages/admin/AdminRevenueReports';
@@ -85,6 +88,7 @@ function App() {
             <Route path="dashboard" element={<CustomerOverview />} />
             <Route path="my-bookings" element={<MyBookings />} />
             <Route path="my-appointments" element={<MyAppointments />} />
+            <Route path="reviews" element={<CustomerReviews />} />
             <Route path="profile" element={<CustomerProfile />} />
           </Route>
 
@@ -97,6 +101,7 @@ function App() {
             }
           >
             <Route path="dashboard" element={<OwnerOverview />} />
+            <Route path="plus" element={<OwnerPlus />} />
             <Route path="hotel-profile" element={<HotelProfile />} />
             <Route path="halls" element={<ManageHalls />} />
             <Route path="halls/new" element={<HallForm />} />
@@ -116,6 +121,7 @@ function App() {
             <Route path="dashboard" element={<AdminOverview />} />
             <Route path="hotels" element={<AdminHotels />} />
             <Route path="venues" element={<AdminVenues />} />
+            <Route path="plus" element={<AdminPlus />} />
             <Route path="reports" element={<AdminReports />} />
             <Route path="reports/operations" element={<AdminOperationsReports />} />
             <Route path="reports/revenue" element={<AdminRevenueReports />} />

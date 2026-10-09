@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
+import StarRating from '../../components/StarRating';
+import ReviewModal from '../../components/ReviewModal';
 import { API_BASE, formatDate } from '../../utils/auth';
 import api, { getApiError } from '../../utils/api';
 import {
@@ -12,7 +14,7 @@ const filters = [
   { id: 'all', label: 'All' },
   { id: 'pending', label: 'Pending' },
   { id: 'upcoming', label: 'Upcoming' },
-  { id: 'past', label: 'Past' },
+  { id: 'past', label: 'Past & Completed' },
 ];
 
 const statusClass = {
@@ -44,6 +46,17 @@ const resolveImage = (image) => {
     return image;
   }
   return `${API_BASE}${image}`;
+};
+
+const formatTimeDisplay = (timeStr) => {
+  if (!timeStr) return '';
+  const [hStr, mStr] = timeStr.split(':');
+  const h = parseInt(hStr, 10);
+  if (Number.isNaN(h)) return timeStr;
+  const m = mStr || '00';
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const formattedHour = h % 12 === 0 ? 12 : h % 12;
+  return `${formattedHour}:${m} ${ampm}`;
 };
 
 const startOfToday = () => {
@@ -95,11 +108,14 @@ const IconConfirmed = () => (
 function MyBookings() {
   const location = useLocation();
   const [bookings, setBookings] = useState([]);
+  const [reviewsMap, setReviewsMap] = useState({});
   const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [toast, setToast] = useState(location.state?.toast || '');
   const [cancellingId, setCancellingId] = useState('');
+  const [selectedBookingForReview, setSelectedBookingForReview] = useState(null);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
 
   useEffect(() => {
     if (location.state?.toast) {
@@ -121,8 +137,21 @@ function MyBookings() {
       setLoading(true);
       setError('');
 
-      const { data } = await api.get('/api/bookings/my-bookings');
-      setBookings(data.bookings || []);
+      const [bookingsRes, reviewsRes] = await Promise.all([
+        api.get('/api/bookings/my-bookings'),
+        api.get('/api/reviews/my').catch(() => ({ data: { reviews: [] } })),
+      ]);
+
+      const list = bookingsRes.data.bookings || [];
+      setBookings(list);
+
+      const rMap = {};
+      (reviewsRes.data.reviews || []).forEach((r) => {
+        if (r.bookingId?._id || r.bookingId) {
+          rMap[String(r.bookingId?._id || r.bookingId)] = r;
+        }
+      });
+      setReviewsMap(rMap);
     } catch (err) {
       setError(getApiError(err, 'Unable to load bookings'));
     } finally {
@@ -134,12 +163,12 @@ function MyBookings() {
     loadBookings();
   }, []);
 
-  const filtered = useMemo(() => {
-    const today = startOfToday();
+  const today = useMemo(() => startOfToday(), []);
 
+  const filtered = useMemo(() => {
     return bookings.filter((booking) => {
       const eventDate = new Date(booking.eventDate);
-      const isPast = !Number.isNaN(eventDate.getTime()) && eventDate < today;
+      const isPast = !Number.isNaN(eventDate.getTime()) && eventDate <= new Date();
 
       if (filter === 'pending') {
         return booking.status === 'pending';
@@ -160,7 +189,7 @@ function MyBookings() {
         );
       }
 
-      return true;
+      return booking.status !== 'cancelled' && booking.status !== 'rejected';
     });
   }, [bookings, filter]);
 
@@ -214,6 +243,16 @@ function MyBookings() {
     }
   };
 
+  const handleOpenReview = (booking) => {
+    setSelectedBookingForReview(booking);
+    setReviewModalOpen(true);
+  };
+
+  const handleReviewSuccess = () => {
+    setToast('Your hotel rating & review have been submitted successfully!');
+    loadBookings();
+  };
+
   return (
     <div className="customer-page my-bookings-page">
       {toast && <div className="customer-toast">{toast}</div>}
@@ -222,7 +261,7 @@ function MyBookings() {
         <div>
           <p className="customer-eyebrow">HallHub</p>
           <h1>My Bookings</h1>
-          <p>Review requests, visit schedules, and confirmed deposits.</p>
+          <p>Review requests, visit schedules, and rate completed hotel stays.</p>
         </div>
         <Link to="/hotels" className="customer-gold-btn">
           Browse Halls
@@ -322,8 +361,21 @@ function MyBookings() {
                 booking.appointment?.locationNotes);
             const isConfirmed = booking.status === 'confirmed';
             const isPending = booking.status === 'pending';
+
+            const eventDateObj = new Date(booking.eventDate);
+            const isPastEvent =
+              !Number.isNaN(eventDateObj.getTime()) &&
+              eventDateObj <= new Date();
+
+            // Review eligibility: Confirmed stay and event has passed (service provided)
+            const isEligibleForReview = isConfirmed && isPastEvent;
+            const review = reviewsMap[String(booking._id)];
+
             const hasSecondary =
-              Boolean(booking.specialNotes) || hasVisit || isConfirmed;
+              Boolean(booking.specialNotes) ||
+              hasVisit ||
+              isConfirmed ||
+              Boolean(review);
 
             return (
               <article
@@ -361,8 +413,11 @@ function MyBookings() {
 
                     <dl className="mb-card-facts">
                       <div>
-                        <dt>Event date</dt>
-                        <dd>{formatDate(booking.eventDate)}</dd>
+                        <dt>Event date &amp; time</dt>
+                        <dd>
+                          {formatDate(booking.eventDate)}
+                          {booking.eventTime ? ` · ${formatTimeDisplay(booking.eventTime)}` : ''}
+                        </dd>
                       </div>
                       <div>
                         <dt>Guests</dt>
@@ -417,49 +472,79 @@ function MyBookings() {
                             </p>
                           </div>
                         )}
+
+                        {review && (
+                          <div className="mb-detail mb-detail-review">
+                            <p className="mb-detail-label">Your Rating &amp; Review</p>
+                            <div className="mb-review-snippet-row">
+                              <StarRating rating={review.rating} size="sm" />
+                              {review.comment && <span>“{review.comment}”</span>}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
 
-                    {(isPending || isConfirmed) && (
-                      <div className="mb-card-actions">
-                        {isConfirmed && (
-                          <>
-                            <button
-                              type="button"
-                              className="mb-btn mb-btn-primary"
-                              onClick={() => handleDownloadInvoice(booking)}
-                            >
-                              Download Invoice
-                            </button>
-                            <button
-                              type="button"
-                              className="mb-btn mb-btn-secondary"
-                              onClick={() => handlePrintInvoice(booking)}
-                            >
-                              Print
-                            </button>
-                          </>
-                        )}
-                        {isPending && (
+                    <div className="mb-card-actions">
+                      {isConfirmed && (
+                        <>
                           <button
                             type="button"
-                            className="mb-btn mb-btn-danger"
-                            disabled={cancellingId === booking._id}
-                            onClick={() => handleCancel(booking._id)}
+                            className="mb-btn mb-btn-primary"
+                            onClick={() => handleDownloadInvoice(booking)}
                           >
-                            {cancellingId === booking._id
-                              ? 'Cancelling...'
-                              : 'Cancel Request'}
+                            Download Invoice
                           </button>
-                        )}
-                      </div>
-                    )}
+                          <button
+                            type="button"
+                            className="mb-btn mb-btn-secondary"
+                            onClick={() => handlePrintInvoice(booking)}
+                          >
+                            Print
+                          </button>
+                        </>
+                      )}
+
+                      {/* Review eligibility button (Requirement 3 & 4) */}
+                      {isEligibleForReview && (
+                        <button
+                          type="button"
+                          className="mb-btn mb-btn-gold"
+                          onClick={() => handleOpenReview(booking)}
+                        >
+                          ⭐ {review ? 'Edit Review (★ ' + review.rating + ')' : 'Rate Hotel & Leave Review'}
+                        </button>
+                      )}
+
+                      {isPending && (
+                        <button
+                          type="button"
+                          className="mb-btn mb-btn-danger"
+                          disabled={cancellingId === booking._id}
+                          onClick={() => handleCancel(booking._id)}
+                        >
+                          {cancellingId === booking._id
+                            ? 'Cancelling...'
+                            : 'Cancel Request'}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </article>
             );
           })}
         </div>
+      )}
+
+      {reviewModalOpen && selectedBookingForReview && (
+        <ReviewModal
+          booking={selectedBookingForReview}
+          initialReview={reviewsMap[String(selectedBookingForReview._id)] || null}
+          isOpen={reviewModalOpen}
+          onClose={() => setReviewModalOpen(false)}
+          onSuccess={handleReviewSuccess}
+        />
       )}
     </div>
   );

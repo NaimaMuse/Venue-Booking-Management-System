@@ -110,10 +110,9 @@ const getOwnerHotelReport = async (req, res) => {
       }
 
       const deposit = Number(booking.depositAmount) || 0;
-      if (
-        (status === 'confirmed' || status === 'accepted') &&
-        deposit > 0
-      ) {
+      const isEarning = (status === 'confirmed' || status === 'accepted') && deposit > 0;
+
+      if (isEarning) {
         depositRevenue += deposit;
       }
 
@@ -127,23 +126,22 @@ const getOwnerHotelReport = async (req, res) => {
         if (status === 'confirmed') {
           hallStatsMap[hallId].confirmed += 1;
         }
-        if (
-          (status === 'confirmed' || status === 'accepted') &&
-          deposit > 0
-        ) {
+        if (isEarning) {
           hallStatsMap[hallId].revenue += deposit;
         }
       }
 
       const key = monthKey(booking.eventDate || booking.createdAt);
       if (!timelineMap[key]) {
-        timelineMap[key] = { key, label: monthLabel(key), bookings: 0, revenue: 0 };
+        timelineMap[key] = {
+          key,
+          label: monthLabel(key),
+          bookings: 0,
+          revenue: 0,
+        };
       }
       timelineMap[key].bookings += 1;
-      if (
-        (status === 'confirmed' || status === 'accepted') &&
-        deposit > 0
-      ) {
+      if (isEarning) {
         timelineMap[key].revenue += deposit;
       }
     });
@@ -163,16 +161,21 @@ const getOwnerHotelReport = async (req, res) => {
     const conversionRate =
       totalBookings > 0 ? Math.round((won / totalBookings) * 100) : 0;
 
-    const recent = bookings.slice(0, 8).map((booking) => ({
-      id: booking._id,
-      customerName: booking.customerId?.fullName || 'Customer',
-      hallName: booking.hallId?.hallName || 'Hall',
-      eventDate: booking.eventDate,
-      status: booking.status,
-      guestCount: booking.guestCount,
-      depositAmount: booking.depositAmount || 0,
-      createdAt: booking.createdAt,
-    }));
+    const recent = bookings.slice(0, 8).map((booking) => {
+      const deposit = booking.depositAmount || 0;
+
+      return {
+        id: booking._id,
+        customerName: booking.customerId?.fullName || 'Customer',
+        hallName: booking.hallId?.hallName || 'Hall',
+        eventDate: booking.eventDate,
+        status: booking.status,
+        guestCount: booking.guestCount,
+        depositAmount: deposit,
+        bookingAmount: booking.bookingAmount || deposit,
+        createdAt: booking.createdAt,
+      };
+    });
 
     return res.status(200).json({
       hotel: {
